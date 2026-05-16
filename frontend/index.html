@@ -415,27 +415,24 @@ window.onYouTubeIframeAPIReady = function(){
   ytAPIReady = true;
 };
 
-function createPlayer(videoId, startSecond){
-  if(ytPlayer && ytPlayer.destroy){
-    try { ytPlayer.destroy(); } catch(e){}
-    ytPlayer = null;
-  }
-
-  // Recreate iframe (destroy removes it from DOM)
-  const hero = document.getElementById('playerHero');
+function createPlayer(videoId, startSecond, remainingSeconds){
+  // Don't destroy — just update src
   let iframe = document.getElementById('ytPlayer');
   if(!iframe){
     iframe = document.createElement('iframe');
     iframe.id = 'ytPlayer';
     iframe.allow = 'autoplay; encrypted-media';
     iframe.allowFullscreen = true;
+    const hero = document.getElementById('playerHero');
     hero.insertBefore(iframe, hero.firstChild);
   }
 
   iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&disablekb=1&playsinline=1&cc_load_policy=0&enablejsapi=1&start=${startSecond}`;
 
+  // Bind YT API for mute control
+  ytPlayer = null;
   const tryBind = setInterval(()=>{
-    if(!ytAPIReady || !document.getElementById('ytPlayer')) return;
+    if(!ytAPIReady) return;
     clearInterval(tryBind);
     try {
       ytPlayer = new YT.Player('ytPlayer', {
@@ -444,17 +441,25 @@ function createPlayer(videoId, startSecond){
             e.target.mute();
             e.target.playVideo();
             isMuted = true;
-            document.getElementById('muteIndicator').classList.remove('hidden');
-            document.getElementById('muteIndicator').textContent = '🔇 Click to unmute';
-            document.querySelector('.btn-watch').textContent = '▶ Play';
-          },
-          'onStateChange': e => {
-            if(e.data === YT.PlayerState.ENDED) loadLive();
+            const mi = document.getElementById('muteIndicator');
+            if(mi){ mi.classList.remove('hidden'); mi.textContent = '🔇 Click to unmute'; }
+            const bw = document.querySelector('.btn-watch');
+            if(bw) bw.textContent = '▶ Play';
           }
         }
       });
     } catch(e){ console.warn('YT bind failed', e); }
   }, 300);
+
+  // Auto-advance timer — reload live data when this video should end
+  if(advanceTimer) clearTimeout(advanceTimer);
+  if(remainingSeconds > 0 && remainingSeconds < 86400){
+    console.log(`Next video in ${remainingSeconds} seconds`);
+    advanceTimer = setTimeout(()=>{
+      console.log('Advancing to next video...');
+      loadLive();
+    }, (remainingSeconds + 2) * 1000); // +2 buffer
+  }
 }
 
 function toggleMute(){
@@ -707,13 +712,9 @@ async function loadLive(){
     `;
 
     // Create player from exact second
-    createPlayer(video.youtube_id, start_second);
+    createPlayer(video.youtube_id, start_second, remaining_seconds);
 
-    // Auto-advance timer
-    if(advanceTimer) clearTimeout(advanceTimer);
-    if(remaining_seconds > 0 && remaining_seconds < 86400){
-      advanceTimer = setTimeout(()=>loadLive(), remaining_seconds * 1000);
-    }
+    // Remove old advance timer — createPlayer handles it now
 
   } catch(err){
     console.error('Live load error:', err);
