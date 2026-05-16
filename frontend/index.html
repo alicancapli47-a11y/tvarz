@@ -47,7 +47,12 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:54px;display:flex;ali
 .player-hero{position:relative;width:100%;background:#000;overflow:hidden}
 .player-hero::before{content:'';display:block;padding-top:52%}
 .player-hero iframe{position:absolute;top:-80px;left:-2px;width:calc(100% + 4px);height:calc(100% + 160px);border:none;pointer-events:none}
+.player-click-zone{position:absolute;inset:0;cursor:pointer;z-index:5}
 .hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(8,8,9,0.05) 30%,rgba(8,8,9,0.8) 75%,rgba(8,8,9,1) 100%);pointer-events:none}
+.mute-indicator{position:absolute;top:1rem;right:1rem;z-index:10;display:flex;align-items:center;gap:6px;background:rgba(8,8,9,0.7);border:0.5px solid var(--border2);padding:5px 12px;font-family:var(--fm);font-size:10px;letter-spacing:0.1em;color:var(--text2);pointer-events:none;transition:opacity 0.3s}
+.mute-indicator.hidden{opacity:0}
+.fullscreen-btn{position:absolute;bottom:1rem;right:1rem;z-index:10;background:rgba(8,8,9,0.7);border:0.5px solid var(--border2);color:var(--text);width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:all 0.15s}
+.fullscreen-btn:hover{background:rgba(8,8,9,0.9);border-color:var(--border2)}
 .hero-content{position:absolute;bottom:0;left:0;right:0;padding:1.5rem 2.5rem}
 .now-label{font-family:var(--fm);font-size:9px;letter-spacing:0.2em;color:var(--red);text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:8px}
 .now-label::before{content:'';width:16px;height:1px;background:var(--red)}
@@ -221,15 +226,18 @@ footer{border-top:0.5px solid var(--border);padding:2rem 2.5rem;display:flex;ali
 
 <!-- HOME -->
 <div class="page active" id="page-home">
-  <div class="player-hero">
-    <iframe id="ytPlayer" src="https://www.youtube.com/embed/6y7k_mbiEw0?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&disablekb=1&playsinline=1&cc_load_policy=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+  <div class="player-hero" id="playerHero">
+    <iframe id="ytPlayer" src="https://www.youtube.com/embed/6y7k_mbiEw0?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&disablekb=1&playsinline=1&cc_load_policy=0&enablejsapi=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    <div class="player-click-zone" onclick="toggleMute()" title="Click to unmute"></div>
     <div class="hero-overlay"></div>
+    <div class="mute-indicator" id="muteIndicator">🔇 Click to unmute</div>
+    <button class="fullscreen-btn" onclick="goFullscreen()" title="Fullscreen">⛶</button>
     <div class="hero-content">
       <div class="now-label">Now Playing</div>
       <div class="hero-title" id="heroTitle">Loading...</div>
       <div class="hero-tags" id="heroTags"><span class="tag red">AI Film</span><span class="tag">Large Scale Studios</span></div>
       <div class="hero-actions">
-        <button class="btn-watch" onclick="watchNow()">▶ Watch with Sound</button>
+        <button class="btn-watch" onclick="toggleMute()">▶ Play</button>
         <button class="btn-ghost" onclick="showPage('archive')">Browse Archive</button>
       </div>
     </div>
@@ -428,8 +436,53 @@ function updateViewers(){ document.getElementById('viewerCount').textContent=(12
 setInterval(updateViewers,7000);
 
 // ── PLAYER ──
-function watchNow(){
-  window.open('https://www.youtube.com/watch?v='+currentVideoId,'_blank');
+let isMuted = true;
+let ytPlayer = null;
+
+function initYTAPI(){
+  const tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(tag);
+}
+
+window.onYouTubeIframeAPIReady = function(){
+  ytPlayer = new YT.Player('ytPlayer', {
+    events:{
+      'onReady': function(e){
+        e.target.mute();
+        e.target.playVideo();
+      }
+    }
+  });
+};
+
+function toggleMute(){
+  if(!ytPlayer) return;
+  if(isMuted){
+    ytPlayer.unMute();
+    ytPlayer.setVolume(100);
+    isMuted = false;
+    document.getElementById('muteIndicator').classList.add('hidden');
+    document.querySelector('.btn-watch').textContent = '🔊 Mute';
+  } else {
+    ytPlayer.mute();
+    isMuted = true;
+    document.getElementById('muteIndicator').classList.remove('hidden');
+    document.getElementById('muteIndicator').textContent = '🔇 Click to unmute';
+    document.querySelector('.btn-watch').textContent = '▶ Play';
+  }
+}
+
+function goFullscreen(){
+  const hero = document.getElementById('playerHero');
+  if(document.fullscreenElement){
+    document.exitFullscreen();
+  } else {
+    hero.requestFullscreen().catch(()=>{
+      // Fallback — open YouTube
+      window.open('https://www.youtube.com/watch?v='+currentVideoId,'_blank');
+    });
+  }
 }
 
 function switchChannel(el, videoId, title){
@@ -441,7 +494,17 @@ function switchChannel(el, videoId, title){
   const dot=document.createElement('div'); dot.className='ch-live'; el.appendChild(dot);
   currentVideoId = videoId;
   if(title) currentVideoTitle = title;
-  document.getElementById('ytPlayer').src=`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&disablekb=1&playsinline=1&cc_load_policy=0`;
+  isMuted = true;
+  document.getElementById('muteIndicator').classList.remove('hidden');
+  document.getElementById('muteIndicator').textContent = '🔇 Click to unmute';
+  document.querySelector('.btn-watch').textContent = '▶ Play';
+  // Reload iframe with new video
+  const f = document.getElementById('ytPlayer');
+  f.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&disablekb=1&playsinline=1&cc_load_policy=0&enablejsapi=1`;
+  // Reinit YT API after src change
+  setTimeout(()=>{
+    ytPlayer = new YT.Player('ytPlayer',{events:{'onReady':function(e){e.target.mute();e.target.playVideo();}}});
+  }, 500);
 }
 
 // Init channel tile click handlers
@@ -650,7 +713,7 @@ async function loadVideos(){
       document.getElementById('heroTitle').textContent=first.title;
       const catLabel={film:'AI Film',doc:'Documentary',series:'Series',short:'Short'}[first.category]||'AI Film';
       document.getElementById('heroTags').innerHTML=`<span class="tag red">${catLabel}</span><span class="tag">Large Scale Studios</span>`;
-      document.getElementById('ytPlayer').src=`https://www.youtube.com/embed/${first.youtube_id}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&disablekb=1&playsinline=1&cc_load_policy=0`;
+      document.getElementById('ytPlayer').src=`https://www.youtube.com/embed/${first.youtube_id}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&disablekb=1&playsinline=1&cc_load_policy=0&enablejsapi=1`;
     }
     buildArchiveGrid();
   }catch(err){
@@ -660,6 +723,7 @@ async function loadVideos(){
 }
 
 // ── INIT ──
+initYTAPI();
 loadGoogleScript();
 restoreSession();
 buildDayTabs();
