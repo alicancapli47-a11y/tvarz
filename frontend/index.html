@@ -724,7 +724,39 @@ async function buildArchive(){
   }
 }
 
-function buildArchiveStatic(){
+function buildArchiveFromData(videos){
+  const grid = document.getElementById('archiveGrid');
+  const banner = document.getElementById('archivePremiumBanner');
+  if(!isPremium) banner.style.display='flex'; else banner.style.display='none';
+
+  const filtered = currentFilter==='all' ? videos : videos.filter(v=>v.category===currentFilter);
+  grid.innerHTML = '';
+
+  filtered.forEach(item=>{
+    const locked = item.is_premium && !isPremium;
+    const initials = item.title.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+    const catLabel = {film:'AI Film',doc:'Documentary',series:'Series',short:'Short'}[item.category] || item.category;
+    const card = document.createElement('div');
+    card.className = 'film-card';
+    card.innerHTML = `
+      <div class="film-thumb">
+        <div class="film-thumb-inner">${initials}</div>
+        <div class="film-thumb-gradient"></div>
+        <div class="watermark">TVARZ</div>
+        ${locked
+          ? `<div class="film-premium-badge">Premium</div><div class="lock-overlay"><div class="lock-icon">🔒</div><div class="lock-text">Unlock with Premium</div></div>`
+          : `<div class="film-free-badge">Free</div>`}
+      </div>
+      <div class="film-info">
+        <div class="film-cat">${catLabel}</div>
+        <div class="film-name">${item.title}</div>
+        <div class="film-meta2">${item.duration||''}</div>
+      </div>
+    `;
+    card.onclick = () => locked ? showPage('pricing') : playVideo(item);
+    grid.appendChild(card);
+  });
+}
   const grid=document.getElementById('archiveGrid');
   const items=currentFilter==='all'?archive:archive.filter(a=>a.cat===currentFilter);
   grid.innerHTML='';
@@ -782,17 +814,8 @@ function loadPlayer(videoId, title, category){
 }
 
 function openFullscreen(){
-  const modal = document.getElementById('fsModal');
-  const fsPlayer = document.getElementById('fsPlayer');
-  document.getElementById('fsTitle').textContent = currentVideoTitle;
-  // Set src with autoplay + unmuted — works because it's triggered by user click
-  fsPlayer.setAttribute('allow', 'autoplay; encrypted-media; fullscreen; picture-in-picture');
-  fsPlayer.src = '';
-  setTimeout(()=>{
-    fsPlayer.src = `https://www.youtube.com/embed/${currentVideoId}?autoplay=1&mute=0&controls=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playsinline=1&fs=1&enablejsapi=1`;
-  }, 50);
-  modal.classList.add('open');
-  document.body.style.overflow = 'hidden';
+  // Open directly on YouTube — guaranteed sound + quality controls
+  window.open(`https://www.youtube.com/watch?v=${currentVideoId}`, '_blank');
 }
 
 function closeFullscreen(){
@@ -957,17 +980,6 @@ function toggleFaq(el){
 loadGoogleScript();
 restoreSession();
 buildSchedule(0);
-buildArchive();
-
-// Load first real video into player
-fetch(`${API}/program/archive`)
-  .then(r=>r.json())
-  .then(data=>{
-    if(data.success && data.data.videos.length > 0){
-      const first = data.data.videos.find(v=>v.youtube_id && v.youtube_id !== 'dQw4w9WgXcQ');
-      if(first) loadPlayer(first.youtube_id, first.title, first.category);
-    }
-  }).catch(()=>{});
 
 const n=new Date();
 const opts={weekday:'long',month:'long',day:'numeric'};
@@ -985,9 +997,27 @@ document.getElementById('authModal').addEventListener('click',function(e){
   if(e.target===this) closeModal();
 });
 
+// Load archive + update everything from API
+fetch(`${API}/program/archive`)
+  .then(r=>r.json())
+  .then(data=>{
+    if(!data.success) return;
+    const videos = data.data.videos;
+
+    // Update stats
+    const total = videos.length;
+    document.querySelectorAll('.stat-v')[1].textContent = total;
+
+    // Load first real video
+    const first = videos.find(v=>v.youtube_id && v.youtube_id !== 'dQw4w9WgXcQ');
+    if(first) loadPlayer(first.youtube_id, first.title, first.category);
+
+    // Build archive with real data
+    buildArchiveFromData(videos);
+  }).catch(()=>{ buildArchive(); });
+
 // Check for premium success redirect
 if(window.location.search.includes('premium=success')){
-  // Re-fetch user to update premium status
   const token=localStorage.getItem('tvarz_token');
   if(token){
     fetch(`${API}/auth/me`,{headers:{Authorization:`Bearer ${token}`}})
@@ -999,7 +1029,6 @@ if(window.location.search.includes('premium=success')){
           currentUser=data.data.user;
           isPremium=data.data.user.is_premium;
           renderAuthArea();
-          buildArchive();
         }
       });
   }
