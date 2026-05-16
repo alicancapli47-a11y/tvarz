@@ -356,7 +356,7 @@ footer{border-top:0.5px solid var(--border);padding:2rem 2.5rem;display:flex;ali
 </div>
 
 <script>
-const API = 'https://tvarz-production.up.railway.app';
+const API = 'https://api.tvarz.com';
 const GOOGLE_CLIENT_ID = '548804749992-1vlr2bbl71u6u4kpgrh95bbk3rti0bta.apps.googleusercontent.com';
 
 let currentUser = null;
@@ -401,6 +401,21 @@ async function loadStream(){
     // Timer — advance at exact end time
     if(advanceTimer) clearTimeout(advanceTimer);
     advanceTimer = setTimeout(loadStream, (remaining_seconds + 1) * 1000);
+
+    // Poll every 30s to catch any drift
+    if(window._pollTimer) clearInterval(window._pollTimer);
+    window._pollTimer = setInterval(async()=>{
+      try {
+        const r = await fetch(`${API}/program/live`);
+        const pd = await r.json();
+        if(!pd.success) return;
+        // If video changed — reload immediately
+        if(pd.data.video.youtube_id !== currentVideoId){
+          clearInterval(window._pollTimer);
+          loadStream();
+        }
+      } catch(e){}
+    }, 15000);
 
   } catch(e){
     console.error('Stream error:', e);
