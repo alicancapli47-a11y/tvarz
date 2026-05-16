@@ -433,7 +433,7 @@ function buildIframe(videoId, startSecond, remainingSeconds){
   iframe.style.cssText = 'position:absolute;top:-90px;left:-2px;width:calc(100% + 4px);height:calc(100% + 180px);border:none;pointer-events:none';
   iframe.allow = 'autoplay; encrypted-media';
   iframe.allowFullscreen = true;
-  iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playsinline=1&enablejsapi=1&start=${startSecond}`;
+  iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playsinline=1&enablejsapi=1`;
 
   container.appendChild(iframe);
   muted = true;
@@ -473,12 +473,21 @@ function buildIframe(videoId, startSecond, remainingSeconds){
         events:{
           onReady(e){
             e.target.mute();
+            e.target.seekTo(startSecond, true);
             e.target.playVideo();
+            // Verify seek after 1 second
+            setTimeout(()=>{
+              try {
+                const current = e.target.getCurrentTime();
+                if(current < startSecond - 5){
+                  e.target.seekTo(startSecond, true);
+                  e.target.playVideo();
+                }
+              } catch(err){}
+            }, 1000);
           },
           onStateChange(e){
-            // -1 = unstarted, 0 = ended, 1 = playing, 2 = paused, 3 = buffering
             if(e.data === 0){
-              // Video ended — immediately load next
               clearTimeout(advanceTimer);
               clearInterval(window._pollTimer);
               loadStream();
