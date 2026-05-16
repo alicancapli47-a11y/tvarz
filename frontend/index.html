@@ -396,7 +396,7 @@ async function loadStream(){
     document.getElementById('upNext').textContent = next_video ? next_video.title : '—';
 
     // Build iframe with start second
-    buildIframe(video.youtube_id, start_second);
+    buildIframe(video.youtube_id, start_second, remaining_seconds);
 
     // Timer — advance at exact end time
     if(advanceTimer) clearTimeout(advanceTimer);
@@ -424,8 +424,7 @@ async function loadStream(){
   }
 }
 
-function buildIframe(videoId, startSecond){
-  // Create fresh iframe — this is the only reliable way to seek
+function buildIframe(videoId, startSecond, remainingSeconds){
   const container = document.getElementById('iframeContainer');
   container.innerHTML = '';
 
@@ -439,8 +438,32 @@ function buildIframe(videoId, startSecond){
   container.appendChild(iframe);
   muted = true;
   document.getElementById('muteHint').classList.remove('gone');
+  document.getElementById('muteHint').textContent = '🔇 Tap to unmute';
 
-  // Bind YT Player API for unmute
+  // Clear old timers
+  if(advanceTimer) clearTimeout(advanceTimer);
+  if(window._pollTimer) clearInterval(window._pollTimer);
+
+  // Primary timer — fires exactly when video should end
+  advanceTimer = setTimeout(()=>{
+    loadStream();
+  }, remainingSeconds * 1000);
+
+  // Secondary — poll every 10s to detect video end early
+  window._pollTimer = setInterval(async()=>{
+    try {
+      const r = await fetch(`${API}/program/live`);
+      const pd = await r.json();
+      if(!pd.success) return;
+      if(pd.data.video.youtube_id !== currentVideoId){
+        clearInterval(window._pollTimer);
+        clearTimeout(advanceTimer);
+        loadStream();
+      }
+    } catch(e){}
+  }, 10000);
+
+  // YT API bind for unmute + state detection
   ytPlayer = null;
   const wait = setInterval(()=>{
     if(!ytReady) return;
@@ -448,8 +471,19 @@ function buildIframe(videoId, startSecond){
     try {
       ytPlayer = new YT.Player('ytIframe', {
         events:{
-          onReady(e){ e.target.mute(); e.target.playVideo(); },
-          onStateChange(e){ if(e.data === YT.PlayerState.ENDED) loadStream(); }
+          onReady(e){
+            e.target.mute();
+            e.target.playVideo();
+          },
+          onStateChange(e){
+            // -1 = unstarted, 0 = ended, 1 = playing, 2 = paused, 3 = buffering
+            if(e.data === 0){
+              // Video ended — immediately load next
+              clearTimeout(advanceTimer);
+              clearInterval(window._pollTimer);
+              loadStream();
+            }
+          }
         }
       });
     } catch(err){}
