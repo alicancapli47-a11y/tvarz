@@ -469,6 +469,7 @@ footer{border-top:0.5px solid var(--border);padding:2rem 2.5rem;display:flex;ali
       </svg>
       Continue with Google
     </button>
+    <div id="googleBtnContainer" style="margin-top:10px;display:flex;justify-content:center"></div>
     <div class="modal-divider">or</div>
     <div style="font-size:12px;color:var(--text3);text-align:center">More sign-in options coming soon</div>
     <div class="modal-note">By signing in you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</div>
@@ -642,16 +643,69 @@ function setDay(offset,btn){
   buildSchedule(offset);
 }
 
-// ── ARCHIVE ──
-function buildArchive(){
+// ── ARCHIVE — Real API ──
+async function buildArchive(){
   const grid=document.getElementById('archiveGrid');
-  const items=currentFilter==='all'?archive:archive.filter(a=>a.cat===currentFilter);
-  grid.innerHTML='';
+  grid.innerHTML='<div style="color:var(--text3);font-family:var(--font-mono);font-size:12px;padding:2rem">Loading...</div>';
 
-  // show banner if not premium
   const banner=document.getElementById('archivePremiumBanner');
   if(!isPremium) banner.style.display='flex'; else banner.style.display='none';
 
+  try {
+    const token = localStorage.getItem('tvarz_token');
+    const catParam = currentFilter === 'all' ? '' : `?category=${currentFilter}`;
+    const res = await fetch(`${API}/program/archive${catParam}`, {
+      headers: token ? {Authorization:`Bearer ${token}`} : {}
+    });
+    const data = await res.json();
+    if(!data.success) throw new Error(data.message);
+
+    const videos = data.data.videos;
+    grid.innerHTML = '';
+
+    videos.forEach(item=>{
+      const locked = item.is_premium && !isPremium;
+      const initials = item.title.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+      const catLabel = {film:'AI Film',doc:'Documentary',series:'Series',short:'Short'}[item.category] || item.category;
+      const card = document.createElement('div');
+      card.className = 'film-card';
+      card.innerHTML = `
+        <div class="film-thumb">
+          <div class="film-thumb-inner">${initials}</div>
+          <div class="film-thumb-gradient"></div>
+          <div class="watermark">TVARZ</div>
+          ${locked?`
+            <div class="film-premium-badge">Premium</div>
+            <div class="lock-overlay">
+              <div class="lock-icon">🔒</div>
+              <div class="lock-text">Unlock with Premium</div>
+            </div>
+          `:`<div class="film-free-badge">Free</div>`}
+        </div>
+        <div class="film-info">
+          <div class="film-cat">${catLabel}</div>
+          <div class="film-name">${item.title}</div>
+          <div class="film-meta2">${item.duration || ''}</div>
+        </div>
+      `;
+      card.onclick = () => locked ? showPage('pricing') : playVideo(item);
+      grid.appendChild(card);
+    });
+
+    if(videos.length === 0){
+      grid.innerHTML = '<div style="color:var(--text3);font-family:var(--font-mono);font-size:12px;padding:2rem">No content found.</div>';
+    }
+  } catch(err){
+    console.error('Archive error:', err);
+    // Fallback to static data
+    buildArchiveStatic();
+  }
+}
+
+function buildArchiveStatic(){
+  const grid=document.getElementById('archiveGrid');
+  const items=currentFilter==='all'?archive:archive.filter(a=>a.cat===currentFilter);
+  grid.innerHTML='';
   items.forEach(item=>{
     const locked=item.premium&&!isPremium;
     const initials=item.title.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
@@ -662,13 +716,7 @@ function buildArchive(){
         <div class="film-thumb-inner">${initials}</div>
         <div class="film-thumb-gradient"></div>
         <div class="watermark">TVARZ</div>
-        ${locked?`
-          <div class="film-premium-badge">Premium</div>
-          <div class="lock-overlay">
-            <div class="lock-icon">🔒</div>
-            <div class="lock-text">Unlock with Premium</div>
-          </div>
-        `:`<div class="film-free-badge">Free</div>`}
+        ${locked?`<div class="film-premium-badge">Premium</div><div class="lock-overlay"><div class="lock-icon">🔒</div><div class="lock-text">Unlock with Premium</div></div>`:`<div class="film-free-badge">Free</div>`}
       </div>
       <div class="film-info">
         <div class="film-cat">${item.catLabel}</div>
@@ -681,22 +729,83 @@ function buildArchive(){
   });
 }
 
-function filterArchive(cat,btn){
-  currentFilter=cat;
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  buildArchive();
+function playVideo(item){
+  if(item.youtube_id){
+    const f=document.getElementById('ytPlayer');
+    f.src=`https://www.youtube.com/embed/${item.youtube_id}?autoplay=1&mute=0&controls=1&modestbranding=1&rel=0`;
+    document.getElementById('heroTitle').textContent=item.title;
+    showPage('home');
+  } else {
+    showPage('home');
+  }
 }
+
+// ── CONFIG ──
+const API = 'https://tvarz-production.up.railway.app';
+const GOOGLE_CLIENT_ID = '548804749992-1vlr2bbl71u6u4kpgrh95bbk3rti0bta.apps.googleusercontent.com';
 
 // ── AUTH ──
 function openModal(){document.getElementById('authModal').classList.add('open')}
 function closeModal(){document.getElementById('authModal').classList.remove('open')}
 
+// Load Google Identity Services
+function loadGoogleScript(){
+  const s=document.createElement('script');
+  s.src='https://accounts.google.com/gsi/client';
+  s.async=true;
+  s.defer=true;
+  s.onload=initGoogle;
+  document.head.appendChild(s);
+}
+
+function initGoogle(){
+  google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback: handleGoogleResponse,
+    auto_select: false
+  });
+}
+
 function googleSignIn(){
-  // Simulate Google OAuth
-  currentUser={name:'Ali',email:'ali@tvarz.com',avatar:'A'};
-  closeModal();
-  renderAuthArea();
+  if(typeof google === 'undefined'){
+    alert('Google sign-in loading, please try again.');
+    return;
+  }
+  google.accounts.id.prompt((notification)=>{
+    if(notification.isNotDisplayed()||notification.isSkippedMoment()){
+      // Fallback — render button
+      google.accounts.id.renderButton(
+        document.getElementById('googleBtnContainer'),
+        {theme:'filled_black',size:'large',width:320}
+      );
+    }
+  });
+}
+
+async function handleGoogleResponse(response){
+  try {
+    const res = await fetch(`${API}/auth/google`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({token: response.credential})
+    });
+    const data = await res.json();
+    if(!data.success) throw new Error(data.message);
+
+    // Save to localStorage
+    localStorage.setItem('tvarz_token', data.data.token);
+    localStorage.setItem('tvarz_user', JSON.stringify(data.data.user));
+
+    currentUser = data.data.user;
+    isPremium = data.data.user.is_premium;
+
+    closeModal();
+    renderAuthArea();
+    buildArchive();
+  } catch(err){
+    console.error('Auth error:', err);
+    alert('Sign in failed. Please try again.');
+  }
 }
 
 function renderAuthArea(){
@@ -705,26 +814,76 @@ function renderAuthArea(){
     area.innerHTML=`<button class="btn-login" onclick="openModal()">Sign in</button>`;
     return;
   }
+  const initial = currentUser.name ? currentUser.name[0].toUpperCase() : '?';
   if(isPremium){
     area.innerHTML=`
       <div class="user-status">
         <div class="premium-badge-nav">Premium</div>
-        <div class="avatar" title="${currentUser.email}">${currentUser.avatar}</div>
+        <div class="avatar" title="${currentUser.email}" onclick="signOut()" style="cursor:pointer">${initial}</div>
       </div>`;
   } else {
     area.innerHTML=`
       <div class="user-status">
         <button class="btn-premium-nav" onclick="showPage('pricing')">Get Premium</button>
-        <div class="avatar" title="${currentUser.email}">${currentUser.avatar}</div>
+        <div class="avatar" title="${currentUser.email}" onclick="signOut()" style="cursor:pointer">${initial}</div>
       </div>`;
   }
 }
 
+function signOut(){
+  if(!confirm('Sign out?')) return;
+  localStorage.removeItem('tvarz_token');
+  localStorage.removeItem('tvarz_user');
+  currentUser = null;
+  isPremium = false;
+  renderAuthArea();
+  buildArchive();
+}
+
+function restoreSession(){
+  const token = localStorage.getItem('tvarz_token');
+  const user = localStorage.getItem('tvarz_user');
+  if(token && user){
+    currentUser = JSON.parse(user);
+    isPremium = currentUser.is_premium;
+    renderAuthArea();
+    // Refresh token in background
+    fetch(`${API}/auth/me`, {headers:{Authorization:`Bearer ${token}`}})
+      .then(r=>r.json())
+      .then(data=>{
+        if(data.success){
+          localStorage.setItem('tvarz_token', data.data.token);
+          localStorage.setItem('tvarz_user', JSON.stringify(data.data.user));
+          currentUser = data.data.user;
+          isPremium = data.data.user.is_premium;
+          renderAuthArea();
+          buildArchive();
+        }
+      }).catch(()=>{});
+  }
+}
+
 // ── PRICING ──
-function startTrial(){
+async function startTrial(){
   if(!currentUser){openModal();return;}
-  // Lemon Squeezy checkout would open here
-  alert('Redirecting to checkout...\n\n(Lemon Squeezy integration goes here)');
+  const token = localStorage.getItem('tvarz_token');
+  try {
+    const res = await fetch(`${API}/user/checkout`, {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':`Bearer ${token}`
+      }
+    });
+    const data = await res.json();
+    if(data.success && data.data.checkout_url){
+      window.open(data.data.checkout_url, '_blank');
+    } else {
+      alert('Could not create checkout. Please try again.');
+    }
+  } catch(err){
+    alert('Error connecting to payment service.');
+  }
 }
 
 // ── FAQ ──
@@ -736,15 +895,15 @@ function toggleFaq(el){
 }
 
 // ── INIT ──
+loadGoogleScript();
+restoreSession();
 buildSchedule(0);
 buildArchive();
 
-// Set today's date in schedule
 const n=new Date();
 const opts={weekday:'long',month:'long',day:'numeric'};
 document.getElementById('schedDate').textContent=n.toLocaleDateString('en-US',opts);
 
-// Day tabs — set real names
 const dayBtns=document.querySelectorAll('.day-tab');
 dayBtns.forEach((btn,i)=>{
   if(i===0){btn.textContent='Today';return;}
@@ -753,10 +912,29 @@ dayBtns.forEach((btn,i)=>{
   btn.textContent=days[d.getDay()];
 });
 
-// Close modal on backdrop click
 document.getElementById('authModal').addEventListener('click',function(e){
   if(e.target===this) closeModal();
 });
+
+// Check for premium success redirect
+if(window.location.search.includes('premium=success')){
+  // Re-fetch user to update premium status
+  const token=localStorage.getItem('tvarz_token');
+  if(token){
+    fetch(`${API}/auth/me`,{headers:{Authorization:`Bearer ${token}`}})
+      .then(r=>r.json())
+      .then(data=>{
+        if(data.success){
+          localStorage.setItem('tvarz_token',data.data.token);
+          localStorage.setItem('tvarz_user',JSON.stringify(data.data.user));
+          currentUser=data.data.user;
+          isPremium=data.data.user.is_premium;
+          renderAuthArea();
+          buildArchive();
+        }
+      });
+  }
+}
 </script>
 </body>
 </html>
