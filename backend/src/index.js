@@ -6,6 +6,7 @@ const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const programRoutes = require('./routes/program');
 const webhookRoutes = require('./routes/webhook');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -35,6 +36,7 @@ app.get('/', (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/user', userRoutes);
 app.use('/program', programRoutes);
+app.use('/admin', adminRoutes);
 
 // 404
 app.use((req, res) => {
