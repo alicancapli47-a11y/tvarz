@@ -62,7 +62,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:54px;display:flex;ali
 .hero-content{position:absolute;bottom:0;left:0;right:0;padding:2rem 2.5rem}
 .now-label{font-family:var(--font-mono);font-size:9px;letter-spacing:0.2em;color:var(--red);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px}
 .now-label::before{content:'';width:16px;height:1px;background:var(--red)}
-.hero-title{font-family:var(--font-display);font-size:clamp(2rem,5vw,4rem);font-weight:700;letter-spacing:0.02em;line-height:0.95;color:var(--text);max-width:700px;text-transform:uppercase}
+.hero-title{font-family:var(--font-display);font-size:clamp(1.4rem,3vw,2.4rem);font-weight:700;letter-spacing:0.02em;line-height:1;color:var(--text);max-width:600px;text-transform:uppercase}
 .hero-tags{display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap}
 .tag{font-family:var(--font-mono);font-size:10px;letter-spacing:0.1em;padding:3px 10px;border:0.5px solid var(--border2);color:var(--text2);text-transform:uppercase}
 .tag.red{border-color:rgba(217,43,58,0.5);color:var(--red)}
@@ -261,23 +261,16 @@ footer{border-top:0.5px solid var(--border);padding:2rem 2.5rem;display:flex;ali
 <div class="page active" id="page-home">
   <div class="player-hero">
     <iframe id="ytPlayer"
-      src="https://www.youtube.com/embed/UwWA3UDIwi4?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&disablekb=1&playsinline=1&cc_load_policy=0&fs=0&color=white"
+      src="https://www.youtube.com/embed/UwWA3UDIwi4?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&disablekb=1&playsinline=1&cc_load_policy=0&fs=0"
       allow="autoplay; encrypted-media" allowfullscreen>
     </iframe>
     <div class="hero-overlay"></div>
     <div class="hero-content">
       <div class="now-label">Now Playing</div>
       <div class="hero-title" id="heroTitle">Giant Creatures Lurking Deep in the Amazon Jungle</div>
-      <div class="hero-tags">
+      <div class="hero-tags" id="heroTags">
         <span class="tag red">AI Film</span>
-        <span class="tag">Thriller</span>
-        <span class="tag">Horror</span>
-        <span class="tag">10:12</span>
         <span class="tag">Large Scale Studios</span>
-      </div>
-      <div class="hero-progress">
-        <div class="progress-track"><div class="progress-fill" id="heroProgress" style="width:0%"></div></div>
-        <div class="progress-times"><span id="heroElapsed">0:00</span><span id="heroRemain">10:12</span></div>
       </div>
       <div class="hero-actions">
         <button class="btn-watch" onclick="openFullscreen()">▶ Watch Now</button>
@@ -493,7 +486,7 @@ footer{border-top:0.5px solid var(--border);padding:2rem 2.5rem;display:flex;ali
     <button class="fs-close" onclick="closeFullscreen()">✕</button>
   </div>
   <div class="fs-iframe-wrap">
-    <iframe id="fsPlayer" src="" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
+    <iframe id="fsPlayer" src="" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen allow="autoplay"></iframe>
   </div>
 </div>
 
@@ -776,9 +769,14 @@ const GOOGLE_CLIENT_ID = '548804749992-1vlr2bbl71u6u4kpgrh95bbk3rti0bta.apps.goo
 let currentVideoId = 'UwWA3UDIwi4';
 let currentVideoTitle = 'Giant Creatures Lurking Deep in the Amazon Jungle';
 
-function loadPlayer(videoId, title){
+function loadPlayer(videoId, title, category){
   currentVideoId = videoId;
-  if(title){ currentVideoTitle = title; document.getElementById('heroTitle').textContent = title; }
+  if(title){
+    currentVideoTitle = title;
+    document.getElementById('heroTitle').textContent = title;
+    const catLabel = {film:'AI Film',doc:'Documentary',series:'Series',short:'Short'}[category] || 'AI Film';
+    document.getElementById('heroTags').innerHTML = `<span class="tag red">${catLabel}</span><span class="tag">Large Scale Studios</span>`;
+  }
   const f = document.getElementById('ytPlayer');
   f.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&disablekb=1&playsinline=1&cc_load_policy=0`;
 }
@@ -787,7 +785,12 @@ function openFullscreen(){
   const modal = document.getElementById('fsModal');
   const fsPlayer = document.getElementById('fsPlayer');
   document.getElementById('fsTitle').textContent = currentVideoTitle;
-  fsPlayer.src = `https://www.youtube.com/embed/${currentVideoId}?autoplay=1&mute=0&controls=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playsinline=1&fs=1`;
+  // Set src with autoplay + unmuted — works because it's triggered by user click
+  fsPlayer.setAttribute('allow', 'autoplay; encrypted-media; fullscreen; picture-in-picture');
+  fsPlayer.src = '';
+  setTimeout(()=>{
+    fsPlayer.src = `https://www.youtube.com/embed/${currentVideoId}?autoplay=1&mute=0&controls=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playsinline=1&fs=1&enablejsapi=1`;
+  }, 50);
   modal.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -962,10 +965,7 @@ fetch(`${API}/program/archive`)
   .then(data=>{
     if(data.success && data.data.videos.length > 0){
       const first = data.data.videos.find(v=>v.youtube_id && v.youtube_id !== 'dQw4w9WgXcQ');
-      if(first){
-        loadPlayer(first.youtube_id, first.title);
-        document.getElementById('heroTitle').textContent = first.title;
-      }
+      if(first) loadPlayer(first.youtube_id, first.title, first.category);
     }
   }).catch(()=>{});
 
