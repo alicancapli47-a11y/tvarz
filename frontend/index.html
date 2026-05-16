@@ -57,7 +57,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:54px;display:flex;ali
 /* ── HOME PAGE ── */
 .player-hero{position:relative;width:100%;background:#000;overflow:hidden}
 .player-hero::before{content:'';display:block;padding-top:52%}
-.player-hero iframe{position:absolute;inset:0;width:100%;height:100%;border:none}
+.player-hero iframe{position:absolute;inset:-60px -2px -60px -2px;width:calc(100% + 4px);height:calc(100% + 120px);border:none;pointer-events:none}
 .hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(8,8,9,0.1) 40%,rgba(8,8,9,0.85) 85%,rgba(8,8,9,1) 100%);pointer-events:none}
 .hero-content{position:absolute;bottom:0;left:0;right:0;padding:2rem 2.5rem}
 .now-label{font-family:var(--font-mono);font-size:9px;letter-spacing:0.2em;color:var(--red);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px}
@@ -251,7 +251,7 @@ footer{border-top:0.5px solid var(--border);padding:2rem 2.5rem;display:flex;ali
 <div class="page active" id="page-home">
   <div class="player-hero">
     <iframe id="ytPlayer"
-      src="https://www.youtube.com/embed/videoseries?list=PLbpi6ZahtOH6Ar_3GPy3workwN3m1RZFd&autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&disablekb=1"
+      src="https://www.youtube.com/embed/videoseries?list=PLbpi6ZahtOH6Ar_3GPy3workwN3m1RZFd&autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&disablekb=1&playsinline=1&cc_load_policy=0&fs=0&color=white"
       allow="autoplay; encrypted-media" allowfullscreen>
     </iframe>
     <div class="hero-overlay"></div>
