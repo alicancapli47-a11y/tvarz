@@ -547,25 +547,47 @@ function buildDayTabs(){
   }
 }
 
-function buildSchedule(offset){
-  const now=new Date();
-  const d=new Date(now); d.setDate(d.getDate()+offset);
-  document.getElementById('schedDate').textContent=d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
-  const curMins=now.getHours()*60+now.getMinutes();
-  let curIdx=0;
-  scheduleData.forEach((s,i)=>{const[h,m]=s.time.split(':').map(Number);if(h*60+m<=curMins)curIdx=i;});
-  const list=document.getElementById('schedList'); list.innerHTML='';
-  scheduleData.forEach((s,i)=>{
-    const[h,m]=s.time.split(':').map(Number);
-    const slotMins=h*60+m;
-    const isNow=offset===0&&i===curIdx;
-    const isPast=offset===0&&slotMins<curMins&&i<curIdx;
-    const row=document.createElement('div');
-    row.className=`sched-row${isNow?' now':''}${isPast?' past':''}`;
-    row.innerHTML=`<div class="sched-time${isNow?' now-t':''}">${s.time}${isNow?'<span class="now-badge">NOW</span>':''}</div><div><div class="sched-name">${s.title}</div><div class="sched-genre">${s.genre}</div></div><div class="sched-dur">${s.dur}</div>`;
-    if(!isPast) row.onclick=()=>showPage('home');
-    list.appendChild(row);
-  });
+async function buildSchedule(offset){
+  const now = new Date();
+  const d = new Date(now); d.setDate(d.getDate()+offset);
+  document.getElementById('schedDate').textContent = d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+
+  const list = document.getElementById('schedList');
+  list.innerHTML = '<div style="padding:1rem;color:var(--text3);font-family:var(--fm);font-size:12px">Loading...</div>';
+
+  try {
+    const res = await fetch(`${API}/program/schedule-today`);
+    const data = await res.json();
+    if(!data.success) throw new Error();
+
+    const schedule = data.data.schedule;
+    const curMins = now.getHours()*60 + now.getMinutes();
+    list.innerHTML = '';
+
+    schedule.forEach((s, i) => {
+      const [h,m] = s.time.split(':').map(Number);
+      const slotMins = h*60+m;
+      const nextMins = i+1 < schedule.length ? (()=>{const[nh,nm]=schedule[i+1].time.split(':').map(Number);return nh*60+nm;})() : 1440;
+      const isNow = offset===0 && slotMins <= curMins && curMins < nextMins;
+      const isPast = offset===0 && nextMins <= curMins;
+
+      const row = document.createElement('div');
+      row.className = `sched-row${isNow?' now':''}${isPast?' past':''}`;
+      row.innerHTML = `
+        <div class="sched-time${isNow?' now-t':''}">${s.time}${isNow?'<span class="now-badge">NOW</span>':''}</div>
+        <div>
+          <div class="sched-name">${s.title}</div>
+          <div class="sched-genre">${{film:'AI Film',doc:'Documentary',series:'Series',short:'Short'}[s.category]||s.category}</div>
+        </div>
+        <div class="sched-dur">${s.duration||''}</div>
+      `;
+      if(!isPast) row.onclick = () => showPage('home');
+      list.appendChild(row);
+      if(isNow) setTimeout(()=>row.scrollIntoView({block:'center',behavior:'smooth'}),200);
+    });
+  } catch(e) {
+    list.innerHTML = '<div style="padding:1rem;color:var(--text3);font-family:var(--fm);font-size:12px">Could not load schedule.</div>';
+  }
 }
 
 // ── ARCHIVE ──
@@ -695,30 +717,59 @@ function toggleFaq(el){
   a.classList.toggle('open');s.textContent=a.classList.contains('open')?'−':'+';
 }
 
-// ── LOAD DATA FROM API ──
+// ── LOAD LIVE DATA ──
 async function loadVideos(){
-  try{
-    const res=await fetch(`${API}/program/archive`);
-    const data=await res.json();
-    if(!data.success)return;
-    allVideos=data.data.videos;
-    document.getElementById('totalFilms').textContent=allVideos.length;
-    document.getElementById('archiveSubtitle').textContent=`${allVideos.length} TITLES · FILMS · DOCUMENTARIES · SERIES`;
+  try {
+    // First get live position
+    const liveRes = await fetch(`${API}/program/live`);
+    const liveData = await liveRes.json();
 
-    // Set first real video as current
-    const first=allVideos.find(v=>v.youtube_id&&v.youtube_id!=='dQw4w9WgXcQ');
-    if(first){
-      currentVideoId=first.youtube_id;
-      currentVideoTitle=first.title;
-      document.getElementById('heroTitle').textContent=first.title;
-      const catLabel={film:'AI Film',doc:'Documentary',series:'Series',short:'Short'}[first.category]||'AI Film';
-      document.getElementById('heroTags').innerHTML=`<span class="tag red">${catLabel}</span><span class="tag">Large Scale Studios</span>`;
-      document.getElementById('ytPlayer').src=`https://www.youtube.com/embed/${first.youtube_id}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&disablekb=1&playsinline=1&cc_load_policy=0&enablejsapi=1`;
+    if(liveData.success){
+      const { video, start_second, remaining_seconds, next_video } = liveData.data;
+
+      // Set current video info
+      currentVideoId = video.youtube_id;
+      currentVideoTitle = video.title;
+      document.getElementById('heroTitle').textContent = video.title;
+
+      const catLabel = {film:'AI Film',doc:'Documentary',series:'Series',short:'Short'}[video.category]||'AI Film';
+      document.getElementById('heroTags').innerHTML = `
+        <span class="tag red">${catLabel}</span>
+        <span class="tag">Large Scale Studios</span>
+        ${next_video ? `<span class="tag">Next: ${next_video.title}</span>` : ''}
+      `;
+
+      // Load iframe starting from exact second
+      document.getElementById('ytPlayer').src =
+        `https://www.youtube.com/embed/${video.youtube_id}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&disablekb=1&playsinline=1&cc_load_policy=0&enablejsapi=1&start=${start_second}`;
+
+      // Reinit YT API with new src
+      setTimeout(()=>{
+        ytPlayer = new YT.Player('ytPlayer',{
+          events:{'onReady': e => { e.target.mute(); e.target.playVideo(); }}
+        });
+      }, 800);
+
+      // Auto-advance when video ends
+      if(remaining_seconds > 0 && remaining_seconds < 86400){
+        setTimeout(()=>loadVideos(), remaining_seconds * 1000);
+      }
     }
-    buildArchiveGrid();
-  }catch(err){
-    console.error('Failed to load videos:',err);
-    document.getElementById('heroTitle').textContent='Giant Creatures — Amazon Jungle';
+
+    // Load archive separately
+    const archRes = await fetch(`${API}/program/archive`);
+    const archData = await archRes.json();
+    if(archData.success){
+      allVideos = archData.data.videos;
+      document.getElementById('totalFilms').textContent = allVideos.length;
+      document.getElementById('archiveSubtitle').textContent =
+        `${allVideos.length} TITLES · FILMS · DOCUMENTARIES · SERIES`;
+      buildArchiveGrid();
+    }
+
+  } catch(err){
+    console.error('Load error:', err);
+    document.getElementById('heroTitle').textContent = 'Loading...';
   }
 }
 
