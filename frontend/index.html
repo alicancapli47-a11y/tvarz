@@ -416,16 +416,26 @@ window.onYouTubeIframeAPIReady = function(){
 };
 
 function createPlayer(videoId, startSecond){
-  // Destroy old player if exists
-  if(ytPlayer && ytPlayer.destroy) ytPlayer.destroy();
+  if(ytPlayer && ytPlayer.destroy){
+    try { ytPlayer.destroy(); } catch(e){}
+    ytPlayer = null;
+  }
 
-  // Reset iframe
-  const iframe = document.getElementById('ytPlayer');
+  // Recreate iframe (destroy removes it from DOM)
+  const hero = document.getElementById('playerHero');
+  let iframe = document.getElementById('ytPlayer');
+  if(!iframe){
+    iframe = document.createElement('iframe');
+    iframe.id = 'ytPlayer';
+    iframe.allow = 'autoplay; encrypted-media';
+    iframe.allowFullscreen = true;
+    hero.insertBefore(iframe, hero.firstChild);
+  }
+
   iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&disablekb=1&playsinline=1&cc_load_policy=0&enablejsapi=1&start=${startSecond}`;
 
-  // Wait for API then bind
   const tryBind = setInterval(()=>{
-    if(!ytAPIReady) return;
+    if(!ytAPIReady || !document.getElementById('ytPlayer')) return;
     clearInterval(tryBind);
     try {
       ytPlayer = new YT.Player('ytPlayer', {
@@ -439,13 +449,12 @@ function createPlayer(videoId, startSecond){
             document.querySelector('.btn-watch').textContent = '▶ Play';
           },
           'onStateChange': e => {
-            // Video ended — load next
             if(e.data === YT.PlayerState.ENDED) loadLive();
           }
         }
       });
-    } catch(e){ console.warn('YT player bind failed', e); }
-  }, 200);
+    } catch(e){ console.warn('YT bind failed', e); }
+  }, 300);
 }
 
 function toggleMute(){
