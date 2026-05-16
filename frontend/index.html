@@ -57,7 +57,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:54px;display:flex;ali
 /* ── HOME PAGE ── */
 .player-hero{position:relative;width:100%;background:#000;overflow:hidden}
 .player-hero::before{content:'';display:block;padding-top:52%}
-.player-hero iframe{position:absolute;inset:-60px -2px -60px -2px;width:calc(100% + 4px);height:calc(100% + 120px);border:none;pointer-events:none}
+.player-hero iframe{position:absolute;top:-80px;left:-2px;width:calc(100% + 4px);height:calc(100% + 160px);border:none;pointer-events:none}
 .hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(8,8,9,0.1) 40%,rgba(8,8,9,0.85) 85%,rgba(8,8,9,1) 100%);pointer-events:none}
 .hero-content{position:absolute;bottom:0;left:0;right:0;padding:2rem 2.5rem}
 .now-label{font-family:var(--font-mono);font-size:9px;letter-spacing:0.2em;color:var(--red);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px}
@@ -75,6 +75,16 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:54px;display:flex;ali
 .btn-watch:hover{background:var(--red2)}
 .btn-ghost{font-family:var(--font-display);font-size:13px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;padding:10px 20px;background:rgba(255,255,255,0.06);border:0.5px solid var(--border);color:var(--text);cursor:pointer;border-radius:1px;transition:all 0.15s}
 .btn-ghost:hover{background:rgba(255,255,255,0.1)}
+
+/* ── FULLSCREEN PLAYER MODAL ── */
+.fs-modal{position:fixed;inset:0;background:#000;z-index:1000;display:none;flex-direction:column}
+.fs-modal.open{display:flex}
+.fs-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;background:linear-gradient(180deg,rgba(0,0,0,0.9) 0%,transparent 100%);position:absolute;top:0;left:0;right:0;z-index:10}
+.fs-title{font-family:var(--font-display);font-size:1.1rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text)}
+.fs-close{background:rgba(255,255,255,0.1);border:0.5px solid var(--border2);color:var(--text);font-size:1.1rem;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:1px;transition:all 0.15s}
+.fs-close:hover{background:rgba(255,255,255,0.2)}
+.fs-iframe-wrap{position:relative;width:100%;height:100%}
+.fs-iframe-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:none}
 
 /* stats strip */
 .stats-strip{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:0.5px solid var(--border)}
@@ -270,7 +280,7 @@ footer{border-top:0.5px solid var(--border);padding:2rem 2.5rem;display:flex;ali
         <div class="progress-times"><span id="heroElapsed">0:00</span><span id="heroRemain">10:12</span></div>
       </div>
       <div class="hero-actions">
-        <button class="btn-watch" onclick="enablePlayer()">▶ Watch Now</button>
+        <button class="btn-watch" onclick="openFullscreen()">▶ Watch Now</button>
         <button class="btn-ghost" onclick="showPage('archive')">Browse Archive</button>
       </div>
     </div>
@@ -473,6 +483,17 @@ footer{border-top:0.5px solid var(--border);padding:2rem 2.5rem;display:flex;ali
     <div class="modal-divider">or</div>
     <div style="font-size:12px;color:var(--text3);text-align:center">More sign-in options coming soon</div>
     <div class="modal-note">By signing in you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</div>
+  </div>
+</div>
+
+<!-- ══ FULLSCREEN PLAYER MODAL ══ -->
+<div class="fs-modal" id="fsModal">
+  <div class="fs-header">
+    <div class="fs-title" id="fsTitle">Now Playing</div>
+    <button class="fs-close" onclick="closeFullscreen()">✕</button>
+  </div>
+  <div class="fs-iframe-wrap">
+    <iframe id="fsPlayer" src="" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
   </div>
 </div>
 
@@ -738,11 +759,12 @@ function buildArchiveStatic(){
 }
 
 function playVideo(item){
-  if(item.youtube_id){
-    const f=document.getElementById('ytPlayer');
-    f.src=`https://www.youtube.com/embed/${item.youtube_id}?autoplay=1&mute=0&controls=1&modestbranding=1&rel=0`;
-    document.getElementById('heroTitle').textContent=item.title;
+  if(item.youtube_id && item.youtube_id !== 'dQw4w9WgXcQ'){
+    currentVideoId = item.youtube_id;
+    currentVideoTitle = item.title;
+    document.getElementById('heroTitle').textContent = item.title;
     showPage('home');
+    setTimeout(()=>openFullscreen(), 200);
   } else {
     showPage('home');
   }
@@ -751,6 +773,32 @@ function playVideo(item){
 // ── CONFIG ──
 const API = 'https://tvarz-production.up.railway.app';
 const GOOGLE_CLIENT_ID = '548804749992-1vlr2bbl71u6u4kpgrh95bbk3rti0bta.apps.googleusercontent.com';
+let currentVideoId = 'UwWA3UDIwi4';
+let currentVideoTitle = 'Giant Creatures Lurking Deep in the Amazon Jungle';
+
+function loadPlayer(videoId, title){
+  currentVideoId = videoId;
+  if(title){ currentVideoTitle = title; document.getElementById('heroTitle').textContent = title; }
+  const f = document.getElementById('ytPlayer');
+  f.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&disablekb=1&playsinline=1&cc_load_policy=0`;
+}
+
+function openFullscreen(){
+  const modal = document.getElementById('fsModal');
+  const fsPlayer = document.getElementById('fsPlayer');
+  document.getElementById('fsTitle').textContent = currentVideoTitle;
+  fsPlayer.src = `https://www.youtube.com/embed/${currentVideoId}?autoplay=1&mute=0&controls=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playsinline=1&fs=1`;
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeFullscreen(){
+  document.getElementById('fsPlayer').src = '';
+  document.getElementById('fsModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function enablePlayer(){ openFullscreen(); }
 
 // ── AUTH ──
 function openModal(){document.getElementById('authModal').classList.add('open')}
