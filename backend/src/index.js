@@ -16,7 +16,9 @@ app.use(cors({
   origin: [
     process.env.FRONTEND_URL,
     'http://localhost:3000',
-    'https://tvarz.vercel.app'
+    'https://tvarz.vercel.app',
+    'https://tvarz.com',
+    'https://www.tvarz.com'
   ],
   credentials: true
 }));
