@@ -46,13 +46,17 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:54px;display:flex;ali
 /* PLAYER HERO */
 .player-hero{position:relative;width:100%;background:#000;overflow:hidden}
 .player-hero::before{content:'';display:block;padding-top:52%}
-.player-hero iframe{position:absolute;top:-80px;left:-2px;width:calc(100% + 4px);height:calc(100% + 160px);border:none;pointer-events:none}
+.player-hero iframe{position:absolute;top:-80px;left:-2px;width:calc(100% + 4px);height:calc(100% + 160px);border:none}
 .player-click-zone{position:absolute;inset:0;cursor:pointer;z-index:5}
 .hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(8,8,9,0.05) 30%,rgba(8,8,9,0.8) 75%,rgba(8,8,9,1) 100%);pointer-events:none}
+.play-overlay{position:absolute;top:0;left:0;right:0;bottom:40%;display:flex;align-items:center;justify-content:center;z-index:6;cursor:pointer}
+.play-overlay.hidden{display:none}
+.play-circle{width:80px;height:80px;border-radius:50%;background:rgba(217,43,58,0.9);display:flex;align-items:center;justify-content:center;font-size:2rem;color:#fff;transition:transform 0.2s;box-shadow:0 0 40px rgba(217,43,58,0.4)}
+.play-overlay:hover .play-circle{transform:scale(1.1)}
 .mute-indicator{position:absolute;top:1rem;right:1rem;z-index:10;display:flex;align-items:center;gap:6px;background:rgba(8,8,9,0.7);border:0.5px solid var(--border2);padding:5px 12px;font-family:var(--fm);font-size:10px;letter-spacing:0.1em;color:var(--text2);pointer-events:none;transition:opacity 0.3s}
-.mute-indicator.hidden{opacity:0}
+.mute-indicator.hidden{opacity:0;pointer-events:none}
 .fullscreen-btn{position:absolute;bottom:1rem;right:1rem;z-index:10;background:rgba(8,8,9,0.7);border:0.5px solid var(--border2);color:var(--text);width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:all 0.15s}
-.fullscreen-btn:hover{background:rgba(8,8,9,0.9);border-color:var(--border2)}
+.fullscreen-btn:hover{background:rgba(8,8,9,0.9)}
 .hero-content{position:absolute;bottom:0;left:0;right:0;padding:1.5rem 2.5rem}
 .now-label{font-family:var(--fm);font-size:9px;letter-spacing:0.2em;color:var(--red);text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:8px}
 .now-label::before{content:'';width:16px;height:1px;background:var(--red)}
@@ -227,11 +231,13 @@ footer{border-top:0.5px solid var(--border);padding:2rem 2.5rem;display:flex;ali
 <!-- HOME -->
 <div class="page active" id="page-home">
   <div class="player-hero" id="playerHero">
-    <iframe id="ytPlayer" src="https://www.youtube.com/embed/6y7k_mbiEw0?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&disablekb=1&playsinline=1&cc_load_policy=0&enablejsapi=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-    <div class="player-click-zone" onclick="toggleMute()" title="Click to unmute"></div>
+    <iframe id="ytPlayer" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    <div class="play-overlay" id="playOverlay" onclick="startPlaying()">
+      <div class="play-circle">▶</div>
+    </div>
     <div class="hero-overlay"></div>
-    <div class="mute-indicator" id="muteIndicator">🔇 Click to unmute</div>
-    <button class="fullscreen-btn" onclick="goFullscreen()" title="Fullscreen">⛶</button>
+    <div class="mute-indicator hidden" id="muteIndicator">🔇 Click to unmute</div>
+    <button class="fullscreen-btn" onclick="goFullscreen()">⛶</button>
     <div class="hero-content">
       <div class="now-label">Now Playing</div>
       <div class="hero-title" id="heroTitle">Loading...</div>
@@ -400,37 +406,55 @@ function updateViewers(){ document.getElementById('viewerCount').textContent=(12
 setInterval(updateViewers,7000);
 
 // ── PLAYER ──
-let isMuted = true;
+let isMuted = false;
 let ytPlayer = null;
 let advanceTimer = null;
 let ytAPIReady = false;
+let isPlaying = false;
+let pendingVideoId = null;
+let pendingStart = 0;
+let pendingRemaining = 0;
 
 function initYTAPI(){
+  window.onYouTubeIframeAPIReady = function(){
+    ytAPIReady = true;
+  };
   const tag = document.createElement('script');
   tag.src = 'https://www.youtube.com/iframe_api';
   document.head.appendChild(tag);
 }
 
-window.onYouTubeIframeAPIReady = function(){
-  ytAPIReady = true;
-};
-
 function createPlayer(videoId, startSecond, remainingSeconds){
-  // Don't destroy — just update src
-  let iframe = document.getElementById('ytPlayer');
-  if(!iframe){
-    iframe = document.createElement('iframe');
-    iframe.id = 'ytPlayer';
-    iframe.allow = 'autoplay; encrypted-media';
-    iframe.allowFullscreen = true;
-    const hero = document.getElementById('playerHero');
-    hero.insertBefore(iframe, hero.firstChild);
-  }
+  pendingVideoId = videoId;
+  pendingStart = startSecond;
+  pendingRemaining = remainingSeconds;
 
-  iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&disablekb=1&playsinline=1&cc_load_policy=0&enablejsapi=1&start=${startSecond}`;
+  // Set advance timer — fires when this video should end
+  if(advanceTimer) clearTimeout(advanceTimer);
+  advanceTimer = setTimeout(()=>loadLive(), (remainingSeconds + 1) * 1000);
 
-  // Bind YT API for mute control
-  ytPlayer = null;
+  // Show play overlay
+  const overlay = document.getElementById('playOverlay');
+  if(overlay) overlay.classList.remove('hidden');
+  const bw = document.querySelector('.btn-watch');
+  if(bw) bw.textContent = '▶ Play';
+}
+
+function startPlaying(){
+  if(!pendingVideoId) return;
+  isPlaying = true;
+
+  // Hide overlay
+  const overlay = document.getElementById('playOverlay');
+  if(overlay) overlay.classList.add('hidden');
+
+  // Load iframe with autoplay+sound
+  const iframe = document.getElementById('ytPlayer');
+  iframe.src = `https://www.youtube.com/embed/${pendingVideoId}?autoplay=1&mute=0&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playsinline=1&enablejsapi=1&start=${pendingStart}`;
+
+  // Bind YT API
+  if(ytPlayer){ try{ ytPlayer.destroy(); }catch(e){} ytPlayer=null; }
+
   const tryBind = setInterval(()=>{
     if(!ytAPIReady) return;
     clearInterval(tryBind);
@@ -438,56 +462,43 @@ function createPlayer(videoId, startSecond, remainingSeconds){
       ytPlayer = new YT.Player('ytPlayer', {
         events:{
           'onReady': e => {
-            e.target.mute();
+            e.target.seekTo(pendingStart, true);
+            e.target.unMute();
+            e.target.setVolume(100);
             e.target.playVideo();
-            isMuted = true;
+            isMuted = false;
             const mi = document.getElementById('muteIndicator');
-            if(mi){ mi.classList.remove('hidden'); mi.textContent = '🔇 Click to unmute'; }
+            if(mi) mi.classList.add('hidden');
             const bw = document.querySelector('.btn-watch');
-            if(bw) bw.textContent = '▶ Play';
+            if(bw) bw.textContent = '🔊 Mute';
+          },
+          'onStateChange': e => {
+            if(e.data === YT.PlayerState.ENDED) loadLive();
           }
         }
       });
     } catch(e){ console.warn('YT bind failed', e); }
-  }, 300);
-
-  // Auto-advance timer — reload live data when this video should end
-  if(advanceTimer) clearTimeout(advanceTimer);
-  if(remainingSeconds > 0 && remainingSeconds < 86400){
-    console.log(`Next video in ${remainingSeconds} seconds`);
-    advanceTimer = setTimeout(()=>{
-      console.log('Advancing to next video...');
-      loadLive();
-    }, (remainingSeconds + 2) * 1000); // +2 buffer
-  }
+  }, 200);
 }
 
 function toggleMute(){
+  if(!isPlaying){ startPlaying(); return; }
   if(!ytPlayer || typeof ytPlayer.unMute !== 'function') return;
   if(isMuted){
-    ytPlayer.unMute();
-    ytPlayer.setVolume(100);
-    isMuted = false;
-    document.getElementById('muteIndicator').classList.add('hidden');
-    document.querySelector('.btn-watch').textContent = '🔊 Mute';
+    ytPlayer.unMute(); ytPlayer.setVolume(100); isMuted=false;
+    const mi=document.getElementById('muteIndicator'); if(mi) mi.classList.add('hidden');
+    const bw=document.querySelector('.btn-watch'); if(bw) bw.textContent='🔊 Mute';
   } else {
-    ytPlayer.mute();
-    isMuted = true;
-    document.getElementById('muteIndicator').classList.remove('hidden');
-    document.getElementById('muteIndicator').textContent = '🔇 Click to unmute';
-    document.querySelector('.btn-watch').textContent = '▶ Play';
+    ytPlayer.mute(); isMuted=true;
+    const mi=document.getElementById('muteIndicator'); if(mi){ mi.classList.remove('hidden'); mi.textContent='🔇 Click to unmute'; }
+    const bw=document.querySelector('.btn-watch'); if(bw) bw.textContent='▶ Unmute';
   }
 }
 
 function goFullscreen(){
   const hero = document.getElementById('playerHero');
-  if(document.fullscreenElement){
-    document.exitFullscreen();
-  } else {
-    hero.requestFullscreen().catch(()=>{
-      window.open('https://www.youtube.com/watch?v='+currentVideoId,'_blank');
-    });
-  }
+  if(document.fullscreenElement) document.exitFullscreen();
+  else hero.requestFullscreen().catch(()=>window.open('https://www.youtube.com/watch?v='+pendingVideoId,'_blank'));
 }
 
 // ── SCHEDULE ──
