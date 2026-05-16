@@ -248,42 +248,6 @@ footer{border-top:0.5px solid var(--border);padding:2rem 2.5rem;display:flex;ali
     <div class="stat-cell"><div class="stat-l">New This Week</div><div class="stat-v">3</div></div>
     <div class="stat-cell"><div class="stat-l">Always Free</div><div class="stat-v accent">∞</div></div>
   </div>
-  <div class="section">
-    <div class="sec-header"><div class="sec-title">Channels</div><div class="sec-sub">Select a stream</div></div>
-    <div class="channels-row" id="channelsRow">
-      <div class="channel-tile on" data-vid="6y7k_mbiEw0">
-        <div class="ch-live"></div>
-        <div class="ch-num">01</div>
-        <div class="ch-name">AI Films</div>
-        <div class="ch-sub">Large Scale Studios</div>
-      </div>
-      <div class="channel-tile" data-vid="bm-RLg1hPPo">
-        <div class="ch-num">02</div>
-        <div class="ch-name">Survival</div>
-        <div class="ch-sub">True stories</div>
-      </div>
-      <div class="channel-tile" data-vid="kp4gT908ILg">
-        <div class="ch-num">03</div>
-        <div class="ch-name">Thriller</div>
-        <div class="ch-sub">Dark cinema</div>
-      </div>
-      <div class="channel-tile" data-vid="DxmKdOGdkkA">
-        <div class="ch-num">04</div>
-        <div class="ch-name">Mystery</div>
-        <div class="ch-sub">Psychological</div>
-      </div>
-      <div class="channel-tile" data-vid="uurljh2axsI">
-        <div class="ch-num">05</div>
-        <div class="ch-name">Action</div>
-        <div class="ch-sub">Adventure</div>
-      </div>
-      <div class="channel-tile" style="opacity:0.3;cursor:default">
-        <div class="ch-num">06</div>
-        <div class="ch-name">Turkish</div>
-        <div class="ch-sub">Coming soon</div>
-      </div>
-    </div>
-  </div>
   <footer>
     <div class="footer-logo"><img src="tvarzlogo.png" alt="TVARZ"></div>
     <div class="footer-copy">© 2025 Tvarz · Free AI Cinema Channel</div>
@@ -438,6 +402,8 @@ setInterval(updateViewers,7000);
 // ── PLAYER ──
 let isMuted = true;
 let ytPlayer = null;
+let advanceTimer = null;
+let ytAPIReady = false;
 
 function initYTAPI(){
   const tag = document.createElement('script');
@@ -446,18 +412,44 @@ function initYTAPI(){
 }
 
 window.onYouTubeIframeAPIReady = function(){
-  ytPlayer = new YT.Player('ytPlayer', {
-    events:{
-      'onReady': function(e){
-        e.target.mute();
-        e.target.playVideo();
-      }
-    }
-  });
+  ytAPIReady = true;
 };
 
+function createPlayer(videoId, startSecond){
+  // Destroy old player if exists
+  if(ytPlayer && ytPlayer.destroy) ytPlayer.destroy();
+
+  // Reset iframe
+  const iframe = document.getElementById('ytPlayer');
+  iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&disablekb=1&playsinline=1&cc_load_policy=0&enablejsapi=1&start=${startSecond}`;
+
+  // Wait for API then bind
+  const tryBind = setInterval(()=>{
+    if(!ytAPIReady) return;
+    clearInterval(tryBind);
+    try {
+      ytPlayer = new YT.Player('ytPlayer', {
+        events:{
+          'onReady': e => {
+            e.target.mute();
+            e.target.playVideo();
+            isMuted = true;
+            document.getElementById('muteIndicator').classList.remove('hidden');
+            document.getElementById('muteIndicator').textContent = '🔇 Click to unmute';
+            document.querySelector('.btn-watch').textContent = '▶ Play';
+          },
+          'onStateChange': e => {
+            // Video ended — load next
+            if(e.data === YT.PlayerState.ENDED) loadLive();
+          }
+        }
+      });
+    } catch(e){ console.warn('YT player bind failed', e); }
+  }, 200);
+}
+
 function toggleMute(){
-  if(!ytPlayer) return;
+  if(!ytPlayer || typeof ytPlayer.unMute !== 'function') return;
   if(isMuted){
     ytPlayer.unMute();
     ytPlayer.setVolume(100);
@@ -479,42 +471,10 @@ function goFullscreen(){
     document.exitFullscreen();
   } else {
     hero.requestFullscreen().catch(()=>{
-      // Fallback — open YouTube
       window.open('https://www.youtube.com/watch?v='+currentVideoId,'_blank');
     });
   }
 }
-
-function switchChannel(el, videoId, title){
-  document.querySelectorAll('.channel-tile').forEach(t=>{
-    t.classList.remove('on');
-    const d=t.querySelector('.ch-live'); if(d) d.remove();
-  });
-  el.classList.add('on');
-  const dot=document.createElement('div'); dot.className='ch-live'; el.appendChild(dot);
-  currentVideoId = videoId;
-  if(title) currentVideoTitle = title;
-  isMuted = true;
-  document.getElementById('muteIndicator').classList.remove('hidden');
-  document.getElementById('muteIndicator').textContent = '🔇 Click to unmute';
-  document.querySelector('.btn-watch').textContent = '▶ Play';
-  // Reload iframe with new video
-  const f = document.getElementById('ytPlayer');
-  f.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&disablekb=1&playsinline=1&cc_load_policy=0&enablejsapi=1`;
-  // Reinit YT API after src change
-  setTimeout(()=>{
-    ytPlayer = new YT.Player('ytPlayer',{events:{'onReady':function(e){e.target.mute();e.target.playVideo();}}});
-  }, 500);
-}
-
-// Init channel tile click handlers
-document.querySelectorAll('.channel-tile[data-vid]').forEach(tile=>{
-  tile.addEventListener('click', function(){
-    const vid = this.dataset.vid;
-    const name = this.querySelector('.ch-name').textContent;
-    switchChannel(this, vid, name);
-  });
-});
 
 // ── SCHEDULE ──
 const scheduleData = [
@@ -718,59 +678,53 @@ function toggleFaq(el){
 }
 
 // ── LOAD LIVE DATA ──
-async function loadVideos(){
+async function loadLive(){
   try {
-    // First get live position
-    const liveRes = await fetch(`${API}/program/live`);
-    const liveData = await liveRes.json();
+    const res = await fetch(`${API}/program/live`);
+    const data = await res.json();
+    if(!data.success) return;
 
-    if(liveData.success){
-      const { video, start_second, remaining_seconds, next_video } = liveData.data;
+    const { video, start_second, remaining_seconds, next_video } = data.data;
 
-      // Set current video info
-      currentVideoId = video.youtube_id;
-      currentVideoTitle = video.title;
-      document.getElementById('heroTitle').textContent = video.title;
+    currentVideoId = video.youtube_id;
+    currentVideoTitle = video.title;
+    document.getElementById('heroTitle').textContent = video.title;
 
-      const catLabel = {film:'AI Film',doc:'Documentary',series:'Series',short:'Short'}[video.category]||'AI Film';
-      document.getElementById('heroTags').innerHTML = `
-        <span class="tag red">${catLabel}</span>
-        <span class="tag">Large Scale Studios</span>
-        ${next_video ? `<span class="tag">Next: ${next_video.title}</span>` : ''}
-      `;
+    const catLabel = {film:'AI Film',doc:'Documentary',series:'Series',short:'Short'}[video.category]||'AI Film';
+    document.getElementById('heroTags').innerHTML = `
+      <span class="tag red">${catLabel}</span>
+      <span class="tag">Large Scale Studios</span>
+      ${next_video ? `<span class="tag" style="color:var(--text3)">Next: ${next_video.title}</span>` : ''}
+    `;
 
-      // Load iframe starting from exact second
-      document.getElementById('ytPlayer').src =
-        `https://www.youtube.com/embed/${video.youtube_id}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&disablekb=1&playsinline=1&cc_load_policy=0&enablejsapi=1&start=${start_second}`;
+    // Create player from exact second
+    createPlayer(video.youtube_id, start_second);
 
-      // Reinit YT API with new src
-      setTimeout(()=>{
-        ytPlayer = new YT.Player('ytPlayer',{
-          events:{'onReady': e => { e.target.mute(); e.target.playVideo(); }}
-        });
-      }, 800);
-
-      // Auto-advance when video ends
-      if(remaining_seconds > 0 && remaining_seconds < 86400){
-        setTimeout(()=>loadVideos(), remaining_seconds * 1000);
-      }
-    }
-
-    // Load archive separately
-    const archRes = await fetch(`${API}/program/archive`);
-    const archData = await archRes.json();
-    if(archData.success){
-      allVideos = archData.data.videos;
-      document.getElementById('totalFilms').textContent = allVideos.length;
-      document.getElementById('archiveSubtitle').textContent =
-        `${allVideos.length} TITLES · FILMS · DOCUMENTARIES · SERIES`;
-      buildArchiveGrid();
+    // Auto-advance timer
+    if(advanceTimer) clearTimeout(advanceTimer);
+    if(remaining_seconds > 0 && remaining_seconds < 86400){
+      advanceTimer = setTimeout(()=>loadLive(), remaining_seconds * 1000);
     }
 
   } catch(err){
-    console.error('Load error:', err);
-    document.getElementById('heroTitle').textContent = 'Loading...';
+    console.error('Live load error:', err);
+    document.getElementById('heroTitle').textContent = 'Connection error — retrying...';
+    setTimeout(()=>loadLive(), 10000);
   }
+}
+
+async function loadVideos(){
+  // Load archive for archive page
+  try {
+    const res = await fetch(`${API}/program/archive`);
+    const data = await res.json();
+    if(!data.success) return;
+    allVideos = data.data.videos;
+    document.getElementById('totalFilms').textContent = allVideos.length;
+    document.getElementById('archiveSubtitle').textContent =
+      `${allVideos.length} TITLES · FILMS · DOCUMENTARIES · SERIES`;
+    buildArchiveGrid();
+  } catch(e){ console.error(e); }
 }
 
 // ── INIT ──
@@ -779,6 +733,7 @@ loadGoogleScript();
 restoreSession();
 buildDayTabs();
 buildSchedule(0);
+loadLive();
 loadVideos();
 </script>
 </body>
