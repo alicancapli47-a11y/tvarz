@@ -251,7 +251,7 @@ footer{border-top:0.5px solid var(--border);padding:2rem 2.5rem;display:flex;ali
 <div class="page active" id="page-home">
   <div class="player-hero">
     <iframe id="ytPlayer"
-      src="https://www.youtube.com/embed/videoseries?list=PLbpi6ZahtOH6Ar_3GPy3workwN3m1RZFd&autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&disablekb=1&playsinline=1&cc_load_policy=0&fs=0&color=white"
+      src="https://www.youtube.com/embed/UwWA3UDIwi4?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&disablekb=1&playsinline=1&cc_load_policy=0&fs=0&color=white"
       allow="autoplay; encrypted-media" allowfullscreen>
     </iframe>
     <div class="hero-overlay"></div>
@@ -581,24 +581,32 @@ function updateViewers(){
 setInterval(updateViewers,7000);
 
 // ── PLAYER ──
-function enablePlayer(){
-  const f=document.getElementById('ytPlayer');
-  f.style.pointerEvents='auto';
-  f.src=f.src.replace('mute=1','mute=0');
+let currentVideoId = 'UwWA3UDIwi4'; // default
+
+function loadPlayer(videoId, title){
+  currentVideoId = videoId;
+  const f = document.getElementById('ytPlayer');
+  f.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&disablekb=1&playsinline=1&cc_load_policy=0&fs=0`;
+  if(title) document.getElementById('heroTitle').textContent = title;
 }
 
-function switchCh(el,list,name){
-  document.querySelectorAll('.channel-tile').forEach(t=>{
-    t.classList.remove('on');
-    const d=t.querySelector('.ch-live');
-    if(d) d.remove();
-  });
-  el.classList.add('on');
-  const dot=document.createElement('div');
-  dot.className='ch-live';
-  el.appendChild(dot);
-  const f=document.getElementById('ytPlayer');
-  f.src=`https://www.youtube.com/embed/videoseries?list=${list}&autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&disablekb=1`;
+function enablePlayer(){
+  const f = document.getElementById('ytPlayer');
+  // Reload with sound + controls enabled
+  f.src = `https://www.youtube.com/embed/${currentVideoId}?autoplay=1&mute=0&controls=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playsinline=1&fs=1`;
+  f.style.pointerEvents = 'auto';
+}
+
+function playVideo(item){
+  if(item.youtube_id && item.youtube_id !== 'dQw4w9WgXcQ'){
+    showPage('home');
+    setTimeout(()=>{
+      loadPlayer(item.youtube_id, item.title);
+      enablePlayer();
+    }, 100);
+  } else {
+    showPage('home');
+  }
 }
 
 // ── SCHEDULE ──
@@ -899,6 +907,19 @@ loadGoogleScript();
 restoreSession();
 buildSchedule(0);
 buildArchive();
+
+// Load first real video into player
+fetch(`${API}/program/archive`)
+  .then(r=>r.json())
+  .then(data=>{
+    if(data.success && data.data.videos.length > 0){
+      const first = data.data.videos.find(v=>v.youtube_id && v.youtube_id !== 'dQw4w9WgXcQ');
+      if(first){
+        loadPlayer(first.youtube_id, first.title);
+        document.getElementById('heroTitle').textContent = first.title;
+      }
+    }
+  }).catch(()=>{});
 
 const n=new Date();
 const opts={weekday:'long',month:'long',day:'numeric'};
