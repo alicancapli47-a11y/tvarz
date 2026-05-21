@@ -361,6 +361,15 @@ async function loadStream(){
     if(!d.success) throw new Error('no data');
 
     const { stream_token, title, category, remaining_seconds, next_video } = d.data;
+
+    // If same video still playing and plenty of time left — don't rebuild iframe
+    if(title === currentTitle && remaining_seconds > 10){
+      // Just reschedule
+      if(advanceTimer) clearTimeout(advanceTimer);
+      advanceTimer = setTimeout(loadStream, (remaining_seconds + 1) * 1000);
+      return;
+    }
+
     currentTitle = title;
 
     document.getElementById('filmTitle').textContent = title;
@@ -372,18 +381,42 @@ async function loadStream(){
 
     await buildIframeFromToken(stream_token, remaining_seconds);
 
+    // Primary timer — fires exactly when video should end
     if(advanceTimer) clearTimeout(advanceTimer);
     advanceTimer = setTimeout(loadStream, (remaining_seconds + 1) * 1000);
 
+    // Aggressive poll — every 3s near end, every 10s otherwise
     if(window._pollTimer) clearInterval(window._pollTimer);
+    const pollInterval = remaining_seconds < 30 ? 3000 : 10000;
     window._pollTimer = setInterval(async()=>{
       try {
         const r = await fetch(`${API}/program/live`);
         const pd = await r.json();
         if(!pd.success) return;
-        if(pd.data.title !== currentTitle){ clearInterval(window._pollTimer); loadStream(); }
+        // Video changed — switch immediately
+        if(pd.data.title !== currentTitle){
+          clearInterval(window._pollTimer);
+          clearTimeout(advanceTimer);
+          loadStream();
+          return;
+        }
+        // Near end — switch to fast polling
+        if(pd.data.remaining_seconds < 15){
+          clearInterval(window._pollTimer);
+          window._pollTimer = setInterval(async()=>{
+            try {
+              const r2 = await fetch(`${API}/program/live`);
+              const pd2 = await r2.json();
+              if(pd2.success && pd2.data.title !== currentTitle){
+                clearInterval(window._pollTimer);
+                clearTimeout(advanceTimer);
+                loadStream();
+              }
+            } catch(e){}
+          }, 2000);
+        }
       } catch(e){}
-    }, 15000);
+    }, pollInterval);
 
   } catch(e){
     console.error('Stream error:', e);
