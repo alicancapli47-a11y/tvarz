@@ -1,544 +1,608 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZD3BV0XKCK"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-ZD3BV0XKCK');
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tvarz Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Tvarz — Free AI Cinema Channel</title>
+<meta name="description" content="Tvarz is a free AI cinema channel streaming 24/7. Watch AI-generated films, thrillers, documentaries and more. Always free, always on.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --red:#D92B3A;--green:#2ecc71;--gold:#C9A84C;
+  --red:#D92B3A;--red2:#a81e2a;--gold:#C9A84C;
   --bg:#080809;--surface:#141416;--surface2:#1a1a1d;--surface3:#222226;
-  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.14);
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.12);
   --text:#ede8e0;--text2:#9a9690;--text3:#5a5855;
   --fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;--fm:'DM Mono',monospace;
 }
-body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100vh;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--surface3)}
 
-.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center}
-.login-box{background:var(--surface);border:0.5px solid var(--border2);padding:2.5rem;width:360px}
-.login-title{font-family:var(--fd);font-size:1.8rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px}
-.login-sub{font-size:13px;color:var(--text2);margin-bottom:2rem}
-input,select,textarea{width:100%;padding:10px 14px;background:var(--surface2);border:0.5px solid var(--border);color:var(--text);font-family:var(--fb);font-size:14px;margin-bottom:12px;outline:none;transition:border 0.15s}
-input:focus,select:focus,textarea:focus{border-color:var(--border2)}
-textarea{resize:vertical;min-height:60px;margin-bottom:0}
-.btn{font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:10px 20px;border:none;cursor:pointer;transition:all 0.15s}
-.btn-red{background:var(--red);color:#fff}.btn-red:hover{background:#a81e2a}
-.btn-ghost{background:var(--surface2);color:var(--text);border:0.5px solid var(--border)}.btn-ghost:hover{background:var(--surface3)}
-.btn-green{background:var(--green);color:#fff}.btn-green:hover{background:#27ae60}
-.btn-blue{background:#2980b9;color:#fff}.btn-blue:hover{background:#2471a3}
-.btn-sm{padding:5px 12px;font-size:11px}
-.btn-danger{background:rgba(217,43,58,0.15);color:var(--red);border:0.5px solid rgba(217,43,58,0.3)}.btn-danger:hover{background:rgba(217,43,58,0.25)}
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;background:rgba(8,8,9,0.95);backdrop-filter:blur(12px);border-bottom:0.5px solid var(--border)}
+.nav-logo img{height:42px;width:auto;display:block;cursor:pointer}
+.nav-links{display:flex;align-items:center}
+.nav-link{font-family:var(--fd);font-size:13px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text2);padding:0 1rem;height:54px;display:flex;align-items:center;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s;background:none;border-top:none;border-left:none;border-right:none}
+.nav-link:hover{color:var(--text)}
+.nav-link.active{color:var(--text);border-bottom-color:var(--red)}
+.nav-right{display:flex;align-items:center;gap:1rem}
+.live-pill{display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:10px;letter-spacing:0.14em;color:var(--red);padding:4px 10px;border:0.5px solid rgba(217,43,58,0.3)}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--red);animation:blink 1.6s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+.nav-clock{font-family:var(--fm);font-size:11px;color:var(--text3);letter-spacing:0.1em}
+.btn-login{font-family:var(--fd);font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:6px 16px;background:transparent;border:0.5px solid var(--border2);color:var(--text);cursor:pointer;transition:all 0.15s}
+.btn-login:hover{background:var(--surface2)}
+.btn-premium-nav{font-family:var(--fd);font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:6px 16px;background:var(--red);border:none;color:#fff;cursor:pointer;transition:all 0.15s}
+.btn-premium-nav:hover{background:var(--red2)}
+.avatar{width:30px;height:30px;border-radius:50%;background:var(--surface3);border:0.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:13px;font-weight:600;color:var(--text);cursor:pointer}
+.user-status{display:flex;align-items:center;gap:8px}
+.premium-badge-nav{font-family:var(--fm);font-size:9px;letter-spacing:0.12em;color:var(--gold);border:0.5px solid rgba(201,168,76,0.4);padding:3px 8px;text-transform:uppercase}
 
-.app{display:none}
-.app.visible{display:block}
-header{background:var(--surface);border-bottom:0.5px solid var(--border);padding:0 2rem;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-.header-logo{font-family:var(--fd);font-size:1.4rem;font-weight:700;letter-spacing:0.1em;color:var(--text)}
-.header-logo span{color:var(--red)}
-.header-right{display:flex;align-items:center;gap:1rem}
-.header-tag{font-family:var(--fm);font-size:10px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase}
-main{padding:2rem;max-width:1200px;margin:0 auto}
+/* PAGES */
+.page{display:none;padding-top:54px;min-height:100vh}
+.page.active{display:block}
 
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-bottom:2rem;border:0.5px solid var(--border);overflow:hidden}
-.stat-card{background:var(--surface);padding:1.2rem 1.5rem}
-.stat-label{font-family:var(--fm);font-size:9px;letter-spacing:0.14em;color:var(--text3);text-transform:uppercase;margin-bottom:4px}
-.stat-val{font-family:var(--fd);font-size:2rem;font-weight:700;color:var(--text);line-height:1}
-.stat-val.red{color:var(--red)}.stat-val.green{color:var(--green)}.stat-val.gold{color:var(--gold)}
+/* ── PLAYER ── */
+.player-wrap{position:relative;width:100%;background:#000;overflow:hidden;cursor:pointer}
+.player-wrap::before{content:'';display:block;padding-top:52%}
+.player-wrap iframe{position:absolute;top:-90px;left:-2px;width:calc(100% + 4px);height:calc(100% + 180px);border:none;pointer-events:none}
+.player-grad{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 35%,rgba(8,8,9,0.75) 72%,rgba(8,8,9,1) 100%);pointer-events:none}
+.player-tap{position:absolute;inset:0;z-index:5;cursor:pointer}
+.mute-hint{position:absolute;top:1rem;right:1rem;z-index:8;background:rgba(8,8,9,0.75);border:0.5px solid var(--border2);padding:5px 12px;font-family:var(--fm);font-size:10px;letter-spacing:0.1em;color:var(--text2);display:flex;align-items:center;gap:6px;transition:opacity 0.4s}
+.mute-hint.gone{opacity:0;pointer-events:none}
+.fs-btn{position:absolute;bottom:5rem;right:1rem;z-index:8;background:rgba(8,8,9,0.75);border:0.5px solid var(--border2);color:var(--text2);width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;transition:all 0.15s}
+.fs-btn:hover{background:rgba(255,255,255,0.1);color:var(--text)}
+.player-info{position:absolute;bottom:0;left:0;right:0;padding:1.2rem 2rem;z-index:6;pointer-events:none}
+.now-label{font-family:var(--fm);font-size:9px;letter-spacing:0.2em;color:var(--red);text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.now-label::before{content:'';width:14px;height:1px;background:var(--red)}
+.film-title{font-family:var(--fd);font-size:clamp(1.3rem,2.5vw,2.2rem);font-weight:700;letter-spacing:0.03em;line-height:1.1;color:var(--text);max-width:650px;text-transform:uppercase;margin-bottom:8px}
+.film-tags{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tag{font-family:var(--fm);font-size:10px;letter-spacing:0.1em;padding:3px 10px;border:0.5px solid var(--border2);color:var(--text2);text-transform:uppercase}
+.tag.red{border-color:rgba(217,43,58,0.4);color:var(--red)}
+.tag.dim{color:var(--text3);border-color:var(--border)}
 
-.section-title{font-family:var(--fd);font-size:1.3rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text);margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between}
+/* UP NEXT */
+.section{padding:2rem 2.5rem}
+.sec-title{font-family:var(--fd);font-size:1.2rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text);margin-bottom:1rem}
+.up-next-box{display:flex;align-items:center;justify-content:space-between;gap:1rem;background:var(--surface);border:0.5px solid var(--border);padding:1rem 1.5rem;cursor:pointer;transition:all 0.2s;flex-wrap:wrap}
+.up-next-box:hover{border-color:rgba(201,168,76,0.4);background:rgba(201,168,76,0.04)}
+.up-next-title{font-family:var(--fd);font-size:15px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text)}
+.up-next-cta{font-family:var(--fm);font-size:10px;letter-spacing:0.12em;color:var(--gold);border:0.5px solid rgba(201,168,76,0.4);padding:5px 14px;white-space:nowrap;flex-shrink:0}
 
-.add-form{background:var(--surface);border:0.5px solid var(--border);padding:1.5rem;margin-bottom:2rem;display:none}
-.add-form.open{display:block}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
-.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
-.form-label{font-family:var(--fm);font-size:10px;letter-spacing:0.1em;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px}
-.form-actions{display:flex;gap:8px;margin-top:1rem}
-.form-hint{font-size:11px;color:var(--text3);margin-top:4px}
-.form-title-bar{font-family:var(--fd);font-size:1rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;padding-bottom:8px;border-bottom:0.5px solid var(--border)}
+/* ARCHIVE */
+.archive-wrap{padding:2.5rem 2rem}
+.filter-bar{display:flex;gap:8px;margin-bottom:2rem;flex-wrap:wrap}
+.filter-btn{font-family:var(--fd);font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:6px 16px;background:var(--surface);border:0.5px solid var(--border);color:var(--text3);cursor:pointer;transition:all 0.15s}
+.filter-btn.on{background:var(--surface3);border-color:var(--border2);color:var(--text)}
+.filter-btn:hover:not(.on){background:var(--surface2);color:var(--text)}
+.prem-banner{background:rgba(201,168,76,0.06);border:0.5px solid rgba(201,168,76,0.25);padding:1rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.archive-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:1px}
+.film-card{background:var(--surface);border:0.5px solid var(--border);cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
+.film-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.film-thumb{position:relative;padding-top:56.25%;background:var(--surface2);overflow:hidden}
+.thumb-img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block;transition:opacity 0.3s;z-index:1}
+.thumb-preview{position:absolute;top:-15%;left:-2px;width:calc(100% + 4px);height:130%;border:none;opacity:0;transition:opacity 0.4s;pointer-events:none;z-index:2}
+.film-card:hover .thumb-preview{opacity:1}
+.film-card:hover .thumb-img{opacity:0}
+.thumb-letters{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:3rem;font-weight:700;color:rgba(255,255,255,0.04);text-transform:uppercase}
+.thumb-grad{position:absolute;inset:0;background:linear-gradient(135deg,rgba(217,43,58,0.12) 0%,transparent 60%);z-index:1}
+.wm{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0.14;font-family:var(--fd);font-size:1.3rem;font-weight:700;letter-spacing:0.2em;color:#fff;text-transform:uppercase;transform:rotate(-20deg);user-select:none;pointer-events:none;z-index:1}
+.lock-ov{position:absolute;inset:0;background:rgba(8,8,9,0.6);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;opacity:0;transition:opacity 0.2s;z-index:3}
+.film-card:hover .lock-ov{opacity:1}
+.lock-icon{font-size:1.4rem;color:var(--gold)}
+.lock-txt{font-family:var(--fd);font-size:11px;font-weight:600;letter-spacing:0.12em;color:var(--gold);text-transform:uppercase}
+.card-badge{position:absolute;top:8px;left:8px;font-family:var(--fm);font-size:8px;letter-spacing:0.1em;padding:3px 8px;text-transform:uppercase;z-index:4}
+.badge-free{background:rgba(8,8,9,0.8);border:0.5px solid var(--border2);color:var(--text2)}
+.badge-prem{background:rgba(201,168,76,0.15);border:0.5px solid rgba(201,168,76,0.4);color:var(--gold)}
+.film-info{padding:10px 12px}
+.film-cat{font-family:var(--fm);font-size:9px;letter-spacing:0.14em;color:var(--red);text-transform:uppercase;margin-bottom:4px}
+.film-name{font-family:var(--fd);font-size:13px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:var(--text);line-height:1.2;margin-bottom:4px}
+.film-desc{font-size:11px;color:var(--text3);line-height:1.5;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.film-dur{font-size:11px;color:var(--text3)}
 
-.video-table{width:100%;border-collapse:collapse}
-.video-table th{font-family:var(--fm);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;padding:8px 12px;text-align:left;border-bottom:0.5px solid var(--border);background:var(--surface)}
-.video-table td{padding:10px 12px;border-bottom:0.5px solid var(--border);font-size:13px;vertical-align:middle}
-.video-table tr:hover td{background:var(--surface2)}
-.video-table tr.inactive td{opacity:0.4}
-.badge{font-family:var(--fm);font-size:9px;letter-spacing:0.1em;padding:3px 8px;text-transform:uppercase}
-.badge-free{background:rgba(46,204,113,0.12);border:0.5px solid rgba(46,204,113,0.3);color:var(--green)}
-.badge-premium{background:rgba(201,168,76,0.12);border:0.5px solid rgba(201,168,76,0.3);color:var(--gold)}
-.badge-inactive{background:var(--surface3);border:0.5px solid var(--border);color:var(--text3)}
-.drag-handle{cursor:grab;color:var(--text3);font-size:16px;user-select:none;padding-right:8px}
-.drag-handle:active{cursor:grabbing}
+/* FILM DETAIL PAGE */
+.detail-wrap{max-width:900px;margin:0 auto;padding:2.5rem 2rem}
+.detail-back{font-family:var(--fm);font-size:11px;letter-spacing:0.1em;color:var(--text3);cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin-bottom:2rem;background:none;border:none;padding:0;transition:color 0.15s}
+.detail-back:hover{color:var(--text)}
+.detail-trailer{position:relative;width:100%;padding-top:56.25%;background:#000;margin-bottom:2rem;overflow:hidden}
+.detail-trailer iframe{position:absolute;inset:0;width:100%;height:100%;border:none}
+.detail-title{font-family:var(--fd);font-size:clamp(1.5rem,3vw,2.8rem);font-weight:700;letter-spacing:0.04em;text-transform:uppercase;line-height:1.1;margin-bottom:12px}
+.detail-meta{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;flex-wrap:wrap}
+.detail-desc{font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:2rem;max-width:680px}
+.detail-cta{display:flex;gap:12px;flex-wrap:wrap}
+.btn-watch-full{font-family:var(--fd);font-size:14px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:14px 32px;background:var(--red);color:#fff;border:none;cursor:pointer;transition:all 0.15s}
+.btn-watch-full:hover{background:var(--red2)}
+.btn-watch-free{font-family:var(--fd);font-size:14px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:14px 32px;background:transparent;color:var(--text);border:0.5px solid var(--border2);cursor:pointer;transition:all 0.15s}
+.btn-watch-free:hover{background:var(--surface2)}
 
-/* EDIT MODAL */
-.modal-bg{position:fixed;inset:0;background:rgba(8,8,9,0.92);backdrop-filter:blur(4px);z-index:500;display:none;align-items:center;justify-content:center;padding:1rem}
+/* PRICING */
+.pricing-wrap{max-width:860px;margin:0 auto;padding:4rem 2rem}
+.pricing-eye{font-family:var(--fm);font-size:10px;letter-spacing:0.2em;color:var(--red);text-transform:uppercase;margin-bottom:12px;text-align:center}
+.pricing-h{font-family:var(--fd);font-size:clamp(2.5rem,6vw,5rem);font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--text);line-height:0.95;margin-bottom:16px;text-align:center}
+.pricing-sub{font-size:15px;color:var(--text2);max-width:480px;margin:0 auto 4rem;line-height:1.6;text-align:center}
+.plans{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin-bottom:3rem}
+.plan{background:var(--surface);border:0.5px solid var(--border);padding:2.5rem}
+.plan.hot{border-color:rgba(217,43,58,0.4);background:rgba(217,43,58,0.03);position:relative}
+.plan-hot-label{position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:var(--red);font-family:var(--fm);font-size:9px;letter-spacing:0.14em;color:#fff;padding:3px 16px;text-transform:uppercase}
+.plan-name{font-family:var(--fd);font-size:1rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text2);margin-bottom:1.5rem}
+.plan-price{font-family:var(--fd);font-size:3.5rem;font-weight:700;color:var(--text);line-height:1}
+.plan-period{font-family:var(--fd);font-size:1rem;color:var(--text3)}
+.plan-trial{font-family:var(--fm);font-size:10px;letter-spacing:0.1em;color:var(--gold);margin:6px 0 2rem}
+.plan-div{height:0.5px;background:var(--border);margin:1.5rem 0}
+.plan-feats{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:2rem}
+.plan-feats li{display:flex;gap:10px;font-size:13px;color:var(--text2);line-height:1.4}
+.fi{flex-shrink:0;margin-top:1px}
+.btn-plan{width:100%;font-family:var(--fd);font-size:14px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:14px;cursor:pointer;border:none;transition:all 0.15s}
+.btn-free{background:var(--surface3);color:var(--text);border:0.5px solid var(--border2)}
+.btn-free:hover{background:var(--surface2)}
+.btn-prem{background:var(--red);color:#fff}
+.btn-prem:hover{background:var(--red2)}
+.faq{margin-top:3rem}
+.faq-title{font-family:var(--fd);font-size:1.3rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text);margin-bottom:1.5rem;text-align:center}
+.faq-item{border-bottom:0.5px solid var(--border);padding:1.2rem 0}
+.faq-q{font-family:var(--fd);font-size:14px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text);cursor:pointer;display:flex;justify-content:space-between}
+.faq-a{font-size:13px;color:var(--text2);line-height:1.6;margin-top:10px;display:none}
+.faq-a.open{display:block}
+
+/* AUTH MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(8,8,9,0.88);backdrop-filter:blur(4px);z-index:500;display:none;align-items:center;justify-content:center}
 .modal-bg.open{display:flex}
-.modal{background:var(--surface);border:0.5px solid var(--border2);padding:2rem;width:100%;max-width:560px;position:relative;max-height:90vh;overflow-y:auto}
+.modal{background:var(--surface);border:0.5px solid var(--border2);padding:2.5rem;width:100%;max-width:400px;position:relative}
 .modal-x{position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--text3);font-size:1.2rem;cursor:pointer}
 .modal-x:hover{color:var(--text)}
+.modal-title{font-family:var(--fd);font-size:1.8rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text);margin-bottom:6px}
+.modal-sub{font-size:13px;color:var(--text2);margin-bottom:2rem;line-height:1.5}
+.btn-google{width:100%;display:flex;align-items:center;justify-content:center;gap:12px;padding:13px;background:var(--surface3);border:0.5px solid var(--border2);color:var(--text);font-family:var(--fd);font-size:14px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:all 0.15s}
+.btn-google:hover{background:var(--surface2)}
+.google-icon{width:18px;height:18px}
+.modal-note{font-size:11px;color:var(--text3);text-align:center;margin-top:1.5rem;line-height:1.5}
+.modal-note a{color:var(--red);text-decoration:none}
 
-.schedule-preview{background:var(--surface);border:0.5px solid var(--border);margin-top:2rem}
-.schedule-preview-header{padding:1rem 1.5rem;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.schedule-list{max-height:400px;overflow-y:auto}
-.schedule-row{display:grid;grid-template-columns:80px 1fr 80px;align-items:center;padding:8px 16px;border-bottom:0.5px solid var(--border);font-size:13px}
-.schedule-row.now-row{background:rgba(217,43,58,0.06);border-left:2px solid var(--red)}
-.sched-time-col{font-family:var(--fm);font-size:11px;color:var(--text3)}
-.sched-time-col.now{color:var(--red)}
-.sched-dur-col{font-family:var(--fm);font-size:11px;color:var(--text3);text-align:right}
+/* FOOTER */
+footer{border-top:0.5px solid var(--border);padding:2rem 2.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-top:4rem}
+.footer-logo img{height:22px}
+.footer-copy{font-size:11px;color:var(--text3);font-family:var(--fm)}
+.footer-links{display:flex;gap:1.5rem}
+.footer-links a{font-size:11px;color:var(--text3);text-decoration:none;font-family:var(--fm)}
+.footer-links a:hover{color:var(--text2)}
 
-.toast{position:fixed;bottom:2rem;right:2rem;padding:12px 20px;border-radius:2px;font-family:var(--fm);font-size:12px;letter-spacing:0.08em;color:#fff;z-index:999;transform:translateY(100px);opacity:0;transition:all 0.3s}
-.toast.show{transform:translateY(0);opacity:1}
-.toast.success{background:var(--green)}
-.toast.error{background:var(--red)}
-
-/* Duration helper */
-.dur-helper{font-family:var(--fm);font-size:10px;color:var(--gold);margin-top:4px;min-height:16px}
+@media(max-width:700px){
+  nav{padding:0 1rem}
+  .player-info{padding:1rem}
+  .section,.archive-wrap,.pricing-wrap{padding:1.5rem 1rem}
+  .plans{grid-template-columns:1fr}
+  .archive-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+  footer{padding:1.5rem 1rem}
+}
 </style>
 </head>
 <body>
 
-<div class="login-wrap" id="loginWrap">
-  <div class="login-box">
-    <div class="login-title">TV<span style="color:var(--red)">ARZ</span> Admin</div>
-    <div class="login-sub">Enter your admin key to continue.</div>
-    <label class="form-label">Admin Key</label>
-    <input type="password" id="keyInput" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
-    <button class="btn btn-red" style="width:100%" onclick="doLogin()">Login</button>
+<!-- NAV -->
+<nav>
+  <div class="nav-logo" onclick="showPage('home')"><img src="tvarzlogo.png" alt="TVARZ"></div>
+  <div class="nav-links">
+    <button class="nav-link active" id="nav-home" onclick="showPage('home')">Watch</button>
+    <button class="nav-link" id="nav-archive" onclick="showPage('archive')">Archive</button>
+    <button class="nav-link" id="nav-pricing" onclick="showPage('pricing')">Pricing</button>
+  </div>
+  <div class="nav-right">
+    <div class="live-pill"><div class="live-dot"></div>LIVE</div>
+    <div class="nav-clock" id="navClock">00:00:00</div>
+    <div id="authArea"><button class="btn-login" onclick="openModal()">Sign in</button></div>
+  </div>
+</nav>
+
+<!-- HOME -->
+<div class="page active" id="page-home">
+  <div class="player-wrap" id="playerWrap">
+    <div id="iframeContainer"></div>
+    <div class="player-grad"></div>
+    <div class="player-tap" id="playerTap" onclick="unmute()"></div>
+    <div class="mute-hint" id="muteHint">🔇 Tap to unmute</div>
+    <button class="fs-btn" onclick="goFullscreen()">⛶</button>
+    <div class="player-info">
+      <div class="now-label">Now Playing</div>
+      <div class="film-title" id="filmTitle">Loading stream...</div>
+      <div class="film-tags" id="filmTags"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title">Up Next</div>
+    <div class="up-next-box" onclick="showPage('pricing')">
+      <div class="up-next-title" id="upNext">—</div>
+      <div class="up-next-cta">UNLOCK WITH PREMIUM →</div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-logo"><img src="tvarzlogo.png" alt="TVARZ"></div>
+    <div class="footer-copy">© 2025 Tvarz · Free AI Cinema Channel</div>
+    <div class="footer-links"><a href="#">Privacy</a><a href="#">Terms</a><a onclick="showPage('pricing')" href="#">Pricing</a></div>
+  </footer>
+</div>
+
+<!-- FILM DETAIL -->
+<div class="page" id="page-detail">
+  <div class="detail-wrap">
+    <button class="detail-back" onclick="showPage('archive')">← Back to Archive</button>
+    <div class="detail-trailer">
+      <iframe id="detailTrailer" allowfullscreen allow="autoplay;encrypted-media"></iframe>
+    </div>
+    <div class="detail-meta">
+      <span class="tag red" id="detailCat">AI Film</span>
+      <span class="tag" id="detailDur">—</span>
+    </div>
+    <div class="detail-title" id="detailTitle">—</div>
+    <div class="detail-desc" id="detailDesc">—</div>
+    <div class="detail-cta">
+      <button class="btn-watch-full" id="detailWatchBtn" onclick="handleDetailWatch()">▶ Watch Full Film</button>
+    </div>
   </div>
 </div>
 
-<div class="app" id="app">
-  <header>
-    <div class="header-logo">TV<span>ARZ</span> <span style="font-size:1rem;font-weight:400;color:var(--text3)">Admin</span></div>
-    <div class="header-right">
-      <div class="header-tag" id="headerStats">Loading...</div>
-      <button class="btn btn-ghost btn-sm" onclick="loadAll()">↻ Refresh</button>
+<!-- ARCHIVE -->
+<div class="page" id="page-archive">
+  <div class="archive-wrap">
+    <div style="margin-bottom:1.5rem">
+      <div style="font-family:var(--fd);font-size:2.2rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">Archive</div>
+      <div style="font-family:var(--fm);font-size:10px;color:var(--text3);letter-spacing:0.12em;margin-top:4px" id="archiveSub">FILMS · DOCUMENTARIES · SERIES</div>
     </div>
-  </header>
-
-  <main>
-    <div class="stats-row">
-      <div class="stat-card"><div class="stat-label">Total Videos</div><div class="stat-val" id="statTotal">—</div></div>
-      <div class="stat-card"><div class="stat-label">Active</div><div class="stat-val green" id="statActive">—</div></div>
-      <div class="stat-card"><div class="stat-label">Content Hours</div><div class="stat-val gold" id="statHours">—</div></div>
-      <div class="stat-card"><div class="stat-label">Loops / Day</div><div class="stat-val red" id="statLoops">—</div></div>
+    <div class="filter-bar">
+      <button class="filter-btn on" onclick="filterArchive('all',this)">All</button>
+      <button class="filter-btn" onclick="filterArchive('film',this)">AI Films</button>
+      <button class="filter-btn" onclick="filterArchive('doc',this)">Documentary</button>
+      <button class="filter-btn" onclick="filterArchive('turkish',this)">Turkish Films & Series</button>
     </div>
-
-    <div class="section-title">
-      Videos
-      <button class="btn btn-red btn-sm" onclick="toggleForm()">+ Add Video</button>
-    </div>
-
-    <div class="add-form" id="addForm">
-      <div class="form-title-bar">Add New Video</div>
-      <div class="form-grid">
-        <div>
-          <label class="form-label">Title *</label>
-          <input type="text" id="fTitle" placeholder="Lost Girls in Amazon">
-        </div>
-        <div>
-          <label class="form-label">YouTube ID *</label>
-          <input type="text" id="fYtId" placeholder="6y7k_mbiEw0">
-          <div class="form-hint">youtube.com/watch?v=<strong>6y7k_mbiEw0</strong></div>
-        </div>
-      </div>
-      <div class="form-grid">
-        <div>
-          <label class="form-label">Trailer ID (optional)</label>
-          <input type="text" id="fTrailerId" placeholder="TY81-GglrwA">
-          <div class="form-hint">Separate short trailer YouTube ID</div>
-        </div>
-        <div></div>
-      </div>
-      <div class="form-grid-3">
-        <div>
-          <label class="form-label">Duration (MM:SS) *</label>
-          <input type="text" id="fDur" placeholder="10:12" oninput="showDurHelper(this,'fDurHelper')">
-          <div class="dur-helper" id="fDurHelper"></div>
-        </div>
-        <div>
-          <label class="form-label">Category</label>
-          <select id="fCat">
-            <option value="film">AI Film</option>
-            <option value="doc">Documentary</option>
-            <option value="turkish">Turkish Films & Series</option>
-            <option value="short">Short</option>
-          </select>
-        </div>
-        <div>
-          <label class="form-label">Access</label>
-          <select id="fPremium">
-            <option value="false">Free</option>
-            <option value="true">Premium</option>
-          </select>
-        </div>
-      </div>
+    <div class="prem-banner" id="premBanner" style="display:none">
       <div>
-        <label class="form-label">Description</label>
-        <textarea id="fDesc" placeholder="Brief description of the film" style="margin-bottom:0"></textarea>
+        <div style="font-family:var(--fd);font-size:14px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);margin-bottom:3px">Unlock the Full Archive</div>
+        <div style="font-size:12px;color:var(--text2)">Get Premium for $3.99/mo — first 3 days free</div>
       </div>
-      <div class="form-actions">
-        <button class="btn btn-green" onclick="addVideo()">Add to Schedule</button>
-        <button class="btn btn-ghost" onclick="toggleForm()">Cancel</button>
-      </div>
+      <button class="btn-prem" style="font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:9px 20px;border:none;cursor:pointer;" onclick="showPage('pricing')">Get Premium</button>
     </div>
-
-    <table class="video-table" id="videoTable">
-      <thead>
-        <tr>
-          <th style="width:30px"></th>
-          <th>Title</th>
-          <th>Category</th>
-          <th>Duration</th>
-          <th>Access</th>
-          <th>Status</th>
-          <th style="width:160px">Actions</th>
-        </tr>
-      </thead>
-      <tbody id="videoBody">
-        <tr><td colspan="7" style="padding:2rem;color:var(--text3);font-family:var(--fm);font-size:12px">Loading...</td></tr>
-      </tbody>
-    </table>
-
-    <div class="schedule-preview">
-      <div class="schedule-preview-header">
-        <div style="font-family:var(--fd);font-size:1.1rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">Today's Schedule</div>
-        <div style="font-family:var(--fm);font-size:11px;color:var(--text3)" id="scheduleInfo">—</div>
-      </div>
-      <div class="schedule-list" id="scheduleList">
-        <div style="padding:1rem;color:var(--text3);font-family:var(--fm);font-size:12px">Loading...</div>
-      </div>
-    </div>
-  </main>
+    <div class="archive-grid" id="archiveGrid"><div style="padding:2rem;color:var(--text3);font-family:var(--fm);font-size:12px">Loading...</div></div>
+  </div>
 </div>
 
-<!-- EDIT MODAL -->
-<div class="modal-bg" id="editModal">
+<!-- PRICING -->
+<div class="page" id="page-pricing">
+  <div class="pricing-wrap">
+    <div class="pricing-eye">Simple pricing</div>
+    <div class="pricing-h">Watch free.<br>Or watch everything.</div>
+    <div class="pricing-sub">Start watching instantly. No credit card required for Free. Cancel Premium anytime.</div>
+    <div class="plans">
+      <div class="plan">
+        <div class="plan-name">Free</div>
+        <div><span class="plan-price">$0</span><span class="plan-period">/forever</span></div>
+        <div class="plan-trial" style="color:var(--text3)">No credit card needed</div>
+        <div class="plan-div"></div>
+        <ul class="plan-feats">
+          <li><span class="fi" style="color:var(--red)">✓</span>Live stream — always on</li>
+          <li><span class="fi" style="color:var(--red)">✓</span>Full schedule access</li>
+          <li><span class="fi" style="color:var(--red)">✓</span>New content weekly</li>
+          <li><span class="fi" style="color:var(--text3)">✗</span><span style="color:var(--text3)">On-demand archive</span></li>
+          <li><span class="fi" style="color:var(--text3)">✗</span><span style="color:var(--text3)">Ad-free experience</span></li>
+        </ul>
+        <button class="btn-plan btn-free" onclick="openModal()">Start Watching Free</button>
+      </div>
+      <div class="plan hot">
+        <div class="plan-hot-label">Most Popular</div>
+        <div class="plan-name" style="color:var(--gold)">Premium</div>
+        <div><span class="plan-price">$3.99</span><span class="plan-period">/month</span></div>
+        <div class="plan-trial">✦ First 3 days completely free</div>
+        <div class="plan-div"></div>
+        <ul class="plan-feats">
+          <li><span class="fi" style="color:var(--gold)">✓</span>Everything in Free</li>
+          <li><span class="fi" style="color:var(--gold)">✓</span>Full archive — all titles</li>
+          <li><span class="fi" style="color:var(--gold)">✓</span>Watch anything, anytime</li>
+          <li><span class="fi" style="color:var(--gold)">✓</span>Ad-free experience</li>
+          <li><span class="fi" style="color:var(--gold)">✓</span>New films 48h early access</li>
+        </ul>
+        <button class="btn-plan btn-prem" onclick="startTrial()">Start Free Trial</button>
+      </div>
+    </div>
+    <div class="faq">
+      <div class="faq-title">Questions</div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">What is Tvarz? <span>+</span></div><div class="faq-a">Tvarz is a free AI cinema channel streaming 24/7 — just like TV, but built with artificial intelligence. Free users watch the live stream. Premium users get the full archive on demand.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Do I need an account? <span>+</span></div><div class="faq-a">No account needed for the free live stream. Sign in with Google to access Premium.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">How does the free trial work? <span>+</span></div><div class="faq-a">3-day free trial, then $3.99/month. Cancel anytime before the trial ends — no charges.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Are the films really made with AI? <span>+</span></div><div class="faq-a">Yes. Every title on Tvarz is produced with AI video tools — Seedance, Veo, Kling, and others.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="modal-bg" id="authModal">
   <div class="modal">
-    <button class="modal-x" onclick="closeEdit()">✕</button>
-    <div class="form-title-bar" style="color:var(--gold)">Edit Video</div>
-    <input type="hidden" id="eId">
-    <div class="form-grid">
-      <div>
-        <label class="form-label">Title *</label>
-        <input type="text" id="eTitle">
-      </div>
-      <div>
-        <label class="form-label">YouTube ID *</label>
-        <input type="text" id="eYtId">
-        <div class="form-hint">youtube.com/watch?v=<strong>ID</strong></div>
-      </div>
-    </div>
-    <div class="form-grid">
-      <div>
-        <label class="form-label">Trailer ID (optional)</label>
-        <input type="text" id="eTrailerId" placeholder="TY81-GglrwA">
-        <div class="form-hint">Separate short trailer YouTube ID</div>
-      </div>
-      <div></div>
-    </div>
-    <div class="form-grid-3">
-      <div>
-        <label class="form-label">Duration (MM:SS) *</label>
-        <input type="text" id="eDur" placeholder="10:12" oninput="showDurHelper(this,'eDurHelper')">
-        <div class="dur-helper" id="eDurHelper"></div>
-      </div>
-      <div>
-        <label class="form-label">Category</label>
-        <select id="eCat">
-          <option value="film">AI Film</option>
-          <option value="doc">Documentary</option>
-          <option value="turkish">Turkish Films & Series</option>
-          <option value="short">Short</option>
-        </select>
-      </div>
-      <div>
-        <label class="form-label">Access</label>
-        <select id="ePremium">
-          <option value="false">Free</option>
-          <option value="true">Premium</option>
-        </select>
-      </div>
-    </div>
-    <div>
-      <label class="form-label">Description</label>
-      <textarea id="eDesc" placeholder="Brief description" style="margin-bottom:0"></textarea>
-    </div>
-    <div class="form-actions">
-      <button class="btn btn-green" onclick="saveEdit()">Save Changes</button>
-      <button class="btn btn-ghost" onclick="closeEdit()">Cancel</button>
-    </div>
+    <button class="modal-x" onclick="closeModal()">✕</button>
+    <div class="modal-title">Sign In</div>
+    <div class="modal-sub">Join Tvarz to unlock Premium and save your watchlist.</div>
+    <button class="btn-google" onclick="googleSignIn()">
+      <svg class="google-icon" viewBox="0 0 24 24" fill="none">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      </svg>
+      Continue with Google
+    </button>
+    <div id="gBtnWrap" style="margin-top:10px;display:flex;justify-content:center"></div>
+    <div class="modal-note">By signing in you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</div>
   </div>
 </div>
-
-<div class="toast" id="toast"></div>
 
 <script>
 const API = 'https://tvarz-production.up.railway.app';
-let adminKey = '';
-let videos = [];
+const GOOGLE_CLIENT_ID = '548804749992-1vlr2bbl71u6u4kpgrh95bbk3rti0bta.apps.googleusercontent.com';
 
-// ── DURATION HELPERS ──
-function parseDuration(val){
-  val = val.trim();
-  if(val.includes(':')){
-    const parts = val.split(':');
-    if(parts.length === 2){
-      const m = parseInt(parts[0])||0;
-      const s = parseInt(parts[1])||0;
-      return m*60+s;
-    }
-    if(parts.length === 3){
-      const h = parseInt(parts[0])||0;
-      const m = parseInt(parts[1])||0;
-      const s = parseInt(parts[2])||0;
-      return h*3600+m*60+s;
-    }
-  }
-  return parseInt(val)||0;
-}
+let currentUser = null;
+let isPremium = false;
+let currentFilter = 'all';
+let allVideos = [];
+let advanceTimer = null;
+let currentVideoId = null;
+let muted = true;
 
-function formatDuration(seconds){
-  const m = Math.floor(seconds/60);
-  const s = seconds%60;
-  return `${m}:${String(s).padStart(2,'0')}`;
-}
-
-function showDurHelper(input, helperId){
-  const sec = parseDuration(input.value);
-  const el = document.getElementById(helperId);
-  if(sec > 0){
-    el.textContent = `= ${sec} seconds (${formatDuration(sec)})`;
-  } else {
-    el.textContent = '';
-  }
-}
-
-// ── LOGIN ──
-function doLogin(){
-  const key = document.getElementById('keyInput').value.trim();
-  if(!key){ toast('Enter admin key', 'error'); return; }
-  adminKey = key;
-  fetch(`${API}/admin/videos`, { headers: { 'x-admin-key': key } })
-    .then(r => r.json())
-    .then(d => {
-      if(!d.success){ toast('Invalid key', 'error'); adminKey=''; return; }
-      document.getElementById('loginWrap').style.display = 'none';
-      document.getElementById('app').classList.add('visible');
-      loadAll();
-    })
-    .catch(() => toast('Connection error', 'error'));
-}
-
-document.getElementById('keyInput').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
-
-// ── LOAD ──
-async function loadAll(){
-  await Promise.all([loadVideos(), loadSchedule()]);
-}
-
-async function loadVideos(){
-  const res = await fetch(`${API}/admin/videos`, { headers: { 'x-admin-key': adminKey } });
-  const data = await res.json();
-  if(!data.success) return;
-  videos = data.data.videos;
-  renderTable();
-  updateStats();
-}
-
-async function loadSchedule(){
+async function loadStream(){
   try {
-    const res = await fetch(`${API}/admin/live-preview`, { headers: { 'x-admin-key': adminKey } });
-    const data = await res.json();
-    if(!data.success) return;
-    const { video_count, total_hours, loops_per_day, schedule } = data.data;
-    document.getElementById('scheduleInfo').textContent = `${video_count} videos · ${total_hours}h content · ${loops_per_day}x/day`;
-    const now = new Date();
-    const curMins = now.getHours() * 60 + now.getMinutes();
-    const list = document.getElementById('scheduleList');
-    list.innerHTML = '';
-    schedule.forEach(row => {
-      const [h,m] = row.time.split(':').map(Number);
-      const mins = h*60+m;
-      const isNow = mins <= curMins && curMins < mins + Math.floor((row.duration_seconds||0)/60);
-      const div = document.createElement('div');
-      div.className = 'schedule-row' + (isNow ? ' now-row' : '');
-      div.innerHTML = `<div class="sched-time-col ${isNow?'now':''}">${row.time}${isNow?' ▶':''}</div><div>${row.title}</div><div class="sched-dur-col">${row.duration||''}</div>`;
-      list.appendChild(div);
-      if(isNow) setTimeout(()=>div.scrollIntoView({block:'center',behavior:'smooth'}), 300);
-    });
+    const res = await fetch(`${API}/program/live`);
+    const d = await res.json();
+    if(!d.success) throw new Error('no data');
+    const { video, start_second, remaining_seconds, next_video } = d.data;
+    currentVideoId = video.youtube_id;
+    document.getElementById('filmTitle').textContent = video.title;
+    const catLabel = {film:'AI Film',doc:'Documentary',series:'Series',short:'Short'}[video.category]||'Film';
+    document.getElementById('filmTags').innerHTML =
+      `<span class="tag red">${catLabel}</span>`+
+      (next_video ? `<span class="tag dim">Next: ${next_video.title}</span>` : '');
+    document.getElementById('upNext').textContent = next_video ? next_video.title : '—';
+    buildIframe(video.youtube_id, start_second, remaining_seconds);
+    if(advanceTimer) clearTimeout(advanceTimer);
+    advanceTimer = setTimeout(loadStream, (remaining_seconds + 1) * 1000);
+    if(window._pollTimer) clearInterval(window._pollTimer);
+    window._pollTimer = setInterval(async()=>{
+      try {
+        const r = await fetch(`${API}/program/live`);
+        const pd = await r.json();
+        if(!pd.success) return;
+        if(pd.data.video.youtube_id !== currentVideoId){ clearInterval(window._pollTimer); loadStream(); }
+      } catch(e){}
+    }, 15000);
+  } catch(e){
+    console.error('Stream error:', e);
+    document.getElementById('filmTitle').textContent = 'Connecting...';
+    setTimeout(loadStream, 5000);
+  }
+}
+
+function buildIframe(videoId, startSecond, remainingSeconds){
+  if(advanceTimer) clearTimeout(advanceTimer);
+  if(window._pollTimer) clearInterval(window._pollTimer);
+  const container = document.getElementById('iframeContainer');
+  container.innerHTML = '';
+  const iframe = document.createElement('iframe');
+  iframe.id = 'ytIframe';
+  iframe.style.cssText = 'position:absolute;top:-90px;left:-2px;width:calc(100% + 4px);height:calc(100% + 180px);border:none;pointer-events:none';
+  iframe.allow = 'autoplay; encrypted-media';
+  iframe.allowFullscreen = true;
+  iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playsinline=1&start=${startSecond}`;
+  container.appendChild(iframe);
+  muted = true;
+  const hint = document.getElementById('muteHint');
+  if(hint){ hint.classList.remove('gone'); hint.textContent = '🔇 Tap to unmute'; }
+  advanceTimer = setTimeout(loadStream, remainingSeconds * 1000);
+}
+
+function unmute(){
+  const iframe = document.getElementById('ytIframe');
+  if(!iframe) return;
+  if(muted){
+    iframe.src = iframe.src.replace('mute=1','mute=0');
+    muted = false;
+    const hint = document.getElementById('muteHint');
+    if(hint) hint.classList.add('gone');
+  } else {
+    iframe.src = iframe.src.replace('mute=0','mute=1');
+    muted = true;
+    const hint = document.getElementById('muteHint');
+    if(hint){ hint.classList.remove('gone'); hint.textContent = '🔇 Tap to unmute'; }
+  }
+}
+
+function goFullscreen(){
+  const wrap = document.getElementById('playerWrap');
+  if(document.fullscreenElement) document.exitFullscreen();
+  else wrap.requestFullscreen().catch(()=>{ if(currentVideoId) window.open('https://www.youtube.com/watch?v='+currentVideoId,'_blank'); });
+}
+
+let currentDetailItem = null;
+const DEFAULT_TRAILER = 'TY81-GglrwA';
+
+function openDetail(item){
+  currentDetailItem = item;
+  const trailerYtId = item.trailer_id || DEFAULT_TRAILER;
+  const cat = {film:'AI Film',doc:'Documentary',turkish:'Turkish Films & Series'}[item.category]||item.category;
+
+  document.getElementById('detailTitle').textContent = item.title;
+  document.getElementById('detailDesc').textContent = item.description || '';
+  document.getElementById('detailCat').textContent = cat;
+  document.getElementById('detailDur').textContent = item.duration || '';
+
+  const trailer = document.getElementById('detailTrailer');
+  trailer.src = `https://www.youtube.com/embed/${trailerYtId}?autoplay=1&mute=0&controls=1&modestbranding=1&rel=0`;
+
+  const locked = item.is_premium && !isPremium;
+  const btn = document.getElementById('detailWatchBtn');
+  btn.textContent = locked ? '🔒 Unlock with Premium — $3.99/mo' : '▶ Watch Full Film';
+
+  showPage('detail');
+}
+
+function handleDetailWatch(){
+  if(!currentDetailItem) return;
+  const locked = currentDetailItem.is_premium && !isPremium;
+  if(locked || true){ // Always go to pricing — full film never plays on site
+    showPage('pricing');
+  }
+}
+
+function showPage(id){
+  // Stop detail trailer when leaving
+  if(id !== 'detail'){
+    const trailer = document.getElementById('detailTrailer');
+    if(trailer) trailer.src = '';
+  }
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  const nl = document.getElementById('nav-'+id); if(nl) nl.classList.add('active');
+  if(id==='archive') buildArchiveGrid();
+  window.scrollTo(0,0);
+}
+
+setInterval(()=>{
+  const n=new Date(),p=x=>String(x).padStart(2,'0');
+  document.getElementById('navClock').textContent=`${p(n.getHours())}:${p(n.getMinutes())}:${p(n.getSeconds())}`;
+},1000);
+
+async function loadArchive(){
+  try {
+    const token = localStorage.getItem('tvarz_token');
+    const res = await fetch(`${API}/program/archive`, { headers: token?{Authorization:`Bearer ${token}`}:{} });
+    const d = await res.json();
+    if(!d.success) return;
+    allVideos = d.data.videos;
+    document.getElementById('archiveSub').textContent = `${allVideos.length} TITLES · FILMS · DOCUMENTARIES · SERIES`;
+    buildArchiveGrid();
   } catch(e){}
 }
 
-function updateStats(){
-  const active = videos.filter(v=>v.is_active);
-  const totalSec = active.filter(v=>v.channel==='main').reduce((s,v)=>s+(v.duration_seconds||0),0);
-  const hours = (totalSec/3600).toFixed(1);
-  const loops = totalSec > 0 ? (86400/totalSec).toFixed(1) : '—';
-  document.getElementById('statTotal').textContent = videos.length;
-  document.getElementById('statActive').textContent = active.length;
-  document.getElementById('statHours').textContent = hours + 'h';
-  document.getElementById('statLoops').textContent = loops + 'x';
-  document.getElementById('headerStats').textContent = `${active.length} active · ${hours}h content`;
-}
-
-function renderTable(){
-  const tbody = document.getElementById('videoBody');
-  tbody.innerHTML = '';
-  if(!videos.length){
-    tbody.innerHTML = '<tr><td colspan="7" style="padding:2rem;color:var(--text3);font-family:var(--fm);font-size:12px">No videos yet.</td></tr>';
-    return;
-  }
-  videos.forEach(v => {
-    const tr = document.createElement('tr');
-    tr.className = v.is_active ? '' : 'inactive';
-    tr.dataset.id = v.id;
-    tr.innerHTML = `
-      <td><span class="drag-handle">⠿</span></td>
-      <td>
-        <div style="font-weight:500">${v.title}</div>
-        <div style="font-family:var(--fm);font-size:10px;color:var(--text3);margin-top:2px">${v.youtube_id||'—'}</div>
-      </td>
-      <td><span style="font-family:var(--fm);font-size:11px;color:var(--text2)">${v.category||'—'}</span></td>
-      <td><span style="font-family:var(--fm);font-size:11px;color:var(--text2)">${v.duration||formatDuration(v.duration_seconds||0)}</span></td>
-      <td><span class="badge ${v.is_premium?'badge-premium':'badge-free'}">${v.is_premium?'Premium':'Free'}</span></td>
-      <td><span class="badge ${v.is_active?'badge-free':'badge-inactive'}">${v.is_active?'Active':'Inactive'}</span></td>
-      <td style="display:flex;gap:6px;flex-wrap:wrap">
-        <button class="btn btn-blue btn-sm" onclick="openEdit('${v.id}')">✎ Edit</button>
-        <button class="btn btn-ghost btn-sm" onclick="toggleActive('${v.id}')">${v.is_active?'Pause':'Resume'}</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteVideo('${v.id}')">✕</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-// ── ADD ──
-function toggleForm(){
-  document.getElementById('addForm').classList.toggle('open');
-}
-
-async function addVideo(){
-  const title = document.getElementById('fTitle').value.trim();
-  const youtube_id = document.getElementById('fYtId').value.trim();
-  const trailer_id = document.getElementById('fTrailerId').value.trim();
-  const durStr = document.getElementById('fDur').value.trim();
-  const duration_seconds = parseDuration(durStr);
-  const category = document.getElementById('fCat').value;
-  const is_premium = document.getElementById('fPremium').value === 'true';
-  const description = document.getElementById('fDesc').value.trim();
-
-  if(!title || !youtube_id || !duration_seconds){
-    toast('Title, YouTube ID and duration are required', 'error'); return;
-  }
-
-  try {
-    const res = await fetch(`${API}/admin/videos`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
-      body: JSON.stringify({ title, youtube_id, trailer_id, duration_seconds, category, is_premium, description })
+function buildArchiveGrid(){
+  const grid = document.getElementById('archiveGrid');
+  const banner = document.getElementById('premBanner');
+  banner.style.display = isPremium ? 'none' : 'flex';
+  const videos = currentFilter==='all' ? allVideos : allVideos.filter(v=>v.category===currentFilter);
+  if(!videos.length){ grid.innerHTML='<div style="padding:2rem;color:var(--text3);font-family:var(--fm);font-size:12px">Loading...</div>'; return; }
+  grid.innerHTML='';
+  videos.forEach(item=>{
+    const locked=item.is_premium&&!isPremium;
+    const init=item.title.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+    const cat={film:'AI Film',doc:'Documentary',turkish:'Turkish Films & Series'}[item.category]||item.category;
+    const card=document.createElement('div');
+    card.className='film-card';
+    const thumbUrl = item.youtube_id ? `https://img.youtube.com/vi/${item.youtube_id}/mqdefault.jpg` : '';
+    const trailerYtId = item.trailer_id || item.youtube_id;
+    const previewSrc = trailerYtId ? `https://www.youtube.com/embed/${trailerYtId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playsinline=1` : '';
+    card.innerHTML=`<div class="film-thumb">${thumbUrl?`<img class="thumb-img" src="${thumbUrl}" alt="${item.title}" loading="lazy">`:`<div class="thumb-letters">${init}</div>`}${previewSrc?`<iframe class="thumb-preview" data-src="${previewSrc}" allowfullscreen allow="autoplay;encrypted-media"></iframe>`:''}<div class="thumb-grad"></div><div class="wm">TVARZ</div>${locked?`<div class="card-badge badge-prem">Premium</div><div class="lock-ov"><div class="lock-icon">🔒</div><div class="lock-txt">Unlock with Premium</div></div>`:''}</div><div class="film-info"><div class="film-cat">${cat}</div><div class="film-name">${item.title}</div>${item.description?`<div class="film-desc">${item.description}</div>`:''}<div class="film-dur">${item.duration||''}</div></div>`;
+    card.addEventListener('mouseenter', ()=>{
+      const iframe = card.querySelector('.thumb-preview');
+      if(iframe && !iframe.src && iframe.dataset.src) iframe.src = iframe.dataset.src;
     });
-    const data = await res.json();
-    if(!data.success) throw new Error(data.message);
-    toast('Video added!', 'success');
-    document.getElementById('fTitle').value='';
-    document.getElementById('fYtId').value='';
-    document.getElementById('fTrailerId').value='';
-    document.getElementById('fDur').value='';
-    document.getElementById('fDesc').value='';
-    document.getElementById('fDurHelper').textContent='';
-    toggleForm();
-    loadAll();
-  } catch(e){
-    toast(e.message || 'Error adding video', 'error');
-  }
-}
-
-// ── EDIT ──
-function openEdit(id){
-  const v = videos.find(x=>x.id===id);
-  if(!v) return;
-  document.getElementById('eId').value = v.id;
-  document.getElementById('eTitle').value = v.title||'';
-  document.getElementById('eYtId').value = v.youtube_id||'';
-  document.getElementById('eTrailerId').value = v.trailer_id||'';
-  document.getElementById('eDur').value = v.duration || formatDuration(v.duration_seconds||0);
-  document.getElementById('eCat').value = v.category||'film';
-  document.getElementById('ePremium').value = v.is_premium ? 'true' : 'false';
-  document.getElementById('eDesc').value = v.description||'';
-  document.getElementById('eDurHelper').textContent = v.duration_seconds ? `= ${v.duration_seconds} seconds` : '';
-  document.getElementById('editModal').classList.add('open');
-}
-
-function closeEdit(){
-  document.getElementById('editModal').classList.remove('open');
-}
-
-document.getElementById('editModal').addEventListener('click', function(e){ if(e.target===this) closeEdit(); });
-
-async function saveEdit(){
-  const id = document.getElementById('eId').value;
-  const title = document.getElementById('eTitle').value.trim();
-  const youtube_id = document.getElementById('eYtId').value.trim();
-  const trailer_id = document.getElementById('eTrailerId').value.trim();
-  const durStr = document.getElementById('eDur').value.trim();
-  const duration_seconds = parseDuration(durStr);
-  const category = document.getElementById('eCat').value;
-  const is_premium = document.getElementById('ePremium').value === 'true';
-  const description = document.getElementById('eDesc').value.trim();
-
-  if(!title || !youtube_id || !duration_seconds){
-    toast('Title, YouTube ID and duration are required', 'error'); return;
-  }
-
-  try {
-    const res = await fetch(`${API}/admin/videos/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
-      body: JSON.stringify({ title, youtube_id, trailer_id, duration_seconds, category, is_premium, description })
+    card.addEventListener('mouseleave', ()=>{
+      const iframe = card.querySelector('.thumb-preview');
+      if(iframe && iframe.src) { iframe.src = ''; }
     });
-    const data = await res.json();
-    if(!data.success) throw new Error(data.message||'Update failed');
-    toast('Saved!', 'success');
-    closeEdit();
-    loadAll();
-  } catch(e){
-    toast(e.message || 'Error saving', 'error');
+    card.onclick=()=>{ openDetail(item); };
+    grid.appendChild(card);
+  });
+}
+
+function filterArchive(cat,btn){
+  currentFilter=cat;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  buildArchiveGrid();
+}
+
+function openModal(){ document.getElementById('authModal').classList.add('open'); }
+function closeModal(){ document.getElementById('authModal').classList.remove('open'); }
+document.getElementById('authModal').addEventListener('click',function(e){ if(e.target===this) closeModal(); });
+
+(function(){
+  const s=document.createElement('script');
+  s.src='https://accounts.google.com/gsi/client';
+  s.async=s.defer=true;
+  s.onload=()=>google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:handleGoogle,auto_select:false});
+  document.head.appendChild(s);
+})();
+
+function googleSignIn(){
+  if(typeof google==='undefined'){ alert('Try again in a moment.'); return; }
+  google.accounts.id.prompt(n=>{
+    if(n.isNotDisplayed()||n.isSkippedMoment()){
+      google.accounts.id.renderButton(document.getElementById('gBtnWrap'),{theme:'filled_black',size:'large',width:320});
+    }
+  });
+}
+
+async function handleGoogle(response){
+  try {
+    const res=await fetch(`${API}/auth/google`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:response.credential})});
+    const d=await res.json();
+    if(!d.success) throw new Error(d.message);
+    localStorage.setItem('tvarz_token',d.data.token);
+    localStorage.setItem('tvarz_user',JSON.stringify(d.data.user));
+    currentUser=d.data.user; isPremium=d.data.user.is_premium;
+    closeModal(); renderAuth(); buildArchiveGrid();
+  } catch(e){ alert('Sign in failed. Please try again.'); }
+}
+
+function renderAuth(){
+  const area=document.getElementById('authArea');
+  if(!currentUser){ area.innerHTML=`<button class="btn-login" onclick="openModal()">Sign in</button>`; return; }
+  const init=currentUser.name?currentUser.name[0].toUpperCase():'?';
+  area.innerHTML=isPremium
+    ?`<div class="user-status"><div class="premium-badge-nav">Premium</div><div class="avatar" onclick="signOut()" title="Sign out">${init}</div></div>`
+    :`<div class="user-status"><button class="btn-premium-nav" onclick="showPage('pricing')">Get Premium</button><div class="avatar" onclick="signOut()" title="Sign out">${init}</div></div>`;
+}
+
+function signOut(){
+  if(!confirm('Sign out?')) return;
+  localStorage.removeItem('tvarz_token'); localStorage.removeItem('tvarz_user');
+  currentUser=null; isPremium=false; renderAuth(); buildArchiveGrid();
+}
+
+function restoreSession(){
+  const token=localStorage.getItem('tvarz_token');
+  const user=localStorage.getItem('tvarz_user');
+  if(token&&user){
+    currentUser=JSON.parse(user); isPremium=currentUser.is_premium; renderAuth();
+    fetch(`${API}/auth/me`,{headers:{Authorization:`Bearer ${token}`}}).then(r=>r.json()).then(d=>{
+      if(d.success){ localStorage.setItem('tvarz_token',d.data.token); localStorage.setItem('tvarz_user',JSON.stringify(d.data.user)); currentUser=d.data.user; isPremium=d.data.user.is_premium; renderAuth(); buildArchiveGrid(); }
+    }).catch(()=>{});
   }
 }
 
-// ── TOGGLE / DELETE ──
-async function toggleActive(id){
-  const res = await fetch(`${API}/admin/videos/${id}/toggle`, {
-    method: 'PATCH',
-    headers: { 'x-admin-key': adminKey }
-  });
-  const data = await res.json();
-  if(data.success){ toast('Updated!', 'success'); loadAll(); }
-  else toast('Error', 'error');
+async function startTrial(){
+  if(!currentUser){ openModal(); return; }
+  const token=localStorage.getItem('tvarz_token');
+  try {
+    const res=await fetch(`${API}/user/checkout`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`}});
+    const d=await res.json();
+    if(d.success&&d.data.checkout_url) window.open(d.data.checkout_url,'_blank');
+    else alert('Could not create checkout. Please try again.');
+  } catch(e){ alert('Payment error. Please try again.'); }
 }
 
-async function deleteVideo(id){
-  const v = videos.find(x=>x.id===id);
-  if(!confirm(`Delete "${v?.title}"? This cannot be undone.`)) return;
-  const res = await fetch(`${API}/admin/videos/${id}`, {
-    method: 'DELETE',
-    headers: { 'x-admin-key': adminKey }
-  });
-  const data = await res.json();
-  if(data.success){ toast('Deleted', 'success'); loadAll(); }
-  else toast('Error deleting', 'error');
+function toggleFaq(el){
+  const a=el.nextElementSibling,s=el.querySelector('span');
+  a.classList.toggle('open'); s.textContent=a.classList.contains('open')?'−':'+';
 }
 
-// ── TOAST ──
-function toast(msg, type='success'){
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = `toast ${type} show`;
-  setTimeout(() => t.className = 'toast', 3000);
-}
-
-document.getElementById('keyInput').focus();
+restoreSession();
+loadStream();
+loadArchive();
 </script>
 </body>
 </html>
