@@ -114,9 +114,16 @@ router.get('/archive', async (req, res) => {
     }
 
     const result = videos.map(v => ({
-      id: v.id, title: v.title, category: v.category, duration: v.duration,
-      duration_seconds: v.duration_seconds, thumbnail_url: v.thumbnail_url,
-      is_premium: v.is_premium, channel: v.channel, sort_order: v.sort_order,
+      id: v.id,
+      title: v.title,
+      category: v.category,
+      duration: v.duration,
+      duration_seconds: v.duration_seconds,
+      thumbnail_url: v.thumbnail_url,
+      is_premium: v.is_premium,
+      channel: v.channel,
+      sort_order: v.sort_order,
+      trailer_id: v.trailer_id || null,
       description: isPremium || !v.is_premium ? v.description : null,
       youtube_id: isPremium || !v.is_premium ? v.youtube_id : null,
       created_at: v.created_at
