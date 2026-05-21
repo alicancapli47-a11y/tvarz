@@ -29,7 +29,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
 
 /* NAV */
 nav{position:fixed;top:0;left:0;right:0;z-index:200;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;background:rgba(8,8,9,0.95);backdrop-filter:blur(12px);border-bottom:0.5px solid var(--border)}
-.nav-logo img{height:30px;width:auto;display:block;cursor:pointer}
+.nav-logo img{height:42px;width:auto;display:block;cursor:pointer}
 .nav-links{display:flex;align-items:center}
 .nav-link{font-family:var(--fd);font-size:13px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text2);padding:0 1rem;height:54px;display:flex;align-items:center;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s;background:none;border-top:none;border-left:none;border-right:none}
 .nav-link:hover{color:var(--text)}
@@ -89,21 +89,40 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:54px;display:flex;ali
 .film-card{background:var(--surface);border:0.5px solid var(--border);cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
 .film-card:hover{border-color:var(--border2);transform:translateY(-2px)}
 .film-thumb{position:relative;padding-top:56.25%;background:var(--surface2);overflow:hidden}
+.thumb-img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block;transition:opacity 0.3s;z-index:1}
+.thumb-preview{position:absolute;top:-15%;left:-2px;width:calc(100% + 4px);height:130%;border:none;opacity:0;transition:opacity 0.4s;pointer-events:none;z-index:2}
+.film-card:hover .thumb-preview{opacity:1}
+.film-card:hover .thumb-img{opacity:0}
 .thumb-letters{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:3rem;font-weight:700;color:rgba(255,255,255,0.04);text-transform:uppercase}
-.thumb-grad{position:absolute;inset:0;background:linear-gradient(135deg,rgba(217,43,58,0.12) 0%,transparent 60%)}
-.wm{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0.14;font-family:var(--fd);font-size:1.3rem;font-weight:700;letter-spacing:0.2em;color:#fff;text-transform:uppercase;transform:rotate(-20deg);user-select:none;pointer-events:none}
-.lock-ov{position:absolute;inset:0;background:rgba(8,8,9,0.6);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;opacity:0;transition:opacity 0.2s}
+.thumb-grad{position:absolute;inset:0;background:linear-gradient(135deg,rgba(217,43,58,0.12) 0%,transparent 60%);z-index:1}
+.wm{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0.14;font-family:var(--fd);font-size:1.3rem;font-weight:700;letter-spacing:0.2em;color:#fff;text-transform:uppercase;transform:rotate(-20deg);user-select:none;pointer-events:none;z-index:1}
+.lock-ov{position:absolute;inset:0;background:rgba(8,8,9,0.6);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;opacity:0;transition:opacity 0.2s;z-index:3}
 .film-card:hover .lock-ov{opacity:1}
 .lock-icon{font-size:1.4rem;color:var(--gold)}
 .lock-txt{font-family:var(--fd);font-size:11px;font-weight:600;letter-spacing:0.12em;color:var(--gold);text-transform:uppercase}
-.card-badge{position:absolute;top:8px;left:8px;font-family:var(--fm);font-size:8px;letter-spacing:0.1em;padding:3px 8px;text-transform:uppercase}
+.card-badge{position:absolute;top:8px;left:8px;font-family:var(--fm);font-size:8px;letter-spacing:0.1em;padding:3px 8px;text-transform:uppercase;z-index:4}
 .badge-free{background:rgba(8,8,9,0.8);border:0.5px solid var(--border2);color:var(--text2)}
 .badge-prem{background:rgba(201,168,76,0.15);border:0.5px solid rgba(201,168,76,0.4);color:var(--gold)}
 .film-info{padding:10px 12px}
 .film-cat{font-family:var(--fm);font-size:9px;letter-spacing:0.14em;color:var(--red);text-transform:uppercase;margin-bottom:4px}
 .film-name{font-family:var(--fd);font-size:13px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:var(--text);line-height:1.2;margin-bottom:4px}
-.film-desc{font-size:11px;color:var(--text3);line-height:1.5;margin-bottom:4px}
+.film-desc{font-size:11px;color:var(--text3);line-height:1.5;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .film-dur{font-size:11px;color:var(--text3)}
+
+/* FILM DETAIL PAGE */
+.detail-wrap{max-width:900px;margin:0 auto;padding:2.5rem 2rem}
+.detail-back{font-family:var(--fm);font-size:11px;letter-spacing:0.1em;color:var(--text3);cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin-bottom:2rem;background:none;border:none;padding:0;transition:color 0.15s}
+.detail-back:hover{color:var(--text)}
+.detail-trailer{position:relative;width:100%;padding-top:56.25%;background:#000;margin-bottom:2rem;overflow:hidden}
+.detail-trailer iframe{position:absolute;inset:0;width:100%;height:100%;border:none}
+.detail-title{font-family:var(--fd);font-size:clamp(1.5rem,3vw,2.8rem);font-weight:700;letter-spacing:0.04em;text-transform:uppercase;line-height:1.1;margin-bottom:12px}
+.detail-meta{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;flex-wrap:wrap}
+.detail-desc{font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:2rem;max-width:680px}
+.detail-cta{display:flex;gap:12px;flex-wrap:wrap}
+.btn-watch-full{font-family:var(--fd);font-size:14px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:14px 32px;background:var(--red);color:#fff;border:none;cursor:pointer;transition:all 0.15s}
+.btn-watch-full:hover{background:var(--red2)}
+.btn-watch-free{font-family:var(--fd);font-size:14px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:14px 32px;background:transparent;color:var(--text);border:0.5px solid var(--border2);cursor:pointer;transition:all 0.15s}
+.btn-watch-free:hover{background:var(--surface2)}
 
 /* PRICING */
 .pricing-wrap{max-width:860px;margin:0 auto;padding:4rem 2rem}
@@ -213,6 +232,25 @@ footer{border-top:0.5px solid var(--border);padding:2rem 2.5rem;display:flex;ali
   </footer>
 </div>
 
+<!-- FILM DETAIL -->
+<div class="page" id="page-detail">
+  <div class="detail-wrap">
+    <button class="detail-back" onclick="showPage('archive')">← Back to Archive</button>
+    <div class="detail-trailer">
+      <iframe id="detailTrailer" allowfullscreen allow="autoplay;encrypted-media"></iframe>
+    </div>
+    <div class="detail-meta">
+      <span class="tag red" id="detailCat">AI Film</span>
+      <span class="tag" id="detailDur">—</span>
+    </div>
+    <div class="detail-title" id="detailTitle">—</div>
+    <div class="detail-desc" id="detailDesc">—</div>
+    <div class="detail-cta">
+      <button class="btn-watch-full" id="detailWatchBtn" onclick="handleDetailWatch()">▶ Watch Full Film</button>
+    </div>
+  </div>
+</div>
+
 <!-- ARCHIVE -->
 <div class="page" id="page-archive">
   <div class="archive-wrap">
@@ -223,9 +261,8 @@ footer{border-top:0.5px solid var(--border);padding:2rem 2.5rem;display:flex;ali
     <div class="filter-bar">
       <button class="filter-btn on" onclick="filterArchive('all',this)">All</button>
       <button class="filter-btn" onclick="filterArchive('film',this)">AI Films</button>
-      <button class="filter-btn" onclick="filterArchive('doc',this)">Documentaries</button>
-      <button class="filter-btn" onclick="filterArchive('series',this)">Series</button>
-      <button class="filter-btn" onclick="filterArchive('short',this)">Shorts</button>
+      <button class="filter-btn" onclick="filterArchive('doc',this)">Documentary</button>
+      <button class="filter-btn" onclick="filterArchive('turkish',this)">Turkish Films & Series</button>
     </div>
     <div class="prem-banner" id="premBanner" style="display:none">
       <div>
@@ -327,7 +364,7 @@ async function loadStream(){
     document.getElementById('filmTitle').textContent = video.title;
     const catLabel = {film:'AI Film',doc:'Documentary',series:'Series',short:'Short'}[video.category]||'Film';
     document.getElementById('filmTags').innerHTML =
-      `<span class="tag red">${catLabel}</span><span class="tag">Large Scale Studios</span>`+
+      `<span class="tag red">${catLabel}</span>`+
       (next_video ? `<span class="tag dim">Next: ${next_video.title}</span>` : '');
     document.getElementById('upNext').textContent = next_video ? next_video.title : '—';
     buildIframe(video.youtube_id, start_second, remaining_seconds);
@@ -389,7 +426,51 @@ function goFullscreen(){
   else wrap.requestFullscreen().catch(()=>{ if(currentVideoId) window.open('https://www.youtube.com/watch?v='+currentVideoId,'_blank'); });
 }
 
+// ── DETAIL PAGE ──
+let currentDetailItem = null;
+
+function openDetail(item){
+  currentDetailItem = item;
+  const trailerYtId = item.trailer_id || item.youtube_id;
+  const cat = {film:'AI Film',doc:'Documentary',turkish:'Turkish Films & Series'}[item.category]||item.category;
+
+  document.getElementById('detailTitle').textContent = item.title;
+  document.getElementById('detailDesc').textContent = item.description || '';
+  document.getElementById('detailCat').textContent = cat;
+  document.getElementById('detailDur').textContent = item.duration || '';
+
+  const trailer = document.getElementById('detailTrailer');
+  trailer.src = trailerYtId
+    ? `https://www.youtube.com/embed/${trailerYtId}?autoplay=1&mute=0&controls=1&modestbranding=1&rel=0`
+    : '';
+
+  const locked = item.is_premium && !isPremium;
+  const btn = document.getElementById('detailWatchBtn');
+  if(locked){
+    btn.textContent = '🔒 Unlock with Premium';
+  } else {
+    btn.textContent = '▶ Watch Full Film';
+  }
+
+  showPage('detail');
+}
+
+function handleDetailWatch(){
+  if(!currentDetailItem) return;
+  const locked = currentDetailItem.is_premium && !isPremium;
+  if(locked){
+    showPage('pricing');
+  } else if(currentDetailItem.youtube_id){
+    window.open('https://www.youtube.com/watch?v='+currentDetailItem.youtube_id,'_blank');
+  }
+}
+
 function showPage(id){
+  // Stop detail trailer when leaving
+  if(id !== 'detail'){
+    const trailer = document.getElementById('detailTrailer');
+    if(trailer) trailer.src = '';
+  }
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
@@ -425,11 +506,22 @@ function buildArchiveGrid(){
   videos.forEach(item=>{
     const locked=item.is_premium&&!isPremium;
     const init=item.title.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
-    const cat={film:'AI Film',doc:'Documentary',series:'Series',short:'Short'}[item.category]||item.category;
+    const cat={film:'AI Film',doc:'Documentary',turkish:'Turkish Films & Series'}[item.category]||item.category;
     const card=document.createElement('div');
     card.className='film-card';
-    card.innerHTML=`<div class="film-thumb"><div class="thumb-letters">${init}</div><div class="thumb-grad"></div><div class="wm">TVARZ</div><div class="card-badge ${locked?'badge-prem':'badge-free'}">${locked?'Premium':'Free'}</div>${locked?`<div class="lock-ov"><div class="lock-icon">🔒</div><div class="lock-txt">Unlock with Premium</div></div>`:''}</div><div class="film-info"><div class="film-cat">${cat}</div><div class="film-name">${item.title}</div>${item.description?`<div class="film-desc">${item.description}</div>`:''}<div class="film-dur">${item.duration||''}</div></div>`;
-    card.onclick=()=>{ if(locked){showPage('pricing');}else if(item.youtube_id){window.open('https://www.youtube.com/watch?v='+item.youtube_id,'_blank');} };
+    const thumbUrl = item.youtube_id ? `https://img.youtube.com/vi/${item.youtube_id}/mqdefault.jpg` : '';
+    const trailerYtId = item.trailer_id || item.youtube_id;
+    const previewSrc = trailerYtId ? `https://www.youtube.com/embed/${trailerYtId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playsinline=1` : '';
+    card.innerHTML=`<div class="film-thumb">${thumbUrl?`<img class="thumb-img" src="${thumbUrl}" alt="${item.title}" loading="lazy">`:`<div class="thumb-letters">${init}</div>`}${previewSrc?`<iframe class="thumb-preview" data-src="${previewSrc}" allowfullscreen allow="autoplay;encrypted-media"></iframe>`:''}<div class="thumb-grad"></div><div class="wm">TVARZ</div><div class="card-badge ${locked?'badge-prem':'badge-free'}">${locked?'Premium':'Free'}</div>${locked?`<div class="lock-ov"><div class="lock-icon">🔒</div><div class="lock-txt">Unlock with Premium</div></div>`:''}</div><div class="film-info"><div class="film-cat">${cat}</div><div class="film-name">${item.title}</div>${item.description?`<div class="film-desc">${item.description}</div>`:''}<div class="film-dur">${item.duration||''}</div></div>`;
+    card.addEventListener('mouseenter', ()=>{
+      const iframe = card.querySelector('.thumb-preview');
+      if(iframe && !iframe.src && iframe.dataset.src) iframe.src = iframe.dataset.src;
+    });
+    card.addEventListener('mouseleave', ()=>{
+      const iframe = card.querySelector('.thumb-preview');
+      if(iframe && iframe.src) { iframe.src = ''; }
+    });
+    card.onclick=()=>{ openDetail(item); };
     grid.appendChild(card);
   });
 }
