@@ -17,21 +17,21 @@
 body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100vh;-webkit-font-smoothing:antialiased}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--surface3)}
 
-/* LOGIN */
 .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center}
 .login-box{background:var(--surface);border:0.5px solid var(--border2);padding:2.5rem;width:360px}
 .login-title{font-family:var(--fd);font-size:1.8rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px}
 .login-sub{font-size:13px;color:var(--text2);margin-bottom:2rem}
-input{width:100%;padding:10px 14px;background:var(--surface2);border:0.5px solid var(--border);color:var(--text);font-family:var(--fb);font-size:14px;margin-bottom:12px;outline:none;transition:border 0.15s}
-input:focus{border-color:var(--border2)}
+input,select,textarea{width:100%;padding:10px 14px;background:var(--surface2);border:0.5px solid var(--border);color:var(--text);font-family:var(--fb);font-size:14px;margin-bottom:12px;outline:none;transition:border 0.15s}
+input:focus,select:focus,textarea:focus{border-color:var(--border2)}
+textarea{resize:vertical;min-height:60px;margin-bottom:0}
 .btn{font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:10px 20px;border:none;cursor:pointer;transition:all 0.15s}
 .btn-red{background:var(--red);color:#fff}.btn-red:hover{background:#a81e2a}
 .btn-ghost{background:var(--surface2);color:var(--text);border:0.5px solid var(--border)}.btn-ghost:hover{background:var(--surface3)}
 .btn-green{background:var(--green);color:#fff}.btn-green:hover{background:#27ae60}
+.btn-blue{background:#2980b9;color:#fff}.btn-blue:hover{background:#2471a3}
 .btn-sm{padding:5px 12px;font-size:11px}
 .btn-danger{background:rgba(217,43,58,0.15);color:var(--red);border:0.5px solid rgba(217,43,58,0.3)}.btn-danger:hover{background:rgba(217,43,58,0.25)}
 
-/* LAYOUT */
 .app{display:none}
 .app.visible{display:block}
 header{background:var(--surface);border-bottom:0.5px solid var(--border);padding:0 2rem;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
@@ -39,30 +39,25 @@ header{background:var(--surface);border-bottom:0.5px solid var(--border);padding
 .header-logo span{color:var(--red)}
 .header-right{display:flex;align-items:center;gap:1rem}
 .header-tag{font-family:var(--fm);font-size:10px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase}
-
 main{padding:2rem;max-width:1200px;margin:0 auto}
 
-/* STATS CARDS */
 .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-bottom:2rem;border:0.5px solid var(--border);overflow:hidden}
 .stat-card{background:var(--surface);padding:1.2rem 1.5rem}
 .stat-label{font-family:var(--fm);font-size:9px;letter-spacing:0.14em;color:var(--text3);text-transform:uppercase;margin-bottom:4px}
 .stat-val{font-family:var(--fd);font-size:2rem;font-weight:700;color:var(--text);line-height:1}
 .stat-val.red{color:var(--red)}.stat-val.green{color:var(--green)}.stat-val.gold{color:var(--gold)}
 
-/* SECTION */
 .section-title{font-family:var(--fd);font-size:1.3rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text);margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between}
 
-/* ADD FORM */
 .add-form{background:var(--surface);border:0.5px solid var(--border);padding:1.5rem;margin-bottom:2rem;display:none}
 .add-form.open{display:block}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
 .form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
 .form-label{font-family:var(--fm);font-size:10px;letter-spacing:0.1em;color:var(--text3);text-transform:uppercase;display:block;margin-bottom:5px}
-select{width:100%;padding:10px 14px;background:var(--surface2);border:0.5px solid var(--border);color:var(--text);font-family:var(--fb);font-size:14px;outline:none}
 .form-actions{display:flex;gap:8px;margin-top:1rem}
 .form-hint{font-size:11px;color:var(--text3);margin-top:4px}
+.form-title-bar{font-family:var(--fd);font-size:1rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;padding-bottom:8px;border-bottom:0.5px solid var(--border)}
 
-/* VIDEO TABLE */
 .video-table{width:100%;border-collapse:collapse}
 .video-table th{font-family:var(--fm);font-size:9px;letter-spacing:0.12em;color:var(--text3);text-transform:uppercase;padding:8px 12px;text-align:left;border-bottom:0.5px solid var(--border);background:var(--surface)}
 .video-table td{padding:10px 12px;border-bottom:0.5px solid var(--border);font-size:13px;vertical-align:middle}
@@ -75,7 +70,13 @@ select{width:100%;padding:10px 14px;background:var(--surface2);border:0.5px soli
 .drag-handle{cursor:grab;color:var(--text3);font-size:16px;user-select:none;padding-right:8px}
 .drag-handle:active{cursor:grabbing}
 
-/* SCHEDULE PREVIEW */
+/* EDIT MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(8,8,9,0.92);backdrop-filter:blur(4px);z-index:500;display:none;align-items:center;justify-content:center;padding:1rem}
+.modal-bg.open{display:flex}
+.modal{background:var(--surface);border:0.5px solid var(--border2);padding:2rem;width:100%;max-width:560px;position:relative;max-height:90vh;overflow-y:auto}
+.modal-x{position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--text3);font-size:1.2rem;cursor:pointer}
+.modal-x:hover{color:var(--text)}
+
 .schedule-preview{background:var(--surface);border:0.5px solid var(--border);margin-top:2rem}
 .schedule-preview-header{padding:1rem 1.5rem;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between}
 .schedule-list{max-height:400px;overflow-y:auto}
@@ -85,16 +86,17 @@ select{width:100%;padding:10px 14px;background:var(--surface2);border:0.5px soli
 .sched-time-col.now{color:var(--red)}
 .sched-dur-col{font-family:var(--fm);font-size:11px;color:var(--text3);text-align:right}
 
-/* TOAST */
 .toast{position:fixed;bottom:2rem;right:2rem;padding:12px 20px;border-radius:2px;font-family:var(--fm);font-size:12px;letter-spacing:0.08em;color:#fff;z-index:999;transform:translateY(100px);opacity:0;transition:all 0.3s}
 .toast.show{transform:translateY(0);opacity:1}
 .toast.success{background:var(--green)}
 .toast.error{background:var(--red)}
+
+/* Duration helper */
+.dur-helper{font-family:var(--fm);font-size:10px;color:var(--gold);margin-top:4px;min-height:16px}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
 <div class="login-wrap" id="loginWrap">
   <div class="login-box">
     <div class="login-title">TV<span style="color:var(--red)">ARZ</span> Admin</div>
@@ -105,7 +107,6 @@ select{width:100%;padding:10px 14px;background:var(--surface2);border:0.5px soli
   </div>
 </div>
 
-<!-- APP -->
 <div class="app" id="app">
   <header>
     <div class="header-logo">TV<span>ARZ</span> <span style="font-size:1rem;font-weight:400;color:var(--text3)">Admin</span></div>
@@ -116,7 +117,6 @@ select{width:100%;padding:10px 14px;background:var(--surface2);border:0.5px soli
   </header>
 
   <main>
-    <!-- STATS -->
     <div class="stats-row">
       <div class="stat-card"><div class="stat-label">Total Videos</div><div class="stat-val" id="statTotal">—</div></div>
       <div class="stat-card"><div class="stat-label">Active</div><div class="stat-val green" id="statActive">—</div></div>
@@ -124,13 +124,13 @@ select{width:100%;padding:10px 14px;background:var(--surface2);border:0.5px soli
       <div class="stat-card"><div class="stat-label">Loops / Day</div><div class="stat-val red" id="statLoops">—</div></div>
     </div>
 
-    <!-- ADD VIDEO -->
     <div class="section-title">
       Videos
       <button class="btn btn-red btn-sm" onclick="toggleForm()">+ Add Video</button>
     </div>
 
     <div class="add-form" id="addForm">
+      <div class="form-title-bar">Add New Video</div>
       <div class="form-grid">
         <div>
           <label class="form-label">Title *</label>
@@ -144,16 +144,16 @@ select{width:100%;padding:10px 14px;background:var(--surface2);border:0.5px soli
       </div>
       <div class="form-grid-3">
         <div>
-          <label class="form-label">Duration (seconds) *</label>
-          <input type="number" id="fDurSec" placeholder="612" min="1">
-          <div class="form-hint">e.g. 10:12 = 612 seconds</div>
+          <label class="form-label">Duration (MM:SS) *</label>
+          <input type="text" id="fDur" placeholder="10:12" oninput="showDurHelper(this,'fDurHelper')">
+          <div class="dur-helper" id="fDurHelper"></div>
         </div>
         <div>
           <label class="form-label">Category</label>
           <select id="fCat">
             <option value="film">AI Film</option>
             <option value="doc">Documentary</option>
-            <option value="series">Series</option>
+            <option value="turkish">Turkish Films & Series</option>
             <option value="short">Short</option>
           </select>
         </div>
@@ -167,7 +167,7 @@ select{width:100%;padding:10px 14px;background:var(--surface2);border:0.5px soli
       </div>
       <div>
         <label class="form-label">Description</label>
-        <input type="text" id="fDesc" placeholder="Brief description of the film">
+        <textarea id="fDesc" placeholder="Brief description of the film" style="margin-bottom:0"></textarea>
       </div>
       <div class="form-actions">
         <button class="btn btn-green" onclick="addVideo()">Add to Schedule</button>
@@ -175,7 +175,6 @@ select{width:100%;padding:10px 14px;background:var(--surface2);border:0.5px soli
       </div>
     </div>
 
-    <!-- VIDEO TABLE -->
     <table class="video-table" id="videoTable">
       <thead>
         <tr>
@@ -185,7 +184,7 @@ select{width:100%;padding:10px 14px;background:var(--surface2);border:0.5px soli
           <th>Duration</th>
           <th>Access</th>
           <th>Status</th>
-          <th style="width:120px">Actions</th>
+          <th style="width:160px">Actions</th>
         </tr>
       </thead>
       <tbody id="videoBody">
@@ -193,7 +192,6 @@ select{width:100%;padding:10px 14px;background:var(--surface2);border:0.5px soli
       </tbody>
     </table>
 
-    <!-- SCHEDULE PREVIEW -->
     <div class="schedule-preview">
       <div class="schedule-preview-header">
         <div style="font-family:var(--fd);font-size:1.1rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">Today's Schedule</div>
@@ -206,6 +204,57 @@ select{width:100%;padding:10px 14px;background:var(--surface2);border:0.5px soli
   </main>
 </div>
 
+<!-- EDIT MODAL -->
+<div class="modal-bg" id="editModal">
+  <div class="modal">
+    <button class="modal-x" onclick="closeEdit()">✕</button>
+    <div class="form-title-bar" style="color:var(--gold)">Edit Video</div>
+    <input type="hidden" id="eId">
+    <div class="form-grid">
+      <div>
+        <label class="form-label">Title *</label>
+        <input type="text" id="eTitle">
+      </div>
+      <div>
+        <label class="form-label">YouTube ID *</label>
+        <input type="text" id="eYtId">
+        <div class="form-hint">youtube.com/watch?v=<strong>ID</strong></div>
+      </div>
+    </div>
+    <div class="form-grid-3">
+      <div>
+        <label class="form-label">Duration (MM:SS) *</label>
+        <input type="text" id="eDur" placeholder="10:12" oninput="showDurHelper(this,'eDurHelper')">
+        <div class="dur-helper" id="eDurHelper"></div>
+      </div>
+      <div>
+        <label class="form-label">Category</label>
+        <select id="eCat">
+          <option value="film">AI Film</option>
+          <option value="doc">Documentary</option>
+          <option value="turkish">Turkish Films & Series</option>
+          <option value="short">Short</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label">Access</label>
+        <select id="ePremium">
+          <option value="false">Free</option>
+          <option value="true">Premium</option>
+        </select>
+      </div>
+    </div>
+    <div>
+      <label class="form-label">Description</label>
+      <textarea id="eDesc" placeholder="Brief description" style="margin-bottom:0"></textarea>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-green" onclick="saveEdit()">Save Changes</button>
+      <button class="btn btn-ghost" onclick="closeEdit()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -213,12 +262,47 @@ const API = 'https://tvarz-production.up.railway.app';
 let adminKey = '';
 let videos = [];
 
+// ── DURATION HELPERS ──
+function parseDuration(val){
+  val = val.trim();
+  if(val.includes(':')){
+    const parts = val.split(':');
+    if(parts.length === 2){
+      const m = parseInt(parts[0])||0;
+      const s = parseInt(parts[1])||0;
+      return m*60+s;
+    }
+    if(parts.length === 3){
+      const h = parseInt(parts[0])||0;
+      const m = parseInt(parts[1])||0;
+      const s = parseInt(parts[2])||0;
+      return h*3600+m*60+s;
+    }
+  }
+  return parseInt(val)||0;
+}
+
+function formatDuration(seconds){
+  const m = Math.floor(seconds/60);
+  const s = seconds%60;
+  return `${m}:${String(s).padStart(2,'0')}`;
+}
+
+function showDurHelper(input, helperId){
+  const sec = parseDuration(input.value);
+  const el = document.getElementById(helperId);
+  if(sec > 0){
+    el.textContent = `= ${sec} seconds (${formatDuration(sec)})`;
+  } else {
+    el.textContent = '';
+  }
+}
+
 // ── LOGIN ──
 function doLogin(){
   const key = document.getElementById('keyInput').value.trim();
   if(!key){ toast('Enter admin key', 'error'); return; }
   adminKey = key;
-  // Test key
   fetch(`${API}/admin/videos`, { headers: { 'x-admin-key': key } })
     .then(r => r.json())
     .then(d => {
@@ -252,13 +336,9 @@ async function loadSchedule(){
     const data = await res.json();
     if(!data.success) return;
     const { video_count, total_hours, loops_per_day, schedule } = data.data;
-
     document.getElementById('scheduleInfo').textContent = `${video_count} videos · ${total_hours}h content · ${loops_per_day}x/day`;
-
-    // Current time for highlight
     const now = new Date();
     const curMins = now.getHours() * 60 + now.getMinutes();
-
     const list = document.getElementById('scheduleList');
     list.innerHTML = '';
     schedule.forEach(row => {
@@ -267,11 +347,7 @@ async function loadSchedule(){
       const isNow = mins <= curMins && curMins < mins + Math.floor((row.duration_seconds||0)/60);
       const div = document.createElement('div');
       div.className = 'schedule-row' + (isNow ? ' now-row' : '');
-      div.innerHTML = `
-        <div class="sched-time-col ${isNow?'now':''}">${row.time}${isNow?' ▶':''}</div>
-        <div>${row.title}</div>
-        <div class="sched-dur-col">${row.duration||''}</div>
-      `;
+      div.innerHTML = `<div class="sched-time-col ${isNow?'now':''}">${row.time}${isNow?' ▶':''}</div><div>${row.title}</div><div class="sched-dur-col">${row.duration||''}</div>`;
       list.appendChild(div);
       if(isNow) setTimeout(()=>div.scrollIntoView({block:'center',behavior:'smooth'}), 300);
     });
@@ -294,7 +370,7 @@ function renderTable(){
   const tbody = document.getElementById('videoBody');
   tbody.innerHTML = '';
   if(!videos.length){
-    tbody.innerHTML = '<tr><td colspan="7" style="padding:2rem;color:var(--text3);font-family:var(--fm);font-size:12px">No videos yet. Add your first video above.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="padding:2rem;color:var(--text3);font-family:var(--fm);font-size:12px">No videos yet.</td></tr>';
     return;
   }
   videos.forEach(v => {
@@ -308,10 +384,11 @@ function renderTable(){
         <div style="font-family:var(--fm);font-size:10px;color:var(--text3);margin-top:2px">${v.youtube_id||'—'}</div>
       </td>
       <td><span style="font-family:var(--fm);font-size:11px;color:var(--text2)">${v.category||'—'}</span></td>
-      <td><span style="font-family:var(--fm);font-size:11px;color:var(--text2)">${v.duration||'—'} <span style="color:var(--text3)">(${v.duration_seconds||0}s)</span></span></td>
+      <td><span style="font-family:var(--fm);font-size:11px;color:var(--text2)">${v.duration||formatDuration(v.duration_seconds||0)}</span></td>
       <td><span class="badge ${v.is_premium?'badge-premium':'badge-free'}">${v.is_premium?'Premium':'Free'}</span></td>
       <td><span class="badge ${v.is_active?'badge-free':'badge-inactive'}">${v.is_active?'Active':'Inactive'}</span></td>
-      <td style="display:flex;gap:6px">
+      <td style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-blue btn-sm" onclick="openEdit('${v.id}')">✎ Edit</button>
         <button class="btn btn-ghost btn-sm" onclick="toggleActive('${v.id}')">${v.is_active?'Pause':'Resume'}</button>
         <button class="btn btn-danger btn-sm" onclick="deleteVideo('${v.id}')">✕</button>
       </td>
@@ -320,16 +397,16 @@ function renderTable(){
   });
 }
 
-// ── FORM ──
+// ── ADD ──
 function toggleForm(){
-  const form = document.getElementById('addForm');
-  form.classList.toggle('open');
+  document.getElementById('addForm').classList.toggle('open');
 }
 
 async function addVideo(){
   const title = document.getElementById('fTitle').value.trim();
   const youtube_id = document.getElementById('fYtId').value.trim();
-  const duration_seconds = parseInt(document.getElementById('fDurSec').value);
+  const durStr = document.getElementById('fDur').value.trim();
+  const duration_seconds = parseDuration(durStr);
   const category = document.getElementById('fCat').value;
   const is_premium = document.getElementById('fPremium').value === 'true';
   const description = document.getElementById('fDesc').value.trim();
@@ -346,11 +423,12 @@ async function addVideo(){
     });
     const data = await res.json();
     if(!data.success) throw new Error(data.message);
-    toast('Video added to schedule!', 'success');
+    toast('Video added!', 'success');
     document.getElementById('fTitle').value='';
     document.getElementById('fYtId').value='';
-    document.getElementById('fDurSec').value='';
+    document.getElementById('fDur').value='';
     document.getElementById('fDesc').value='';
+    document.getElementById('fDurHelper').textContent='';
     toggleForm();
     loadAll();
   } catch(e){
@@ -358,6 +436,58 @@ async function addVideo(){
   }
 }
 
+// ── EDIT ──
+function openEdit(id){
+  const v = videos.find(x=>x.id===id);
+  if(!v) return;
+  document.getElementById('eId').value = v.id;
+  document.getElementById('eTitle').value = v.title||'';
+  document.getElementById('eYtId').value = v.youtube_id||'';
+  document.getElementById('eDur').value = v.duration || formatDuration(v.duration_seconds||0);
+  document.getElementById('eCat').value = v.category||'film';
+  document.getElementById('ePremium').value = v.is_premium ? 'true' : 'false';
+  document.getElementById('eDesc').value = v.description||'';
+  document.getElementById('eDurHelper').textContent = v.duration_seconds ? `= ${v.duration_seconds} seconds` : '';
+  document.getElementById('editModal').classList.add('open');
+}
+
+function closeEdit(){
+  document.getElementById('editModal').classList.remove('open');
+}
+
+document.getElementById('editModal').addEventListener('click', function(e){ if(e.target===this) closeEdit(); });
+
+async function saveEdit(){
+  const id = document.getElementById('eId').value;
+  const title = document.getElementById('eTitle').value.trim();
+  const youtube_id = document.getElementById('eYtId').value.trim();
+  const durStr = document.getElementById('eDur').value.trim();
+  const duration_seconds = parseDuration(durStr);
+  const category = document.getElementById('eCat').value;
+  const is_premium = document.getElementById('ePremium').value === 'true';
+  const description = document.getElementById('eDesc').value.trim();
+
+  if(!title || !youtube_id || !duration_seconds){
+    toast('Title, YouTube ID and duration are required', 'error'); return;
+  }
+
+  try {
+    const res = await fetch(`${API}/admin/videos/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+      body: JSON.stringify({ title, youtube_id, duration_seconds, category, is_premium, description })
+    });
+    const data = await res.json();
+    if(!data.success) throw new Error(data.message||'Update failed');
+    toast('Saved!', 'success');
+    closeEdit();
+    loadAll();
+  } catch(e){
+    toast(e.message || 'Error saving', 'error');
+  }
+}
+
+// ── TOGGLE / DELETE ──
 async function toggleActive(id){
   const res = await fetch(`${API}/admin/videos/${id}/toggle`, {
     method: 'PATCH',
@@ -376,7 +506,7 @@ async function deleteVideo(id){
     headers: { 'x-admin-key': adminKey }
   });
   const data = await res.json();
-  if(data.success){ toast('Video deleted', 'success'); loadAll(); }
+  if(data.success){ toast('Deleted', 'success'); loadAll(); }
   else toast('Error deleting', 'error');
 }
 
@@ -388,7 +518,6 @@ function toast(msg, type='success'){
   setTimeout(() => t.className = 'toast', 3000);
 }
 
-// ── ENTER on login ──
 document.getElementById('keyInput').focus();
 </script>
 </body>
