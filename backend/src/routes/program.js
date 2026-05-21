@@ -58,7 +58,14 @@ function buildDaySchedule(videos) {
   return schedule;
 }
 
-// GET /program/live
+// In-memory token store (resets on redeploy — fine for live stream)
+const streamTokens = new Map();
+
+function generateToken() {
+  return Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
+
+// GET /program/live — returns stream info WITHOUT youtube_id
 router.get('/live', async (req, res) => {
   try {
     const { data: videos, error } = await supabase
@@ -73,10 +80,55 @@ router.get('/live', async (req, res) => {
     const live = calcLive(videos);
     if (!live) return res.status(404).json({ success: false, message: 'No active videos' });
 
-    res.json({ success: true, data: { ...live, server_time: new Date().toISOString() } });
+    // Generate short-lived token for this stream session
+    const token = generateToken();
+    const expiresAt = Date.now() + (live.remaining_seconds + 10) * 1000;
+    streamTokens.set(token, {
+      youtube_id: live.video.youtube_id,
+      start_second: live.start_second,
+      expiresAt
+    });
+
+    // Clean expired tokens
+    for (const [k, v] of streamTokens.entries()) {
+      if (v.expiresAt < Date.now()) streamTokens.delete(k);
+    }
+
+    res.json({
+      success: true,
+      data: {
+        stream_token: token,
+        title: live.video.title,
+        category: live.video.category,
+        start_second: live.start_second,
+        remaining_seconds: live.remaining_seconds,
+        next_video: live.next_video ? { title: live.next_video.title } : null,
+        server_time: new Date().toISOString()
+      }
+    });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
+});
+
+// GET /program/stream?token=xxx — returns embed URL, validates token
+router.get('/stream', async (req, res) => {
+  const { token } = req.query;
+  if (!token) return res.status(400).json({ success: false, message: 'Token required' });
+
+  const data = streamTokens.get(token);
+  if (!data) return res.status(404).json({ success: false, message: 'Invalid or expired token' });
+  if (data.expiresAt < Date.now()) {
+    streamTokens.delete(token);
+    return res.status(410).json({ success: false, message: 'Token expired' });
+  }
+
+  res.json({
+    success: true,
+    data: {
+      embed_url: `https://www.youtube.com/embed/${data.youtube_id}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playsinline=1&start=${data.start_second}`
+    }
+  });
 });
 
 // GET /program/schedule-today
