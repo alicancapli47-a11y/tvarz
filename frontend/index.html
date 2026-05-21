@@ -426,12 +426,12 @@ function goFullscreen(){
   else wrap.requestFullscreen().catch(()=>{ if(currentVideoId) window.open('https://www.youtube.com/watch?v='+currentVideoId,'_blank'); });
 }
 
-// ── DETAIL PAGE ──
 let currentDetailItem = null;
+const DEFAULT_TRAILER = 'TY81-GglrwA';
 
 function openDetail(item){
   currentDetailItem = item;
-  const trailerYtId = item.trailer_id || item.youtube_id;
+  const trailerYtId = item.trailer_id || DEFAULT_TRAILER;
   const cat = {film:'AI Film',doc:'Documentary',turkish:'Turkish Films & Series'}[item.category]||item.category;
 
   document.getElementById('detailTitle').textContent = item.title;
@@ -440,17 +440,11 @@ function openDetail(item){
   document.getElementById('detailDur').textContent = item.duration || '';
 
   const trailer = document.getElementById('detailTrailer');
-  trailer.src = trailerYtId
-    ? `https://www.youtube.com/embed/${trailerYtId}?autoplay=1&mute=0&controls=1&modestbranding=1&rel=0`
-    : '';
+  trailer.src = `https://www.youtube.com/embed/${trailerYtId}?autoplay=1&mute=0&controls=1&modestbranding=1&rel=0`;
 
   const locked = item.is_premium && !isPremium;
   const btn = document.getElementById('detailWatchBtn');
-  if(locked){
-    btn.textContent = '🔒 Unlock with Premium';
-  } else {
-    btn.textContent = '▶ Watch Full Film';
-  }
+  btn.textContent = locked ? '🔒 Unlock with Premium — $3.99/mo' : '▶ Watch Full Film';
 
   showPage('detail');
 }
@@ -458,10 +452,8 @@ function openDetail(item){
 function handleDetailWatch(){
   if(!currentDetailItem) return;
   const locked = currentDetailItem.is_premium && !isPremium;
-  if(locked){
+  if(locked || true){ // Always go to pricing — full film never plays on site
     showPage('pricing');
-  } else if(currentDetailItem.youtube_id){
-    window.open('https://www.youtube.com/watch?v='+currentDetailItem.youtube_id,'_blank');
   }
 }
 
