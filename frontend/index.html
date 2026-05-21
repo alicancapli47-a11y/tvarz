@@ -351,7 +351,7 @@ let isPremium = false;
 let currentFilter = 'all';
 let allVideos = [];
 let advanceTimer = null;
-let currentVideoId = null;
+let currentTitle = null;
 let muted = true;
 
 async function loadStream(){
@@ -359,26 +359,32 @@ async function loadStream(){
     const res = await fetch(`${API}/program/live`);
     const d = await res.json();
     if(!d.success) throw new Error('no data');
-    const { video, start_second, remaining_seconds, next_video } = d.data;
-    currentVideoId = video.youtube_id;
-    document.getElementById('filmTitle').textContent = video.title;
-    const catLabel = {film:'AI Film',doc:'Documentary',series:'Series',short:'Short'}[video.category]||'Film';
+
+    const { stream_token, title, category, remaining_seconds, next_video } = d.data;
+    currentTitle = title;
+
+    document.getElementById('filmTitle').textContent = title;
+    const catLabel = {film:'AI Film',doc:'Documentary',turkish:'Turkish Films & Series',series:'Series',short:'Short'}[category]||'Film';
     document.getElementById('filmTags').innerHTML =
       `<span class="tag red">${catLabel}</span>`+
       (next_video ? `<span class="tag dim">Next: ${next_video.title}</span>` : '');
     document.getElementById('upNext').textContent = next_video ? next_video.title : '—';
-    buildIframe(video.youtube_id, start_second, remaining_seconds);
+
+    await buildIframeFromToken(stream_token, remaining_seconds);
+
     if(advanceTimer) clearTimeout(advanceTimer);
     advanceTimer = setTimeout(loadStream, (remaining_seconds + 1) * 1000);
+
     if(window._pollTimer) clearInterval(window._pollTimer);
     window._pollTimer = setInterval(async()=>{
       try {
         const r = await fetch(`${API}/program/live`);
         const pd = await r.json();
         if(!pd.success) return;
-        if(pd.data.video.youtube_id !== currentVideoId){ clearInterval(window._pollTimer); loadStream(); }
+        if(pd.data.title !== currentTitle){ clearInterval(window._pollTimer); loadStream(); }
       } catch(e){}
     }, 15000);
+
   } catch(e){
     console.error('Stream error:', e);
     document.getElementById('filmTitle').textContent = 'Connecting...';
@@ -386,22 +392,34 @@ async function loadStream(){
   }
 }
 
-function buildIframe(videoId, startSecond, remainingSeconds){
-  if(advanceTimer) clearTimeout(advanceTimer);
-  if(window._pollTimer) clearInterval(window._pollTimer);
-  const container = document.getElementById('iframeContainer');
-  container.innerHTML = '';
-  const iframe = document.createElement('iframe');
-  iframe.id = 'ytIframe';
-  iframe.style.cssText = 'position:absolute;top:-90px;left:-2px;width:calc(100% + 4px);height:calc(100% + 180px);border:none;pointer-events:none';
-  iframe.allow = 'autoplay; encrypted-media';
-  iframe.allowFullscreen = true;
-  iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playsinline=1&start=${startSecond}`;
-  container.appendChild(iframe);
-  muted = true;
-  const hint = document.getElementById('muteHint');
-  if(hint){ hint.classList.remove('gone'); hint.textContent = '🔇 Tap to unmute'; }
-  advanceTimer = setTimeout(loadStream, remainingSeconds * 1000);
+async function buildIframeFromToken(token, remainingSeconds){
+  try {
+    const res = await fetch(`${API}/program/stream?token=${token}`);
+    const d = await res.json();
+    if(!d.success) throw new Error('bad token');
+
+    if(advanceTimer) clearTimeout(advanceTimer);
+    if(window._pollTimer) clearInterval(window._pollTimer);
+
+    const container = document.getElementById('iframeContainer');
+    container.innerHTML = '';
+    const iframe = document.createElement('iframe');
+    iframe.id = 'ytIframe';
+    iframe.style.cssText = 'position:absolute;top:-90px;left:-2px;width:calc(100% + 4px);height:calc(100% + 180px);border:none;pointer-events:none';
+    iframe.allow = 'autoplay; encrypted-media';
+    iframe.allowFullscreen = true;
+    iframe.src = d.data.embed_url;
+    container.appendChild(iframe);
+
+    muted = true;
+    const hint = document.getElementById('muteHint');
+    if(hint){ hint.classList.remove('gone'); hint.textContent = '🔇 Tap to unmute'; }
+
+    advanceTimer = setTimeout(loadStream, remainingSeconds * 1000);
+  } catch(e){
+    console.error('Token error:', e);
+    setTimeout(loadStream, 5000);
+  }
 }
 
 function unmute(){
@@ -423,7 +441,7 @@ function unmute(){
 function goFullscreen(){
   const wrap = document.getElementById('playerWrap');
   if(document.fullscreenElement) document.exitFullscreen();
-  else wrap.requestFullscreen().catch(()=>{ if(currentVideoId) window.open('https://www.youtube.com/watch?v='+currentVideoId,'_blank'); });
+  else wrap.requestFullscreen().catch(()=>{});
 }
 
 let currentDetailItem = null;
