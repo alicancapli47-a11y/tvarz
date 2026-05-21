@@ -142,6 +142,14 @@ main{padding:2rem;max-width:1200px;margin:0 auto}
           <div class="form-hint">youtube.com/watch?v=<strong>6y7k_mbiEw0</strong></div>
         </div>
       </div>
+      <div class="form-grid">
+        <div>
+          <label class="form-label">Trailer ID (optional)</label>
+          <input type="text" id="fTrailerId" placeholder="TY81-GglrwA">
+          <div class="form-hint">Separate short trailer YouTube ID</div>
+        </div>
+        <div></div>
+      </div>
       <div class="form-grid-3">
         <div>
           <label class="form-label">Duration (MM:SS) *</label>
@@ -220,6 +228,14 @@ main{padding:2rem;max-width:1200px;margin:0 auto}
         <input type="text" id="eYtId">
         <div class="form-hint">youtube.com/watch?v=<strong>ID</strong></div>
       </div>
+    </div>
+    <div class="form-grid">
+      <div>
+        <label class="form-label">Trailer ID (optional)</label>
+        <input type="text" id="eTrailerId" placeholder="TY81-GglrwA">
+        <div class="form-hint">Separate short trailer YouTube ID</div>
+      </div>
+      <div></div>
     </div>
     <div class="form-grid-3">
       <div>
@@ -405,6 +421,7 @@ function toggleForm(){
 async function addVideo(){
   const title = document.getElementById('fTitle').value.trim();
   const youtube_id = document.getElementById('fYtId').value.trim();
+  const trailer_id = document.getElementById('fTrailerId').value.trim();
   const durStr = document.getElementById('fDur').value.trim();
   const duration_seconds = parseDuration(durStr);
   const category = document.getElementById('fCat').value;
@@ -419,13 +436,14 @@ async function addVideo(){
     const res = await fetch(`${API}/admin/videos`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
-      body: JSON.stringify({ title, youtube_id, duration_seconds, category, is_premium, description })
+      body: JSON.stringify({ title, youtube_id, trailer_id, duration_seconds, category, is_premium, description })
     });
     const data = await res.json();
     if(!data.success) throw new Error(data.message);
     toast('Video added!', 'success');
     document.getElementById('fTitle').value='';
     document.getElementById('fYtId').value='';
+    document.getElementById('fTrailerId').value='';
     document.getElementById('fDur').value='';
     document.getElementById('fDesc').value='';
     document.getElementById('fDurHelper').textContent='';
@@ -443,6 +461,7 @@ function openEdit(id){
   document.getElementById('eId').value = v.id;
   document.getElementById('eTitle').value = v.title||'';
   document.getElementById('eYtId').value = v.youtube_id||'';
+  document.getElementById('eTrailerId').value = v.trailer_id||'';
   document.getElementById('eDur').value = v.duration || formatDuration(v.duration_seconds||0);
   document.getElementById('eCat').value = v.category||'film';
   document.getElementById('ePremium').value = v.is_premium ? 'true' : 'false';
@@ -461,6 +480,7 @@ async function saveEdit(){
   const id = document.getElementById('eId').value;
   const title = document.getElementById('eTitle').value.trim();
   const youtube_id = document.getElementById('eYtId').value.trim();
+  const trailer_id = document.getElementById('eTrailerId').value.trim();
   const durStr = document.getElementById('eDur').value.trim();
   const duration_seconds = parseDuration(durStr);
   const category = document.getElementById('eCat').value;
@@ -475,7 +495,7 @@ async function saveEdit(){
     const res = await fetch(`${API}/admin/videos/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
-      body: JSON.stringify({ title, youtube_id, duration_seconds, category, is_premium, description })
+      body: JSON.stringify({ title, youtube_id, trailer_id, duration_seconds, category, is_premium, description })
     });
     const data = await res.json();
     if(!data.success) throw new Error(data.message||'Update failed');
