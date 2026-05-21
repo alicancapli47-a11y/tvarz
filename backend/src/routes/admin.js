@@ -26,10 +26,26 @@ router.get('/videos', adminAuth, async (req, res) => {
   }
 });
 
+// POST /admin/videos/reorder — update sort orders (must be before /:id routes)
+router.post('/videos/reorder', adminAuth, async (req, res) => {
+  try {
+    const { order } = req.body; // array of {id, sort_order}
+    if (!order || !Array.isArray(order)) {
+      return res.status(400).json({ success: false, message: 'order array required' });
+    }
+    await Promise.all(order.map(item =>
+      supabase.from('videos').update({ sort_order: item.sort_order }).eq('id', item.id)
+    ));
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 // POST /admin/videos — add new video
 router.post('/videos', adminAuth, async (req, res) => {
   try {
-    const { title, youtube_id, duration, duration_seconds, category, channel, is_premium, description } = req.body;
+    const { title, youtube_id, trailer_id, duration, duration_seconds, category, channel, is_premium, description } = req.body;
 
     if (!title || !youtube_id || !duration_seconds) {
       return res.status(400).json({ success: false, message: 'title, youtube_id, duration_seconds required' });
@@ -50,6 +66,7 @@ router.post('/videos', adminAuth, async (req, res) => {
       .insert({
         title,
         youtube_id,
+        trailer_id: trailer_id || null,
         duration: duration || `${Math.floor(duration_seconds/60)}:${String(duration_seconds%60).padStart(2,'0')}`,
         duration_seconds: parseInt(duration_seconds),
         category: category || 'film',
@@ -69,14 +86,33 @@ router.post('/videos', adminAuth, async (req, res) => {
   }
 });
 
+// PATCH /admin/videos/:id/toggle — active/inactive
+router.patch('/videos/:id/toggle', adminAuth, async (req, res) => {
+  try {
+    const { data: video } = await supabase.from('videos').select('is_active').eq('id', req.params.id).single();
+    const { data, error } = await supabase
+      .from('videos')
+      .update({ is_active: !video.is_active, updated_at: new Date().toISOString() })
+      .eq('id', req.params.id)
+      .select()
+      .single();
+    if (error) throw error;
+    res.json({ success: true, data: { video: data } });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 // PATCH /admin/videos/:id — update video
 router.patch('/videos/:id', adminAuth, async (req, res) => {
   try {
     const updates = req.body;
-    // Recalculate duration string if duration_seconds changed
     if (updates.duration_seconds && !updates.duration) {
       const s = parseInt(updates.duration_seconds);
       updates.duration = `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+    }
+    if ('trailer_id' in updates && !updates.trailer_id) {
+      updates.trailer_id = null;
     }
     updates.updated_at = new Date().toISOString();
 
@@ -105,36 +141,6 @@ router.delete('/videos/:id', adminAuth, async (req, res) => {
   }
 });
 
-// PATCH /admin/videos/:id/toggle — active/inactive
-router.patch('/videos/:id/toggle', adminAuth, async (req, res) => {
-  try {
-    const { data: video } = await supabase.from('videos').select('is_active').eq('id', req.params.id).single();
-    const { data, error } = await supabase
-      .from('videos')
-      .update({ is_active: !video.is_active, updated_at: new Date().toISOString() })
-      .eq('id', req.params.id)
-      .select()
-      .single();
-    if (error) throw error;
-    res.json({ success: true, data: { video: data } });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-});
-
-// PATCH /admin/videos/reorder — update sort orders
-router.patch('/reorder', adminAuth, async (req, res) => {
-  try {
-    const { order } = req.body; // array of {id, sort_order}
-    await Promise.all(order.map(item =>
-      supabase.from('videos').update({ sort_order: item.sort_order }).eq('id', item.id)
-    ));
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-});
-
 // GET /admin/live-preview — preview today's schedule
 router.get('/live-preview', adminAuth, async (req, res) => {
   try {
@@ -152,7 +158,6 @@ router.get('/live-preview', adminAuth, async (req, res) => {
     const totalSeconds = eligible.reduce((sum, v) => sum + v.duration_seconds, 0);
     const totalHours = (totalSeconds / 3600).toFixed(1);
 
-    // Build 24h preview
     const schedule = [];
     let cursor = 0;
     let idx = 0;
@@ -161,7 +166,8 @@ router.get('/live-preview', adminAuth, async (req, res) => {
       schedule.push({
         time: `${String(Math.floor(cursor/3600)).padStart(2,'0')}:${String(Math.floor((cursor%3600)/60)).padStart(2,'0')}`,
         title: video.title,
-        duration: video.duration
+        duration: video.duration,
+        duration_seconds: video.duration_seconds
       });
       cursor += video.duration_seconds;
       idx++;
