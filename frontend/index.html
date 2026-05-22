@@ -654,6 +654,35 @@ function toggleFaq(el){
 restoreSession();
 loadStream();
 loadArchive();
+(function(){
+  const params = new URLSearchParams(window.location.search);
+  if(params.get('premium') === 'success'){
+    // Clean URL
+    window.history.replaceState({}, '', '/');
+    // Refresh token to get latest premium status
+    const token = localStorage.getItem('tvarz_token');
+    if(token){
+      fetch(`${API}/auth/me`, { headers: { Authorization: `Bearer ${token}` } })
+        .then(r => r.json())
+        .then(d => {
+          if(d.success){
+            localStorage.setItem('tvarz_token', d.data.token);
+            localStorage.setItem('tvarz_user', JSON.stringify(d.data.user));
+            currentUser = d.data.user;
+            isPremium = d.data.user.is_premium;
+            renderAuth();
+            buildArchiveGrid();
+            // Show success message
+            const msg = document.createElement('div');
+            msg.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#2ecc71;color:#fff;font-family:var(--fm);font-size:12px;letter-spacing:0.1em;padding:12px 24px;z-index:999;text-transform:uppercase';
+            msg.textContent = '✓ Premium activated — welcome!';
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 4000);
+          }
+        }).catch(()=>{});
+    }
+  }
+})();
 </script>
 </body>
 </html>
