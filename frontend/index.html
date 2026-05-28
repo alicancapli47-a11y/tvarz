@@ -480,10 +480,35 @@ function goFullscreen(){
 let currentDetailItem = null;
 const DEFAULT_TRAILER = 'TY81-GglrwA';
 
+function slugify(title){
+  return title.toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .trim();
+}
+
+function updateMeta(title, description, imageUrl){
+  document.title = title ? `${title} — Tvarz` : 'Tvarz — Free AI Cinema Channel';
+  let desc = document.querySelector('meta[name="description"]');
+  if(!desc){ desc = document.createElement('meta'); desc.name='description'; document.head.appendChild(desc); }
+  desc.content = description ? description.slice(0,160) : 'Watch AI-generated films, thrillers and documentaries on Tvarz.';
+  // OG tags
+  ['og:title','og:description','og:image'].forEach(p => {
+    let el = document.querySelector(`meta[property="${p}"]`);
+    if(!el){ el = document.createElement('meta'); el.setAttribute('property',p); document.head.appendChild(el); }
+    if(p==='og:title') el.content = title || 'Tvarz';
+    if(p==='og:description') el.content = description ? description.slice(0,160) : '';
+    if(p==='og:image') el.content = imageUrl || '';
+  });
+}
+
 function openDetail(item){
   currentDetailItem = item;
   const trailerYtId = item.trailer_id || DEFAULT_TRAILER;
   const cat = {film:'AI Film',doc:'Documentary',turkish:'Turkish Films & Series'}[item.category]||item.category;
+  const slug = slugify(item.title);
+  const thumbUrl = item.youtube_id ? `https://img.youtube.com/vi/${item.youtube_id}/maxresdefault.jpg` : '';
 
   document.getElementById('detailTitle').textContent = item.title;
   document.getElementById('detailDesc').textContent = item.description || '';
@@ -497,22 +522,27 @@ function openDetail(item){
   const btn = document.getElementById('detailWatchBtn');
   btn.textContent = locked ? '🔒 Unlock with Premium — $3.99/mo' : '▶ Watch Full Film';
 
+  // Update URL and meta
+  window.history.pushState({ page: 'detail', slug, id: item.id }, item.title, `/film/${slug}`);
+  updateMeta(item.title, item.description, thumbUrl);
+
   showPage('detail');
 }
 
 function handleDetailWatch(){
   if(!currentDetailItem) return;
-  const locked = currentDetailItem.is_premium && !isPremium;
-  if(locked || true){ // Always go to pricing — full film never plays on site
-    showPage('pricing');
-  }
+  showPage('pricing');
 }
 
 function showPage(id){
-  // Stop detail trailer when leaving
   if(id !== 'detail'){
     const trailer = document.getElementById('detailTrailer');
     if(trailer) trailer.src = '';
+    // Restore URL
+    if(window.location.pathname.startsWith('/film/')){
+      window.history.pushState({page: id}, 'Tvarz', '/');
+    }
+    updateMeta(null, null, null);
   }
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
@@ -521,6 +551,26 @@ function showPage(id){
   if(id==='archive') buildArchiveGrid();
   window.scrollTo(0,0);
 }
+
+// Handle browser back/forward
+window.addEventListener('popstate', function(e){
+  if(e.state?.page === 'detail' && e.state?.id){
+    const item = allVideos.find(v => v.id === e.state.id);
+    if(item) openDetail(item);
+  } else {
+    showPage(e.state?.page || 'home');
+  }
+});
+
+// Handle direct URL access /film/slug
+(function(){
+  const path = window.location.pathname;
+  if(path.startsWith('/film/')){
+    const slug = path.replace('/film/','');
+    // Wait for archive to load then open detail
+    window._pendingSlug = slug;
+  }
+})();
 
 setInterval(()=>{
   const n=new Date(),p=x=>String(x).padStart(2,'0');
@@ -536,6 +586,14 @@ async function loadArchive(){
     allVideos = d.data.videos;
     document.getElementById('archiveSub').textContent = `${allVideos.length} TITLES · FILMS · DOCUMENTARIES · SERIES`;
     buildArchiveGrid();
+
+    // Handle direct URL access /film/slug
+    if(window._pendingSlug){
+      const slug = window._pendingSlug;
+      window._pendingSlug = null;
+      const item = allVideos.find(v => slugify(v.title) === slug);
+      if(item) openDetail(item);
+    }
   } catch(e){}
 }
 
