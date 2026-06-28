@@ -1,9 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZD3BV0XKCK"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-ZD3BV0XKCK');
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tvarz — Free AI Cinema Channel</title>
+<meta name="description" content="Tvarz is a free AI cinema channel streaming 24/7. Watch AI-generated films, thrillers, documentaries and more. Always free, always on.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -20,7 +29,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
 
 /* NAV */
 nav{position:fixed;top:0;left:0;right:0;z-index:200;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;background:rgba(8,8,9,0.95);backdrop-filter:blur(12px);border-bottom:0.5px solid var(--border)}
-.nav-logo img{height:30px;width:auto;display:block;cursor:pointer}
+.nav-logo img{height:42px;width:auto;display:block;cursor:pointer}
 .nav-links{display:flex;align-items:center}
 .nav-link{font-family:var(--fd);font-size:13px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text2);padding:0 1rem;height:54px;display:flex;align-items:center;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s;background:none;border-top:none;border-left:none;border-right:none}
 .nav-link:hover{color:var(--text)}
@@ -45,32 +54,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:54px;display:flex;ali
 /* ── PLAYER ── */
 .player-wrap{position:relative;width:100%;background:#000;overflow:hidden;cursor:pointer}
 .player-wrap::before{content:'';display:block;padding-top:52%}
-
-/* iframe — overflow top/bottom to hide YT bars */
-.player-wrap iframe{
-  position:absolute;
-  top:-90px;left:-2px;
-  width:calc(100% + 4px);
-  height:calc(100% + 180px);
-  border:none;
-  pointer-events:none; /* block all YT controls */
-}
-
-/* gradient overlay — bottom text area */
+.player-wrap iframe{position:absolute;top:-90px;left:-2px;width:calc(100% + 4px);height:calc(100% + 180px);border:none;pointer-events:none}
 .player-grad{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 35%,rgba(8,8,9,0.75) 72%,rgba(8,8,9,1) 100%);pointer-events:none}
-
-/* click overlay — unmute on click */
 .player-tap{position:absolute;inset:0;z-index:5;cursor:pointer}
-
-/* mute hint */
 .mute-hint{position:absolute;top:1rem;right:1rem;z-index:8;background:rgba(8,8,9,0.75);border:0.5px solid var(--border2);padding:5px 12px;font-family:var(--fm);font-size:10px;letter-spacing:0.1em;color:var(--text2);display:flex;align-items:center;gap:6px;transition:opacity 0.4s}
 .mute-hint.gone{opacity:0;pointer-events:none}
-
-/* fullscreen btn */
 .fs-btn{position:absolute;bottom:5rem;right:1rem;z-index:8;background:rgba(8,8,9,0.75);border:0.5px solid var(--border2);color:var(--text2);width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;transition:all 0.15s}
 .fs-btn:hover{background:rgba(255,255,255,0.1);color:var(--text)}
-
-/* info overlay */
 .player-info{position:absolute;bottom:0;left:0;right:0;padding:1.2rem 2rem;z-index:6;pointer-events:none}
 .now-label{font-family:var(--fm);font-size:9px;letter-spacing:0.2em;color:var(--red);text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:8px}
 .now-label::before{content:'';width:14px;height:1px;background:var(--red)}
@@ -80,33 +70,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:54px;display:flex;ali
 .tag.red{border-color:rgba(217,43,58,0.4);color:var(--red)}
 .tag.dim{color:var(--text3);border-color:var(--border)}
 
-/* STATS */
-.stats-strip{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:0.5px solid var(--border)}
-.stat-cell{padding:1rem 1.5rem;border-right:0.5px solid var(--border)}
-.stat-cell:last-child{border-right:none}
-.stat-l{font-family:var(--fm);font-size:9px;letter-spacing:0.14em;color:var(--text3);text-transform:uppercase;margin-bottom:4px}
-.stat-v{font-family:var(--fd);font-size:1.6rem;font-weight:700;color:var(--text);line-height:1}
-.stat-v.red{color:var(--red)}
-
-/* SECTION */
+/* UP NEXT */
 .section{padding:2rem 2.5rem}
 .sec-title{font-family:var(--fd);font-size:1.2rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text);margin-bottom:1rem}
-
-/* SCHEDULE */
-.sched-wrap{max-width:900px;margin:0 auto;padding:2.5rem 2rem}
-.page-title{font-family:var(--fd);font-size:2.2rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px}
-.page-sub{font-family:var(--fm);font-size:11px;color:var(--text3);letter-spacing:0.1em;margin-bottom:2rem}
-.sched-list{display:flex;flex-direction:column;gap:1px}
-.sched-row{display:grid;grid-template-columns:80px 1fr 80px;align-items:center;gap:1rem;padding:12px 16px;background:var(--surface);border:0.5px solid var(--border);position:relative;overflow:hidden}
-.sched-row.now{border-color:rgba(217,43,58,0.4);background:rgba(217,43,58,0.04)}
-.sched-row.now::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--red)}
-.sched-row.past{opacity:0.3}
-.sched-t{font-family:var(--fm);font-size:12px;color:var(--text3);letter-spacing:0.06em}
-.sched-t.now{color:var(--red)}
-.sched-n{font-family:var(--fd);font-size:14px;font-weight:600;letter-spacing:0.04em;color:var(--text);text-transform:uppercase}
-.sched-g{font-size:12px;color:var(--text3);margin-top:2px}
-.sched-d{font-family:var(--fm);font-size:11px;color:var(--text3);text-align:right}
-.now-badge{background:var(--red);color:#fff;font-family:var(--fm);font-size:8px;letter-spacing:0.12em;padding:2px 7px;margin-left:8px;vertical-align:middle;text-transform:uppercase}
+.up-next-box{display:flex;align-items:center;justify-content:space-between;gap:1rem;background:var(--surface);border:0.5px solid var(--border);padding:1rem 1.5rem;cursor:pointer;transition:all 0.2s;flex-wrap:wrap}
+.up-next-box:hover{border-color:rgba(201,168,76,0.4);background:rgba(201,168,76,0.04)}
+.up-next-title{font-family:var(--fd);font-size:15px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text)}
+.up-next-cta{font-family:var(--fm);font-size:10px;letter-spacing:0.12em;color:var(--gold);border:0.5px solid rgba(201,168,76,0.4);padding:5px 14px;white-space:nowrap;flex-shrink:0}
 
 /* ARCHIVE */
 .archive-wrap{padding:2.5rem 2rem}
@@ -115,29 +85,44 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:54px;display:flex;ali
 .filter-btn.on{background:var(--surface3);border-color:var(--border2);color:var(--text)}
 .filter-btn:hover:not(.on){background:var(--surface2);color:var(--text)}
 .prem-banner{background:rgba(201,168,76,0.06);border:0.5px solid rgba(201,168,76,0.25);padding:1rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
-.archive-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem}
-.film-card{background:var(--surface);border:0.5px solid var(--border);cursor:pointer;transition:all 0.25s;position:relative;overflow:hidden;border-radius:2px}
-.film-card:hover{border-color:var(--border2);transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,0.5)}
+.archive-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:1px}
+.film-card{background:var(--surface);border:0.5px solid var(--border);cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
+.film-card:hover{border-color:var(--border2);transform:translateY(-2px)}
 .film-thumb{position:relative;padding-top:56.25%;background:var(--surface2);overflow:hidden}
-.film-thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 0.4s}
-.film-card:hover .film-thumb img{transform:scale(1.05)}
+.thumb-img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block;transition:opacity 0.3s;z-index:1}
+.thumb-preview{position:absolute;top:-15%;left:-2px;width:calc(100% + 4px);height:130%;border:none;opacity:0;transition:opacity 0.4s;pointer-events:none;z-index:2}
+.film-card:hover .thumb-preview{opacity:1}
+.film-card:hover .thumb-img{opacity:0}
 .thumb-letters{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:3rem;font-weight:700;color:rgba(255,255,255,0.04);text-transform:uppercase}
-.thumb-grad{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(8,8,9,0.85) 100%);pointer-events:none}
-.wm{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0.12;font-family:var(--fd);font-size:1.6rem;font-weight:700;letter-spacing:0.2em;color:#fff;text-transform:uppercase;transform:rotate(-20deg);user-select:none;pointer-events:none}
-.lock-ov{position:absolute;inset:0;background:rgba(8,8,9,0.7);backdrop-filter:blur(2px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;opacity:0;transition:opacity 0.2s}
+.thumb-grad{position:absolute;inset:0;background:linear-gradient(135deg,rgba(217,43,58,0.12) 0%,transparent 60%);z-index:1}
+.wm{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0.14;font-family:var(--fd);font-size:1.3rem;font-weight:700;letter-spacing:0.2em;color:#fff;text-transform:uppercase;transform:rotate(-20deg);user-select:none;pointer-events:none;z-index:1}
+.lock-ov{position:absolute;inset:0;background:rgba(8,8,9,0.6);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;opacity:0;transition:opacity 0.2s;z-index:3}
 .film-card:hover .lock-ov{opacity:1}
-.lock-icon{font-size:1.8rem;color:var(--gold)}
-.lock-txt{font-family:var(--fd);font-size:12px;font-weight:600;letter-spacing:0.12em;color:var(--gold);text-transform:uppercase}
-.play-ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s}
-.film-card:hover .play-ov{opacity:1}
-.play-circle-sm{width:52px;height:52px;border-radius:50%;background:rgba(217,43,58,0.92);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.2rem}
-.card-badge{position:absolute;top:10px;left:10px;font-family:var(--fm);font-size:9px;letter-spacing:0.1em;padding:4px 10px;text-transform:uppercase;border-radius:1px;z-index:2}
-.badge-free{background:rgba(8,8,9,0.85);border:0.5px solid var(--border2);color:var(--text2)}
-.badge-prem{background:rgba(201,168,76,0.18);border:0.5px solid rgba(201,168,76,0.5);color:var(--gold)}
-.film-info{padding:14px 16px}
-.film-cat{font-family:var(--fm);font-size:10px;letter-spacing:0.14em;color:var(--red);text-transform:uppercase;margin-bottom:6px}
-.film-name{font-family:var(--fd);font-size:16px;font-weight:600;letter-spacing:0.03em;text-transform:uppercase;color:var(--text);line-height:1.25;margin-bottom:6px;min-height:40px}
-.film-dur{font-size:12px;color:var(--text3);font-family:var(--fm)}
+.lock-icon{font-size:1.4rem;color:var(--gold)}
+.lock-txt{font-family:var(--fd);font-size:11px;font-weight:600;letter-spacing:0.12em;color:var(--gold);text-transform:uppercase}
+.card-badge{position:absolute;top:8px;left:8px;font-family:var(--fm);font-size:8px;letter-spacing:0.1em;padding:3px 8px;text-transform:uppercase;z-index:4}
+.badge-free{background:rgba(8,8,9,0.8);border:0.5px solid var(--border2);color:var(--text2)}
+.badge-prem{background:rgba(201,168,76,0.15);border:0.5px solid rgba(201,168,76,0.4);color:var(--gold)}
+.film-info{padding:10px 12px}
+.film-cat{font-family:var(--fm);font-size:9px;letter-spacing:0.14em;color:var(--red);text-transform:uppercase;margin-bottom:4px}
+.film-name{font-family:var(--fd);font-size:13px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:var(--text);line-height:1.2;margin-bottom:4px}
+.film-desc{font-size:11px;color:var(--text3);line-height:1.5;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.film-dur{font-size:11px;color:var(--text3)}
+
+/* FILM DETAIL PAGE */
+.detail-wrap{max-width:900px;margin:0 auto;padding:2.5rem 2rem}
+.detail-back{font-family:var(--fm);font-size:11px;letter-spacing:0.1em;color:var(--text3);cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin-bottom:2rem;background:none;border:none;padding:0;transition:color 0.15s}
+.detail-back:hover{color:var(--text)}
+.detail-trailer{position:relative;width:100%;padding-top:56.25%;background:#000;margin-bottom:2rem;overflow:hidden}
+.detail-trailer iframe{position:absolute;inset:0;width:100%;height:100%;border:none}
+.detail-title{font-family:var(--fd);font-size:clamp(1.5rem,3vw,2.8rem);font-weight:700;letter-spacing:0.04em;text-transform:uppercase;line-height:1.1;margin-bottom:12px}
+.detail-meta{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;flex-wrap:wrap}
+.detail-desc{font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:2rem;max-width:680px}
+.detail-cta{display:flex;gap:12px;flex-wrap:wrap}
+.btn-watch-full{font-family:var(--fd);font-size:14px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:14px 32px;background:var(--red);color:#fff;border:none;cursor:pointer;transition:all 0.15s}
+.btn-watch-full:hover{background:var(--red2)}
+.btn-watch-free{font-family:var(--fd);font-size:14px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:14px 32px;background:transparent;color:var(--text);border:0.5px solid var(--border2);cursor:pointer;transition:all 0.15s}
+.btn-watch-free:hover{background:var(--surface2)}
 
 /* PRICING */
 .pricing-wrap{max-width:860px;margin:0 auto;padding:4rem 2rem}
@@ -193,11 +178,9 @@ footer{border-top:0.5px solid var(--border);padding:2rem 2.5rem;display:flex;ali
 @media(max-width:700px){
   nav{padding:0 1rem}
   .player-info{padding:1rem}
-  .stats-strip{grid-template-columns:repeat(2,1fr)}
-  .section,.archive-wrap,.sched-wrap,.pricing-wrap{padding:1.5rem 1rem}
+  .section,.archive-wrap,.pricing-wrap{padding:1.5rem 1rem}
   .plans{grid-template-columns:1fr}
   .archive-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
-  .sched-row{grid-template-columns:64px 1fr}.sched-d{display:none}
   footer{padding:1.5rem 1rem}
 }
 </style>
@@ -209,7 +192,6 @@ footer{border-top:0.5px solid var(--border);padding:2rem 2.5rem;display:flex;ali
   <div class="nav-logo" onclick="showPage('home')"><img src="tvarzlogo.png" alt="TVARZ"></div>
   <div class="nav-links">
     <button class="nav-link active" id="nav-home" onclick="showPage('home')">Watch</button>
-    <button class="nav-link" id="nav-schedule" onclick="showPage('schedule')">Schedule</button>
     <button class="nav-link" id="nav-archive" onclick="showPage('archive')">Archive</button>
     <button class="nav-link" id="nav-pricing" onclick="showPage('pricing')">Pricing</button>
   </div>
@@ -223,33 +205,24 @@ footer{border-top:0.5px solid var(--border);padding:2rem 2.5rem;display:flex;ali
 <!-- HOME -->
 <div class="page active" id="page-home">
   <div class="player-wrap" id="playerWrap">
-    <!-- iframe injected by JS -->
     <div id="iframeContainer"></div>
     <div class="player-grad"></div>
-    <!-- tap to unmute -->
     <div class="player-tap" id="playerTap" onclick="unmute()"></div>
-    <!-- mute hint -->
     <div class="mute-hint" id="muteHint">🔇 Tap to unmute</div>
-    <!-- fullscreen -->
     <button class="fs-btn" onclick="goFullscreen()">⛶</button>
-    <!-- info -->
     <div class="player-info">
-      <div class="now-label">Now Playing</div>
+      <div class="now-label">Now Playing <span style="font-family:var(--fm);font-size:8px;letter-spacing:0.12em;color:var(--gold);border:0.5px solid rgba(201,168,76,0.5);background:rgba(201,168,76,0.08);padding:3px 10px;margin-left:10px;text-transform:uppercase">✦ Exclusive · Not on YouTube</span></div>
       <div class="film-title" id="filmTitle">Loading stream...</div>
       <div class="film-tags" id="filmTags"></div>
     </div>
   </div>
 
-  <div class="stats-strip">
-    <div class="stat-cell"><div class="stat-l">Watching Now</div><div class="stat-v red" id="viewerCount">1,284</div></div>
-    <div class="stat-cell"><div class="stat-l">In Archive</div><div class="stat-v" id="totalFilms">—</div></div>
-    <div class="stat-cell"><div class="stat-l">New This Week</div><div class="stat-v">3</div></div>
-    <div class="stat-cell"><div class="stat-l">Always Free</div><div class="stat-v red">∞</div></div>
-  </div>
-
   <div class="section">
     <div class="sec-title">Up Next</div>
-    <div id="upNext" style="font-family:var(--fm);font-size:12px;color:var(--text3)">—</div>
+    <div class="up-next-box" onclick="showPage('pricing')">
+      <div class="up-next-title" id="upNext">—</div>
+      <div class="up-next-cta">UNLOCK WITH PREMIUM →</div>
+    </div>
   </div>
 
   <footer>
@@ -259,12 +232,22 @@ footer{border-top:0.5px solid var(--border);padding:2rem 2.5rem;display:flex;ali
   </footer>
 </div>
 
-<!-- SCHEDULE -->
-<div class="page" id="page-schedule">
-  <div class="sched-wrap">
-    <div class="page-title">Schedule</div>
-    <div class="page-sub" id="schedDate">Today's programming</div>
-    <div class="sched-list" id="schedList"><div style="padding:1rem;color:var(--text3);font-family:var(--fm);font-size:12px">Loading...</div></div>
+<!-- FILM DETAIL -->
+<div class="page" id="page-detail">
+  <div class="detail-wrap">
+    <button class="detail-back" onclick="showPage('archive')">← Back to Archive</button>
+    <div class="detail-trailer">
+      <iframe id="detailTrailer" allowfullscreen allow="autoplay;encrypted-media"></iframe>
+    </div>
+    <div class="detail-meta">
+      <span class="tag red" id="detailCat">AI Film</span>
+      <span class="tag" id="detailDur">—</span>
+    </div>
+    <div class="detail-title" id="detailTitle">—</div>
+    <div class="detail-desc" id="detailDesc">—</div>
+    <div class="detail-cta">
+      <button class="btn-watch-full" id="detailWatchBtn" onclick="handleDetailWatch()">▶ Watch Full Film</button>
+    </div>
   </div>
 </div>
 
@@ -272,15 +255,14 @@ footer{border-top:0.5px solid var(--border);padding:2rem 2.5rem;display:flex;ali
 <div class="page" id="page-archive">
   <div class="archive-wrap">
     <div style="margin-bottom:1.5rem">
-      <div class="page-title">Archive</div>
+      <div style="font-family:var(--fd);font-size:2.2rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">Archive</div>
       <div style="font-family:var(--fm);font-size:10px;color:var(--text3);letter-spacing:0.12em;margin-top:4px" id="archiveSub">FILMS · DOCUMENTARIES · SERIES</div>
     </div>
     <div class="filter-bar">
       <button class="filter-btn on" onclick="filterArchive('all',this)">All</button>
       <button class="filter-btn" onclick="filterArchive('film',this)">AI Films</button>
-      <button class="filter-btn" onclick="filterArchive('doc',this)">Documentaries</button>
-      <button class="filter-btn" onclick="filterArchive('series',this)">Series</button>
-      <button class="filter-btn" onclick="filterArchive('short',this)">Shorts</button>
+      <button class="filter-btn" onclick="filterArchive('doc',this)">Documentary</button>
+      <button class="filter-btn" onclick="filterArchive('turkish',this)">Turkish Films & Series</button>
     </div>
     <div class="prem-banner" id="premBanner" style="display:none">
       <div>
@@ -369,48 +351,72 @@ let isPremium = false;
 let currentFilter = 'all';
 let allVideos = [];
 let advanceTimer = null;
-let currentVideoId = null;
+let currentTitle = null;
 let muted = true;
 
-// ── LOAD STREAM ──
 async function loadStream(){
   try {
     const res = await fetch(`${API}/program/live`);
     const d = await res.json();
     if(!d.success) throw new Error('no data');
 
-    const { video, start_second, remaining_seconds, next_video } = d.data;
-    currentVideoId = video.youtube_id;
+    const { stream_token, title, category, remaining_seconds, next_video } = d.data;
 
-    // Update UI
-    document.getElementById('filmTitle').textContent = video.title;
-    const catLabel = {film:'AI Film',doc:'Documentary',series:'Series',short:'Short'}[video.category]||'Film';
+    // If same video still playing and plenty of time left — don't rebuild iframe
+    if(title === currentTitle && remaining_seconds > 10){
+      // Just reschedule
+      if(advanceTimer) clearTimeout(advanceTimer);
+      advanceTimer = setTimeout(loadStream, (remaining_seconds + 1) * 1000);
+      return;
+    }
+
+    currentTitle = title;
+
+    document.getElementById('filmTitle').textContent = title;
+    const catLabel = {film:'AI Film',doc:'Documentary',turkish:'Turkish Films & Series',series:'Series',short:'Short'}[category]||'Film';
     document.getElementById('filmTags').innerHTML =
-      `<span class="tag red">${catLabel}</span><span class="tag">Large Scale Studios</span>`+
+      `<span class="tag red">${catLabel}</span>`+
       (next_video ? `<span class="tag dim">Next: ${next_video.title}</span>` : '');
     document.getElementById('upNext').textContent = next_video ? next_video.title : '—';
 
-    // Build iframe with start second
-    buildIframe(video.youtube_id, start_second, remaining_seconds);
+    await buildIframeFromToken(stream_token, remaining_seconds);
 
-    // Timer — advance at exact end time
+    // Primary timer — fires exactly when video should end
     if(advanceTimer) clearTimeout(advanceTimer);
     advanceTimer = setTimeout(loadStream, (remaining_seconds + 1) * 1000);
 
-    // Poll every 30s to catch any drift
+    // Aggressive poll — every 3s near end, every 10s otherwise
     if(window._pollTimer) clearInterval(window._pollTimer);
+    const pollInterval = remaining_seconds < 30 ? 3000 : 10000;
     window._pollTimer = setInterval(async()=>{
       try {
         const r = await fetch(`${API}/program/live`);
         const pd = await r.json();
         if(!pd.success) return;
-        // If video changed — reload immediately
-        if(pd.data.video.youtube_id !== currentVideoId){
+        // Video changed — switch immediately
+        if(pd.data.title !== currentTitle){
           clearInterval(window._pollTimer);
+          clearTimeout(advanceTimer);
           loadStream();
+          return;
+        }
+        // Near end — switch to fast polling
+        if(pd.data.remaining_seconds < 15){
+          clearInterval(window._pollTimer);
+          window._pollTimer = setInterval(async()=>{
+            try {
+              const r2 = await fetch(`${API}/program/live`);
+              const pd2 = await r2.json();
+              if(pd2.success && pd2.data.title !== currentTitle){
+                clearInterval(window._pollTimer);
+                clearTimeout(advanceTimer);
+                loadStream();
+              }
+            } catch(e){}
+          }, 2000);
         }
       } catch(e){}
-    }, 15000);
+    }, pollInterval);
 
   } catch(e){
     console.error('Stream error:', e);
@@ -419,43 +425,46 @@ async function loadStream(){
   }
 }
 
-function buildIframe(videoId, startSecond, remainingSeconds){
-  // Clear all timers
-  if(advanceTimer) clearTimeout(advanceTimer);
-  if(window._pollTimer) clearInterval(window._pollTimer);
+async function buildIframeFromToken(token, remainingSeconds){
+  try {
+    const res = await fetch(`${API}/program/stream?token=${token}`);
+    const d = await res.json();
+    if(!d.success) throw new Error('bad token');
 
-  // Build iframe
-  const container = document.getElementById('iframeContainer');
-  container.innerHTML = '';
-  const iframe = document.createElement('iframe');
-  iframe.id = 'ytIframe';
-  iframe.style.cssText = 'position:absolute;top:-90px;left:-2px;width:calc(100% + 4px);height:calc(100% + 180px);border:none;pointer-events:none';
-  iframe.allow = 'autoplay; encrypted-media';
-  iframe.allowFullscreen = true;
-  iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playsinline=1&start=${startSecond}`;
-  container.appendChild(iframe);
+    if(advanceTimer) clearTimeout(advanceTimer);
+    if(window._pollTimer) clearInterval(window._pollTimer);
 
-  muted = true;
-  const hint = document.getElementById('muteHint');
-  if(hint){ hint.classList.remove('gone'); hint.textContent = '🔇 Tap to unmute'; }
+    const container = document.getElementById('iframeContainer');
+    container.innerHTML = '';
+    const iframe = document.createElement('iframe');
+    iframe.id = 'ytIframe';
+    iframe.style.cssText = 'position:absolute;top:-90px;left:-2px;width:calc(100% + 4px);height:calc(100% + 180px);border:none;pointer-events:none';
+    iframe.allow = 'autoplay; encrypted-media';
+    iframe.allowFullscreen = true;
+    iframe.src = d.data.embed_url;
+    container.appendChild(iframe);
 
-  // Single timer — fires when video ends
-  advanceTimer = setTimeout(loadStream, remainingSeconds * 1000);
+    muted = true;
+    const hint = document.getElementById('muteHint');
+    if(hint){ hint.classList.remove('gone'); hint.textContent = '🔇 Tap to unmute'; }
+
+    advanceTimer = setTimeout(loadStream, remainingSeconds * 1000);
+  } catch(e){
+    console.error('Token error:', e);
+    setTimeout(loadStream, 5000);
+  }
 }
 
 function unmute(){
   const iframe = document.getElementById('ytIframe');
   if(!iframe) return;
   if(muted){
-    // Reload iframe with mute=0 — user gesture allows this
-    const src = iframe.src.replace('mute=1','mute=0');
-    iframe.src = src;
+    iframe.src = iframe.src.replace('mute=1','mute=0');
     muted = false;
     const hint = document.getElementById('muteHint');
     if(hint) hint.classList.add('gone');
   } else {
-    const src = iframe.src.replace('mute=0','mute=1');
-    iframe.src = src;
+    iframe.src = iframe.src.replace('mute=0','mute=1');
     muted = true;
     const hint = document.getElementById('muteHint');
     if(hint){ hint.classList.remove('gone'); hint.textContent = '🔇 Tap to unmute'; }
@@ -465,60 +474,109 @@ function unmute(){
 function goFullscreen(){
   const wrap = document.getElementById('playerWrap');
   if(document.fullscreenElement) document.exitFullscreen();
-  else wrap.requestFullscreen().catch(()=>{
-    if(currentVideoId) window.open('https://www.youtube.com/watch?v='+currentVideoId,'_blank');
+  else wrap.requestFullscreen().catch(()=>{});
+}
+
+let currentDetailItem = null;
+const DEFAULT_TRAILER = 'TY81-GglrwA';
+
+function slugify(title){
+  return title.toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .trim();
+}
+
+function updateMeta(title, description, imageUrl){
+  document.title = title ? `${title} — Tvarz` : 'Tvarz — Free AI Cinema Channel';
+  let desc = document.querySelector('meta[name="description"]');
+  if(!desc){ desc = document.createElement('meta'); desc.name='description'; document.head.appendChild(desc); }
+  desc.content = description ? description.slice(0,160) : 'Watch AI-generated films, thrillers and documentaries on Tvarz.';
+  // OG tags
+  ['og:title','og:description','og:image'].forEach(p => {
+    let el = document.querySelector(`meta[property="${p}"]`);
+    if(!el){ el = document.createElement('meta'); el.setAttribute('property',p); document.head.appendChild(el); }
+    if(p==='og:title') el.content = title || 'Tvarz';
+    if(p==='og:description') el.content = description ? description.slice(0,160) : '';
+    if(p==='og:image') el.content = imageUrl || '';
   });
 }
 
-// ── PAGES ──
+function openDetail(item){
+  currentDetailItem = item;
+  const trailerYtId = item.trailer_id || DEFAULT_TRAILER;
+  const cat = {film:'AI Film',doc:'Documentary',turkish:'Turkish Films & Series'}[item.category]||item.category;
+  const slug = slugify(item.title);
+  const thumbUrl = item.youtube_id ? `https://img.youtube.com/vi/${item.youtube_id}/maxresdefault.jpg` : '';
+
+  document.getElementById('detailTitle').textContent = item.title;
+  document.getElementById('detailDesc').textContent = item.description || '';
+  document.getElementById('detailCat').textContent = cat;
+  document.getElementById('detailDur').textContent = item.duration || '';
+
+  const trailer = document.getElementById('detailTrailer');
+  trailer.src = `https://www.youtube.com/embed/${trailerYtId}?autoplay=1&mute=0&controls=1&modestbranding=1&rel=0`;
+
+  const locked = item.is_premium && !isPremium;
+  const btn = document.getElementById('detailWatchBtn');
+  btn.textContent = locked ? '🔒 Unlock with Premium — $3.99/mo' : '▶ Watch Full Film';
+
+  // Update URL and meta
+  window.history.pushState({ page: 'detail', slug, id: item.id }, item.title, `/film/${slug}`);
+  updateMeta(item.title, item.description, thumbUrl);
+
+  showPage('detail');
+}
+
+function handleDetailWatch(){
+  if(!currentDetailItem) return;
+  showPage('pricing');
+}
+
 function showPage(id){
+  if(id !== 'detail'){
+    const trailer = document.getElementById('detailTrailer');
+    if(trailer) trailer.src = '';
+    // Restore URL
+    if(window.location.pathname.startsWith('/film/')){
+      window.history.pushState({page: id}, 'Tvarz', '/');
+    }
+    updateMeta(null, null, null);
+  }
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   const nl = document.getElementById('nav-'+id); if(nl) nl.classList.add('active');
-  if(id==='schedule') loadSchedule();
   if(id==='archive') buildArchiveGrid();
   window.scrollTo(0,0);
 }
 
-// ── CLOCK ──
+// Handle browser back/forward
+window.addEventListener('popstate', function(e){
+  if(e.state?.page === 'detail' && e.state?.id){
+    const item = allVideos.find(v => v.id === e.state.id);
+    if(item) openDetail(item);
+  } else {
+    showPage(e.state?.page || 'home');
+  }
+});
+
+// Handle direct URL access /film/slug
+(function(){
+  const path = window.location.pathname;
+  if(path.startsWith('/film/')){
+    const slug = path.replace('/film/','');
+    // Wait for archive to load then open detail
+    window._pendingSlug = slug;
+  }
+})();
+
 setInterval(()=>{
   const n=new Date(),p=x=>String(x).padStart(2,'0');
   document.getElementById('navClock').textContent=`${p(n.getHours())}:${p(n.getMinutes())}:${p(n.getSeconds())}`;
 },1000);
 
-// ── VIEWERS ──
-setInterval(()=>{ document.getElementById('viewerCount').textContent=(1200+Math.floor(Math.random()*150)-75).toLocaleString(); },7000);
-
-// ── SCHEDULE ──
-async function loadSchedule(){
-  const el = document.getElementById('schedList');
-  el.innerHTML = '<div style="padding:1rem;color:var(--text3);font-family:var(--fm);font-size:12px">Loading...</div>';
-  const now = new Date();
-  document.getElementById('schedDate').textContent = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
-  try {
-    const res = await fetch(`${API}/program/schedule-today`);
-    const d = await res.json();
-    if(!d.success) throw new Error();
-    const sched = d.data.schedule;
-    const curMins = now.getHours()*60+now.getMinutes();
-    el.innerHTML='';
-    sched.forEach((s,i)=>{
-      const [h,m]=s.time.split(':').map(Number);
-      const slotMins=h*60+m;
-      const nextMins=i+1<sched.length?(()=>{const[nh,nm]=sched[i+1].time.split(':').map(Number);return nh*60+nm;})():1440;
-      const isNow=slotMins<=curMins&&curMins<nextMins;
-      const isPast=nextMins<=curMins;
-      const row=document.createElement('div');
-      row.className=`sched-row${isNow?' now':''}${isPast?' past':''}`;
-      row.innerHTML=`<div class="sched-t${isNow?' now':''}">${s.time}${isNow?'<span class="now-badge">NOW</span>':''}</div><div><div class="sched-n">${s.title}</div><div class="sched-g">${{film:'AI Film',doc:'Documentary',series:'Series',short:'Short'}[s.category]||s.category}</div></div><div class="sched-d">${s.duration||''}</div>`;
-      el.appendChild(row);
-      if(isNow) setTimeout(()=>row.scrollIntoView({block:'center',behavior:'smooth'}),200);
-    });
-  } catch(e){ el.innerHTML='<div style="padding:1rem;color:var(--text3);font-family:var(--fm);font-size:12px">Could not load schedule.</div>'; }
-}
-
-// ── ARCHIVE ──
 async function loadArchive(){
   try {
     const token = localStorage.getItem('tvarz_token');
@@ -526,9 +584,16 @@ async function loadArchive(){
     const d = await res.json();
     if(!d.success) return;
     allVideos = d.data.videos;
-    document.getElementById('totalFilms').textContent = allVideos.length;
     document.getElementById('archiveSub').textContent = `${allVideos.length} TITLES · FILMS · DOCUMENTARIES · SERIES`;
     buildArchiveGrid();
+
+    // Handle direct URL access /film/slug
+    if(window._pendingSlug){
+      const slug = window._pendingSlug;
+      window._pendingSlug = null;
+      const item = allVideos.find(v => slugify(v.title) === slug);
+      if(item) openDetail(item);
+    }
   } catch(e){}
 }
 
@@ -541,26 +606,23 @@ function buildArchiveGrid(){
   grid.innerHTML='';
   videos.forEach(item=>{
     const locked=item.is_premium&&!isPremium;
-    const cat={film:'AI Film',doc:'Documentary',series:'Series',short:'Short'}[item.category]||item.category;
-    const thumbUrl = item.youtube_id ? `https://i.ytimg.com/vi/${item.youtube_id}/hqdefault.jpg` : null;
+    const init=item.title.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+    const cat={film:'AI Film',doc:'Documentary',turkish:'Turkish Films & Series'}[item.category]||item.category;
     const card=document.createElement('div');
     card.className='film-card';
-    card.innerHTML=`
-      <div class="film-thumb">
-        ${thumbUrl ? `<img src="${thumbUrl}" alt="${item.title}" loading="lazy">` : `<div class="thumb-letters">${item.title.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase()}</div>`}
-        <div class="thumb-grad"></div>
-        <div class="wm">TVARZ</div>
-        <div class="card-badge ${locked?'badge-prem':'badge-free'}">${locked?'Premium':'Free'}</div>
-        ${locked
-          ? `<div class="lock-ov"><div class="lock-icon">🔒</div><div class="lock-txt">Unlock with Premium</div></div>`
-          : `<div class="play-ov"><div class="play-circle-sm">▶</div></div>`}
-      </div>
-      <div class="film-info">
-        <div class="film-cat">${cat}</div>
-        <div class="film-name">${item.title}</div>
-        <div class="film-dur">${item.duration||''}</div>
-      </div>`;
-    card.onclick=()=>{ if(locked){showPage('pricing');}else if(item.youtube_id){window.open('https://www.youtube.com/watch?v='+item.youtube_id,'_blank');} };
+    const thumbUrl = item.youtube_id ? `https://img.youtube.com/vi/${item.youtube_id}/mqdefault.jpg` : '';
+    const trailerYtId = item.trailer_id || item.youtube_id;
+    const previewSrc = trailerYtId ? `https://www.youtube.com/embed/${trailerYtId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playsinline=1` : '';
+    card.innerHTML=`<div class="film-thumb">${thumbUrl?`<img class="thumb-img" src="${thumbUrl}" alt="${item.title}" loading="lazy">`:`<div class="thumb-letters">${init}</div>`}${previewSrc?`<iframe class="thumb-preview" data-src="${previewSrc}" allowfullscreen allow="autoplay;encrypted-media"></iframe>`:''}<div class="thumb-grad"></div><div class="wm">TVARZ</div>${locked?`<div class="card-badge badge-prem">Premium</div><div class="lock-ov"><div class="lock-icon">🔒</div><div class="lock-txt">Unlock with Premium</div></div>`:''}</div><div class="film-info"><div class="film-cat">${cat}</div><div class="film-name">${item.title}</div>${item.description?`<div class="film-desc">${item.description}</div>`:''}<div class="film-dur">${item.duration||''}</div></div>`;
+    card.addEventListener('mouseenter', ()=>{
+      const iframe = card.querySelector('.thumb-preview');
+      if(iframe && !iframe.src && iframe.dataset.src) iframe.src = iframe.dataset.src;
+    });
+    card.addEventListener('mouseleave', ()=>{
+      const iframe = card.querySelector('.thumb-preview');
+      if(iframe && iframe.src) { iframe.src = ''; }
+    });
+    card.onclick=()=>{ openDetail(item); };
     grid.appendChild(card);
   });
 }
@@ -572,7 +634,6 @@ function filterArchive(cat,btn){
   buildArchiveGrid();
 }
 
-// ── AUTH ──
 function openModal(){ document.getElementById('authModal').classList.add('open'); }
 function closeModal(){ document.getElementById('authModal').classList.remove('open'); }
 document.getElementById('authModal').addEventListener('click',function(e){ if(e.target===this) closeModal(); });
@@ -632,7 +693,6 @@ function restoreSession(){
   }
 }
 
-// ── PRICING ──
 async function startTrial(){
   if(!currentUser){ openModal(); return; }
   const token=localStorage.getItem('tvarz_token');
@@ -649,10 +709,38 @@ function toggleFaq(el){
   a.classList.toggle('open'); s.textContent=a.classList.contains('open')?'−':'+';
 }
 
-// ── INIT ──
 restoreSession();
 loadStream();
 loadArchive();
+(function(){
+  const params = new URLSearchParams(window.location.search);
+  if(params.get('premium') === 'success'){
+    // Clean URL
+    window.history.replaceState({}, '', '/');
+    // Refresh token to get latest premium status
+    const token = localStorage.getItem('tvarz_token');
+    if(token){
+      fetch(`${API}/auth/me`, { headers: { Authorization: `Bearer ${token}` } })
+        .then(r => r.json())
+        .then(d => {
+          if(d.success){
+            localStorage.setItem('tvarz_token', d.data.token);
+            localStorage.setItem('tvarz_user', JSON.stringify(d.data.user));
+            currentUser = d.data.user;
+            isPremium = d.data.user.is_premium;
+            renderAuth();
+            buildArchiveGrid();
+            // Show success message
+            const msg = document.createElement('div');
+            msg.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#2ecc71;color:#fff;font-family:var(--fm);font-size:12px;letter-spacing:0.1em;padding:12px 24px;z-index:999;text-transform:uppercase';
+            msg.textContent = '✓ Premium activated — welcome!';
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 4000);
+          }
+        }).catch(()=>{});
+    }
+  }
+})();
 </script>
 </body>
 </html>
