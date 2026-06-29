@@ -98,4 +98,63 @@ router.get('/subscription', authMiddleware, async (req, res) => {
   }
 });
 
+// GET /user/billing-portal — opens Lemon Squeezy's hosted customer portal
+// User can update card, cancel, or resume subscription there directly
+router.get('/billing-portal', authMiddleware, async (req, res) => {
+  try {
+    const { data: sub } = await supabase
+      .from('subscriptions')
+      .select('*')
+      .eq('user_id', req.user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (!sub || !sub.lemonsqueezy_id) {
+      return res.status(404).json({ success: false, message: 'No subscription found' });
+    }
+
+    const response = await axios.get(
+      `https://api.lemonsqueezy.com/v1/subscriptions/${sub.lemonsqueezy_id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.LEMONSQUEEZY_API_KEY}`,
+          Accept: 'application/vnd.api+json'
+        }
+      }
+    );
+
+    const portalUrl = response.data.data.attributes.urls.customer_portal;
+    res.json({ success: true, data: { portal_url: portalUrl } });
+
+  } catch (err) {
+    console.error('Billing portal error:', err.response?.data || err.message);
+    res.status(500).json({ success: false, message: 'Could not load billing portal' });
+  }
+});
+
+// GET /user/watch-status — how many free watches used today
+router.get('/watch-status', authMiddleware, async (req, res) => {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const { data: watch } = await supabase
+      .from('daily_watches')
+      .select('*')
+      .eq('user_id', req.user.id)
+      .eq('watched_date', today)
+      .maybeSingle();
+
+    res.json({
+      success: true,
+      data: {
+        watched_today: !!watch,
+        video_id: watch?.video_id || null,
+        video_title: watch?.video_title || null
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 module.exports = router;
