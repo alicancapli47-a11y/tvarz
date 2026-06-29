@@ -179,6 +179,32 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:54px;display:flex;ali
 .toggle-switch input:checked + .toggle-track .toggle-knob{transform:translateX(20px);background:#2ecc71}
 .toggle-switch.loading{opacity:0.5;pointer-events:none}
 
+/* CINEMA PLAYER — fullscreen, no YouTube UI ever clickable */
+.cinema-modal{position:fixed;inset:0;background:#000;z-index:1000;display:none}
+.cinema-modal.open{display:block}
+.cinema-iframe-wrap{position:absolute;inset:0;overflow:hidden}
+.cinema-iframe-wrap iframe{position:absolute;top:50%;left:50%;width:100%;height:100%;min-width:100%;min-height:100%;transform:translate(-50%,-50%);border:none;pointer-events:none}
+.cinema-clickzone{position:absolute;inset:0;z-index:2;cursor:pointer}
+.cinema-top{position:absolute;top:0;left:0;right:0;padding:1.2rem 1.5rem;background:linear-gradient(180deg,rgba(0,0,0,0.85) 0%,transparent 100%);z-index:5;display:flex;align-items:center;justify-content:space-between;opacity:1;transition:opacity 0.3s;pointer-events:none}
+.cinema-top.show{pointer-events:auto}
+.cinema-title-row{font-family:var(--fd);font-size:15px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text)}
+.cinema-close{background:rgba(255,255,255,0.1);border:0.5px solid var(--border2);color:var(--text);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all 0.15s}
+.cinema-close:hover{background:rgba(255,255,255,0.2)}
+.cinema-bottom{position:absolute;bottom:0;left:0;right:0;padding:0 1.5rem 1.3rem;background:linear-gradient(0deg,rgba(0,0,0,0.9) 0%,transparent 100%);z-index:5;opacity:1;transition:opacity 0.3s}
+.cinema-progress{position:relative;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;cursor:pointer;margin-bottom:14px}
+.cinema-progress-fill{position:absolute;top:0;left:0;height:100%;background:var(--red);border-radius:2px;width:0%}
+.cinema-progress-handle{position:absolute;top:50%;width:11px;height:11px;background:var(--red);border-radius:50%;transform:translate(-50%,-50%);left:0%}
+.cinema-controls-row{display:flex;align-items:center;gap:16px}
+.cinema-btn{background:none;border:none;color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;width:32px;height:32px;transition:opacity 0.15s}
+.cinema-btn:hover{opacity:0.7}
+.cinema-time{font-family:var(--fm);font-size:11px;color:var(--text2);letter-spacing:0.05em;white-space:nowrap}
+.cinema-spacer{flex:1}
+.cinema-vol-wrap{display:flex;align-items:center;gap:8px}
+.cinema-vol-slider{width:70px;height:3px;background:rgba(255,255,255,0.25);border-radius:2px;position:relative;cursor:pointer}
+.cinema-vol-fill{position:absolute;top:0;left:0;height:100%;background:var(--text);border-radius:2px;width:100%}
+.cinema-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:4;background:#000;font-family:var(--fm);font-size:12px;color:var(--text3);letter-spacing:0.1em}
+.cinema-modal.hide-ui .cinema-top, .cinema-modal.hide-ui .cinema-bottom{opacity:0;pointer-events:none}
+
 /* FOOTER */
 footer{border-top:0.5px solid var(--border);padding:2rem 2.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-top:4rem}
 .footer-logo img{height:22px}
@@ -358,6 +384,35 @@ footer{border-top:0.5px solid var(--border);padding:2rem 2.5rem;display:flex;ali
     </div>
 
     <button class="btn-plan btn-free" onclick="signOut()" style="margin-top:1rem">Sign Out</button>
+  </div>
+</div>
+
+<!-- CINEMA PLAYER — fullscreen, custom controls, no YouTube UI exposed -->
+<div class="cinema-modal" id="cinemaModal">
+  <div class="cinema-iframe-wrap" id="cinemaIframeWrap"></div>
+  <div class="cinema-loading" id="cinemaLoading">Loading film...</div>
+  <div class="cinema-clickzone" id="cinemaClickzone" onclick="cinemaTogglePlay()"></div>
+  <div class="cinema-top show" id="cinemaTop">
+    <div class="cinema-title-row" id="cinemaTitle">—</div>
+    <button class="cinema-close" onclick="closeCinemaPlayer()">✕</button>
+  </div>
+  <div class="cinema-bottom" id="cinemaBottom">
+    <div class="cinema-progress" id="cinemaProgress" onclick="cinemaSeek(event)">
+      <div class="cinema-progress-fill" id="cinemaProgressFill"></div>
+      <div class="cinema-progress-handle" id="cinemaProgressHandle"></div>
+    </div>
+    <div class="cinema-controls-row">
+      <button class="cinema-btn" id="cinemaPlayBtn" onclick="cinemaTogglePlay()">⏸</button>
+      <div class="cinema-vol-wrap">
+        <button class="cinema-btn" id="cinemaMuteBtn" onclick="cinemaToggleMute()" style="font-size:15px">🔊</button>
+        <div class="cinema-vol-slider" id="cinemaVolSlider" onclick="cinemaSetVolume(event)">
+          <div class="cinema-vol-fill" id="cinemaVolFill"></div>
+        </div>
+      </div>
+      <div class="cinema-time" id="cinemaTime">0:00 / 0:00</div>
+      <div class="cinema-spacer"></div>
+      <button class="cinema-btn" onclick="cinemaToggleFullscreen()" style="font-size:15px">⛶</button>
+    </div>
   </div>
 </div>
 
@@ -571,6 +626,159 @@ function openDetail(item){
   showPage('detail');
 }
 
+// ── CINEMA PLAYER ── fullscreen, custom controls, YouTube UI never exposed
+let cinemaPlayer = null;
+let cinemaYTReady = false;
+let cinemaProgressTimer = null;
+let cinemaHideUITimer = null;
+
+(function loadCinemaYTAPI(){
+  if(window.YT && window.YT.Player){ cinemaYTReady = true; return; }
+  const prevReady = window.onYouTubeIframeAPIReady;
+  window.onYouTubeIframeAPIReady = function(){
+    cinemaYTReady = true;
+    if(typeof prevReady === 'function') prevReady();
+  };
+  if(!document.querySelector('script[src*="youtube.com/iframe_api"]')){
+    const s = document.createElement('script');
+    s.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(s);
+  }
+})();
+
+function openCinemaPlayer(embedUrl, title){
+  // Extract video ID from whatever embed URL the backend returned
+  const match = embedUrl.match(/embed\/([a-zA-Z0-9_-]+)/);
+  const videoId = match ? match[1] : null;
+  if(!videoId){ window.open(embedUrl, '_blank'); return; }
+
+  document.getElementById('cinemaTitle').textContent = title || '';
+  document.getElementById('cinemaModal').classList.add('open');
+  document.getElementById('cinemaLoading').style.display = 'flex';
+  document.getElementById('cinemaLoading').textContent = 'Loading film...';
+  document.body.style.overflow = 'hidden';
+
+  const wrap = document.getElementById('cinemaIframeWrap');
+  wrap.innerHTML = '';
+  const iframe = document.createElement('iframe');
+  iframe.id = 'cinemaIframe';
+  iframe.allow = 'autoplay; encrypted-media';
+  iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playsinline=1&disablekb=1&fs=0&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}`;
+  wrap.appendChild(iframe);
+
+  const bindPlayer = setInterval(()=>{
+    if(!cinemaYTReady) return;
+    clearInterval(bindPlayer);
+    try {
+      cinemaPlayer = new YT.Player('cinemaIframe', {
+        events: {
+          onReady(e){
+            document.getElementById('cinemaLoading').style.display = 'none';
+            e.target.playVideo();
+            document.getElementById('cinemaVolFill').style.width = '100%';
+            if(cinemaProgressTimer) clearInterval(cinemaProgressTimer);
+            cinemaProgressTimer = setInterval(updateCinemaProgress, 500);
+            cinemaArmAutoHide();
+          },
+          onStateChange(e){
+            const btn = document.getElementById('cinemaPlayBtn');
+            if(e.data === YT.PlayerState.PLAYING) btn.textContent = '⏸';
+            if(e.data === YT.PlayerState.PAUSED) btn.textContent = '▶';
+            if(e.data === YT.PlayerState.ENDED){
+              btn.textContent = '↻';
+              document.getElementById('cinemaModal').classList.remove('hide-ui');
+            }
+          }
+        }
+      });
+    } catch(err){ console.warn('Cinema player bind failed', err); }
+  }, 250);
+}
+
+function updateCinemaProgress(){
+  if(!cinemaPlayer || typeof cinemaPlayer.getCurrentTime !== 'function') return;
+  try {
+    const cur = cinemaPlayer.getCurrentTime();
+    const dur = cinemaPlayer.getDuration();
+    if(!dur) return;
+    const pct = (cur/dur)*100;
+    document.getElementById('cinemaProgressFill').style.width = pct+'%';
+    document.getElementById('cinemaProgressHandle').style.left = pct+'%';
+    const fmt = s => `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
+    document.getElementById('cinemaTime').textContent = `${fmt(cur)} / ${fmt(dur)}`;
+  } catch(e){}
+}
+
+function cinemaTogglePlay(){
+  if(!cinemaPlayer) return;
+  const state = cinemaPlayer.getPlayerState();
+  if(state === 1) cinemaPlayer.pauseVideo();
+  else cinemaPlayer.playVideo();
+  cinemaArmAutoHide();
+}
+
+function cinemaToggleMute(){
+  if(!cinemaPlayer) return;
+  const muted = cinemaPlayer.isMuted();
+  const btn = document.getElementById('cinemaMuteBtn');
+  if(muted){
+    cinemaPlayer.unMute();
+    cinemaPlayer.setVolume(100);
+    btn.textContent = '🔊';
+    document.getElementById('cinemaVolFill').style.width = '100%';
+  } else {
+    cinemaPlayer.mute();
+    btn.textContent = '🔇';
+    document.getElementById('cinemaVolFill').style.width = '0%';
+  }
+}
+
+function cinemaSetVolume(e){
+  if(!cinemaPlayer) return;
+  const rect = e.currentTarget.getBoundingClientRect();
+  const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  cinemaPlayer.setVolume(pct*100);
+  cinemaPlayer.unMute();
+  document.getElementById('cinemaVolFill').style.width = (pct*100)+'%';
+  document.getElementById('cinemaMuteBtn').textContent = pct === 0 ? '🔇' : '🔊';
+}
+
+function cinemaSeek(e){
+  if(!cinemaPlayer) return;
+  const rect = e.currentTarget.getBoundingClientRect();
+  const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  const dur = cinemaPlayer.getDuration();
+  if(dur) cinemaPlayer.seekTo(dur*pct, true);
+}
+
+function cinemaToggleFullscreen(){
+  const modal = document.getElementById('cinemaModal');
+  if(document.fullscreenElement) document.exitFullscreen();
+  else modal.requestFullscreen().catch(()=>{});
+}
+
+function cinemaArmAutoHide(){
+  const modal = document.getElementById('cinemaModal');
+  modal.classList.remove('hide-ui');
+  if(cinemaHideUITimer) clearTimeout(cinemaHideUITimer);
+  cinemaHideUITimer = setTimeout(()=>{
+    if(cinemaPlayer && cinemaPlayer.getPlayerState() === 1) modal.classList.add('hide-ui');
+  }, 3000);
+}
+
+document.getElementById('cinemaModal').addEventListener('mousemove', cinemaArmAutoHide);
+
+function closeCinemaPlayer(){
+  if(cinemaProgressTimer) clearInterval(cinemaProgressTimer);
+  if(cinemaHideUITimer) clearTimeout(cinemaHideUITimer);
+  try { if(cinemaPlayer && cinemaPlayer.destroy) cinemaPlayer.destroy(); } catch(e){}
+  cinemaPlayer = null;
+  document.getElementById('cinemaIframeWrap').innerHTML = '';
+  document.getElementById('cinemaModal').classList.remove('open','hide-ui');
+  document.body.style.overflow = '';
+  if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+}
+
 async function handleDetailWatch(){
   if(!currentDetailItem) return;
 
@@ -608,11 +816,10 @@ async function handleDetailWatch(){
       return;
     }
 
-    // Play the actual full film — swap trailer iframe to full movie
-    const trailer = document.getElementById('detailTrailer');
-    trailer.src = d.data.embed_url;
-    btn.textContent = '▶ Now Playing';
-    btn.disabled = true;
+    // Play the actual full film in our fullscreen cinema player — no YouTube UI exposed
+    btn.textContent = '▶ Watch Full Film';
+    btn.disabled = false;
+    openCinemaPlayer(d.data.embed_url, currentDetailItem.title);
 
     const used = d.data.watches_used;
     const limit = d.data.daily_limit;
