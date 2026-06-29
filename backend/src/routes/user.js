@@ -163,4 +163,85 @@ router.get('/watch-status', authMiddleware, async (req, res) => {
   }
 });
 
+// POST /user/subscription/cancel — turn off auto-renew (stays active until period ends)
+router.post('/subscription/cancel', authMiddleware, async (req, res) => {
+  try {
+    const { data: sub } = await supabase
+      .from('subscriptions')
+      .select('*')
+      .eq('user_id', req.user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (!sub || !sub.lemonsqueezy_id) {
+      return res.status(404).json({ success: false, message: 'No subscription found' });
+    }
+
+    const response = await axios.patch(
+      `https://api.lemonsqueezy.com/v1/subscriptions/${sub.lemonsqueezy_id}`,
+      { data: { type: 'subscriptions', id: String(sub.lemonsqueezy_id), attributes: { cancelled: true } } },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.LEMONSQUEEZY_API_KEY}`,
+          'Content-Type': 'application/vnd.api+json',
+          Accept: 'application/vnd.api+json'
+        }
+      }
+    );
+
+    const endsAt = response.data.data.attributes.ends_at;
+    await supabase.from('subscriptions').update({
+      status: 'cancelled',
+      ends_at: endsAt,
+      updated_at: new Date().toISOString()
+    }).eq('lemonsqueezy_id', sub.lemonsqueezy_id);
+
+    res.json({ success: true, data: { ends_at: endsAt } });
+  } catch (err) {
+    console.error('Cancel error:', err.response?.data || err.message);
+    res.status(500).json({ success: false, message: 'Could not cancel subscription' });
+  }
+});
+
+// POST /user/subscription/resume — turn auto-renew back on
+router.post('/subscription/resume', authMiddleware, async (req, res) => {
+  try {
+    const { data: sub } = await supabase
+      .from('subscriptions')
+      .select('*')
+      .eq('user_id', req.user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (!sub || !sub.lemonsqueezy_id) {
+      return res.status(404).json({ success: false, message: 'No subscription found' });
+    }
+
+    await axios.patch(
+      `https://api.lemonsqueezy.com/v1/subscriptions/${sub.lemonsqueezy_id}`,
+      { data: { type: 'subscriptions', id: String(sub.lemonsqueezy_id), attributes: { cancelled: false } } },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.LEMONSQUEEZY_API_KEY}`,
+          'Content-Type': 'application/vnd.api+json',
+          Accept: 'application/vnd.api+json'
+        }
+      }
+    );
+
+    await supabase.from('subscriptions').update({
+      status: 'active',
+      ends_at: null,
+      updated_at: new Date().toISOString()
+    }).eq('lemonsqueezy_id', sub.lemonsqueezy_id);
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Resume error:', err.response?.data || err.message);
+    res.status(500).json({ success: false, message: 'Could not resume subscription' });
+  }
+});
+
 module.exports = router;
