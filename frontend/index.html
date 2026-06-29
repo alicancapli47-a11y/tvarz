@@ -546,7 +546,7 @@ function openDetail(item){
   const trailer = document.getElementById('detailTrailer');
   trailer.src = `https://www.youtube.com/embed/${trailerYtId}?autoplay=1&mute=0&controls=1&modestbranding=1&rel=0`;
 
-  const locked = item.is_premium && !isPremium;
+  const locked = !isPremium;
   const btn = document.getElementById('detailWatchBtn');
   btn.disabled = false;
   btn.textContent = locked ? '🔒 Unlock with Premium — $3.99/mo' : '▶ Watch Full Film';
@@ -562,10 +562,8 @@ function openDetail(item){
 async function handleDetailWatch(){
   if(!currentDetailItem) return;
 
-  const locked = currentDetailItem.is_premium && !isPremium;
-  if(locked){ showPage('pricing'); return; }
-
   if(!currentUser){ openModal(); return; }
+  if(!isPremium){ showPage('pricing'); return; }
 
   const btn = document.getElementById('detailWatchBtn');
   const notice = document.getElementById('watchNotice');
@@ -604,8 +602,16 @@ async function handleDetailWatch(){
     btn.textContent = '▶ Now Playing';
     btn.disabled = true;
 
-    if(!d.data.unlimited){
-      notice.textContent = "This was today's free watch. Come back tomorrow, or upgrade to Premium for unlimited access anytime.";
+    const used = d.data.watches_used;
+    const limit = d.data.daily_limit;
+    const remaining = limit - used;
+    if(remaining > 0){
+      notice.textContent = `You have ${remaining} more watch${remaining>1?'es':''} available today.`;
+      notice.style.display = 'block';
+    } else {
+      notice.textContent = isPremium
+        ? "That's today's 2 watches used. More unlock tomorrow."
+        : "That was today's free watch. Upgrade to Premium for 2 watches a day.";
       notice.style.display = 'block';
     }
   } catch(e){
@@ -674,17 +680,25 @@ async function loadAccountPage(){
     `;
   }
 
-  // Daily watch status
-  if(isPremium){
-    watchBox.innerHTML = `Unlimited — Premium members can watch anything, anytime.`;
+  // Daily watch status — Archive is Premium-only; Free just watches the live stream
+  if(!isPremium){
+    watchBox.innerHTML = `Free members watch the live stream — always on, no sign-up needed. <a href="#" onclick="showPage('pricing');return false" style="color:var(--gold)">Upgrade to Premium</a> to unlock 2 on-demand watches a day from the Archive.`;
   } else {
     try {
       const res = await fetch(`${API}/user/watch-status`, { headers: { Authorization: `Bearer ${token}` } });
       const d = await res.json();
-      if(d.success && d.data.watched_today){
-        watchBox.innerHTML = `You watched <strong style="color:var(--text)">${d.data.video_title}</strong> today. Your next free watch unlocks tomorrow.`;
+      if(d.success){
+        const { watches_used, daily_limit, titles } = d.data;
+        const remaining = daily_limit - watches_used;
+        if(watches_used === 0){
+          watchBox.innerHTML = `You have <strong style="color:var(--gold)">${daily_limit} watches</strong> available today. Pick anything from the Archive.`;
+        } else if(remaining > 0){
+          watchBox.innerHTML = `Watched <strong style="color:var(--text)">${titles.join(', ')}</strong> today. <strong style="color:var(--gold)">${remaining}</strong> watch left.`;
+        } else {
+          watchBox.innerHTML = `Watched <strong style="color:var(--text)">${titles.join(' and ')}</strong> today. More unlocks tomorrow.`;
+        }
       } else {
-        watchBox.innerHTML = `You have <strong style="color:var(--gold)">1 free watch</strong> available today. Pick anything from the Archive.`;
+        watchBox.innerHTML = `Could not load watch status.`;
       }
     } catch(e){
       watchBox.innerHTML = `Could not load watch status.`;
@@ -755,7 +769,7 @@ function buildArchiveGrid(){
   if(!videos.length){ grid.innerHTML='<div style="padding:2rem;color:var(--text3);font-family:var(--fm);font-size:12px">Loading...</div>'; return; }
   grid.innerHTML='';
   videos.forEach(item=>{
-    const locked=item.is_premium&&!isPremium;
+    const locked=!isPremium;
     const init=item.title.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
     const cat={film:'AI Film',doc:'Documentary',turkish:'Turkish Films & Series'}[item.category]||item.category;
     const card=document.createElement('div');
