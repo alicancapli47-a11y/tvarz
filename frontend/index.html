@@ -167,6 +167,18 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:54px;display:flex;ali
 .modal-note{font-size:11px;color:var(--text3);text-align:center;margin-top:1.5rem;line-height:1.5}
 .modal-note a{color:var(--red);text-decoration:none}
 
+/* TOGGLE SWITCH */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.toggle-label{font-size:13px;color:var(--text2)}
+.toggle-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.toggle-switch{position:relative;width:46px;height:26px;flex-shrink:0;cursor:pointer}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-track{position:absolute;inset:0;background:var(--surface3);border:0.5px solid var(--border2);border-radius:13px;transition:all 0.2s}
+.toggle-knob{position:absolute;top:3px;left:3px;width:18px;height:18px;background:var(--text3);border-radius:50%;transition:all 0.2s}
+.toggle-switch input:checked + .toggle-track{background:rgba(46,204,113,0.25);border-color:rgba(46,204,113,0.5)}
+.toggle-switch input:checked + .toggle-track .toggle-knob{transform:translateX(20px);background:#2ecc71}
+.toggle-switch.loading{opacity:0.5;pointer-events:none}
+
 /* FOOTER */
 footer{border-top:0.5px solid var(--border);padding:2rem 2.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-top:4rem}
 .footer-logo img{height:22px}
@@ -268,7 +280,7 @@ footer{border-top:0.5px solid var(--border);padding:2rem 2.5rem;display:flex;ali
     <div class="prem-banner" id="premBanner" style="display:none">
       <div>
         <div style="font-family:var(--fd);font-size:14px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);margin-bottom:3px">Unlock the Full Archive</div>
-        <div style="font-size:12px;color:var(--text2)">Get Premium for $3.99/mo — first 3 days free</div>
+        <div style="font-size:12px;color:var(--text2)">Get Premium for $3.99/mo — 2 films a day</div>
       </div>
       <button class="btn-prem" style="font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:9px 20px;border:none;cursor:pointer;" onclick="showPage('pricing')">Get Premium</button>
     </div>
@@ -280,8 +292,8 @@ footer{border-top:0.5px solid var(--border);padding:2rem 2.5rem;display:flex;ali
 <div class="page" id="page-pricing">
   <div class="pricing-wrap">
     <div class="pricing-eye">Simple pricing</div>
-    <div class="pricing-h">Watch free.<br>Or watch everything.</div>
-    <div class="pricing-sub">Start watching instantly. No credit card required for Free. Cancel Premium anytime.</div>
+    <div class="pricing-h">Watch live.<br>Or pick 2 a day.</div>
+    <div class="pricing-sub">Free members watch the live channel. Premium members also get 2 on-demand films a day from the Archive.</div>
     <div class="plans">
       <div class="plan">
         <div class="plan-name">Free</div>
@@ -301,23 +313,23 @@ footer{border-top:0.5px solid var(--border);padding:2rem 2.5rem;display:flex;ali
         <div class="plan-hot-label">Most Popular</div>
         <div class="plan-name" style="color:var(--gold)">Premium</div>
         <div><span class="plan-price">$3.99</span><span class="plan-period">/month</span></div>
-        <div class="plan-trial">✦ First 3 days completely free</div>
+        <div class="plan-trial">✦ 2 on-demand films every day</div>
         <div class="plan-div"></div>
         <ul class="plan-feats">
           <li><span class="fi" style="color:var(--gold)">✓</span>Everything in Free</li>
-          <li><span class="fi" style="color:var(--gold)">✓</span>Full archive — all titles</li>
-          <li><span class="fi" style="color:var(--gold)">✓</span>Watch anything, anytime</li>
+          <li><span class="fi" style="color:var(--gold)">✓</span>Full archive access</li>
+          <li><span class="fi" style="color:var(--gold)">✓</span>2 on-demand films a day</li>
           <li><span class="fi" style="color:var(--gold)">✓</span>Ad-free experience</li>
           <li><span class="fi" style="color:var(--gold)">✓</span>New films 48h early access</li>
         </ul>
-        <button class="btn-plan btn-prem" onclick="startTrial()">Start Free Trial</button>
+        <button class="btn-plan btn-prem" onclick="startTrial()">Get Premium</button>
       </div>
     </div>
     <div class="faq">
       <div class="faq-title">Questions</div>
-      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">What is Tvarz? <span>+</span></div><div class="faq-a">Tvarz is a free AI cinema channel streaming 24/7 — just like TV, but built with artificial intelligence. Free users watch the live stream. Premium users get the full archive on demand.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">What is Tvarz? <span>+</span></div><div class="faq-a">Tvarz is a free AI cinema channel streaming 24/7 — just like TV, but built with artificial intelligence. Free members watch the live stream only. Premium members can also pick 2 films a day from the Archive.</div></div>
       <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Do I need an account? <span>+</span></div><div class="faq-a">No account needed for the free live stream. Sign in with Google to access Premium.</div></div>
-      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">How does the free trial work? <span>+</span></div><div class="faq-a">3-day free trial, then $3.99/month. Cancel anytime before the trial ends — no charges.</div></div>
+      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Why only 2 films a day? <span>+</span></div><div class="faq-a">Tvarz is built around live, shared viewing — not an unlimited on-demand library. Premium gives you 2 picks a day from the Archive on top of the live channel, so there's always something new to look forward to.</div></div>
       <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Are the films really made with AI? <span>+</span></div><div class="faq-a">Yes. Every title on Tvarz is produced with AI video tools — Seedance, Veo, Kling, and others.</div></div>
     </div>
   </div>
@@ -584,7 +596,7 @@ async function handleDetailWatch(){
       if(d.code === 'DAILY_LIMIT_REACHED'){
         notice.textContent = d.message;
         notice.style.display = 'block';
-        btn.textContent = '✦ Upgrade for Unlimited Access';
+        btn.textContent = '✦ Upgrade to Premium';
         btn.onclick = () => showPage('pricing');
       } else if(d.code === 'PREMIUM_REQUIRED'){
         showPage('pricing');
@@ -659,16 +671,32 @@ async function loadAccountPage(){
       const d = await res.json();
       const sub = d.success ? d.data.subscription : null;
       const renews = sub?.renews_at ? new Date(sub.renews_at).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : null;
+      const endsAt = sub?.ends_at ? new Date(sub.ends_at).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : null;
       const trialEnds = sub?.trial_ends_at ? new Date(sub.trial_ends_at) : null;
       const onTrial = trialEnds && trialEnds > new Date();
+      const isCancelled = sub?.status === 'cancelled';
 
       subBox.innerHTML = `
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
           <div class="premium-badge-nav">Premium ${onTrial ? '· Trial' : ''}</div>
           <div style="font-size:12px;color:var(--text2)">$3.99/month</div>
         </div>
-        ${renews ? `<div style="font-size:13px;color:var(--text2);margin-bottom:14px">${sub?.status==='cancelled' ? 'Access ends' : 'Renews'} on ${renews}</div>` : ''}
-        <button class="btn-plan btn-free" style="width:auto;padding:10px 20px" onclick="openBillingPortal()">Manage Billing</button>
+        ${isCancelled
+          ? `<div style="font-size:13px;color:var(--gold);margin-bottom:14px">Access ends on ${endsAt || renews || '—'}</div>`
+          : renews ? `<div style="font-size:13px;color:var(--text2);margin-bottom:14px">Renews on ${renews}</div>` : ''}
+
+        <div class="toggle-row" style="margin-bottom:14px">
+          <div>
+            <div class="toggle-label">Auto-renew</div>
+            <div class="toggle-sub" id="renewSub">${isCancelled ? 'Off — your access ends on the date above' : 'On — billed automatically each month'}</div>
+          </div>
+          <label class="toggle-switch" id="renewSwitch">
+            <input type="checkbox" id="renewCheckbox" ${isCancelled ? '' : 'checked'} onchange="toggleAutoRenew(this)">
+            <span class="toggle-track"><span class="toggle-knob"></span></span>
+          </label>
+        </div>
+
+        <button class="btn-plan btn-free" style="width:auto;padding:9px 18px;font-size:12px" onclick="openBillingPortal()">Update Payment Method</button>
       `;
     } catch(e){
       subBox.innerHTML = `<div style="color:var(--text3);font-size:13px">Could not load subscription details.</div>`;
@@ -704,6 +732,41 @@ async function loadAccountPage(){
       watchBox.innerHTML = `Could not load watch status.`;
     }
   }
+}
+
+async function toggleAutoRenew(checkbox){
+  const wrap = document.getElementById('renewSwitch');
+  const sub = document.getElementById('renewSub');
+  const turningOn = checkbox.checked;
+
+  wrap.classList.add('loading');
+  const token = localStorage.getItem('tvarz_token');
+
+  try {
+    const res = await fetch(`${API}/user/subscription/${turningOn ? 'resume' : 'cancel'}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const d = await res.json();
+
+    if(!d.success){
+      checkbox.checked = !turningOn; // revert on failure
+      alert(d.message || 'Could not update subscription.');
+      wrap.classList.remove('loading');
+      return;
+    }
+
+    if(turningOn){
+      sub.textContent = 'On — billed automatically each month';
+    } else {
+      const endsAt = d.data?.ends_at ? new Date(d.data.ends_at).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : 'the end of your billing period';
+      sub.textContent = `Off — your access ends on ${endsAt}`;
+    }
+  } catch(e){
+    checkbox.checked = !turningOn;
+    alert('Connection error. Please try again.');
+  }
+  wrap.classList.remove('loading');
 }
 
 async function openBillingPortal(){
