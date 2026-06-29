@@ -248,6 +248,7 @@ footer{border-top:0.5px solid var(--border);padding:2rem 2.5rem;display:flex;ali
     <div class="detail-cta">
       <button class="btn-watch-full" id="detailWatchBtn" onclick="handleDetailWatch()">▶ Watch Full Film</button>
     </div>
+    <div id="watchNotice" style="display:none;margin-top:1rem;font-family:var(--fm);font-size:12px;color:var(--gold);background:rgba(201,168,76,0.08);border:0.5px solid rgba(201,168,76,0.3);padding:10px 16px"></div>
   </div>
 </div>
 
@@ -319,6 +320,32 @@ footer{border-top:0.5px solid var(--border);padding:2rem 2.5rem;display:flex;ali
       <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">How does the free trial work? <span>+</span></div><div class="faq-a">3-day free trial, then $3.99/month. Cancel anytime before the trial ends — no charges.</div></div>
       <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Are the films really made with AI? <span>+</span></div><div class="faq-a">Yes. Every title on Tvarz is produced with AI video tools — Seedance, Veo, Kling, and others.</div></div>
     </div>
+  </div>
+</div>
+
+<!-- ACCOUNT -->
+<div class="page" id="page-account">
+  <div class="pricing-wrap" style="max-width:560px">
+    <div class="pricing-eye" style="text-align:left">My Account</div>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:2rem">
+      <div class="avatar" style="width:48px;height:48px;font-size:18px" id="acctAvatar">?</div>
+      <div>
+        <div style="font-family:var(--fd);font-size:18px;font-weight:600;color:var(--text)" id="acctName">—</div>
+        <div style="font-family:var(--fm);font-size:12px;color:var(--text3)" id="acctEmail">—</div>
+      </div>
+    </div>
+
+    <div style="background:var(--surface);border:0.5px solid var(--border);padding:1.5rem;margin-bottom:1rem">
+      <div style="font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:1rem">Subscription</div>
+      <div id="acctSubBox">Loading...</div>
+    </div>
+
+    <div style="background:var(--surface);border:0.5px solid var(--border);padding:1.5rem;margin-bottom:1rem">
+      <div style="font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:1rem">Today's Free Watch</div>
+      <div id="acctWatchBox" style="font-size:13px;color:var(--text2)">Loading...</div>
+    </div>
+
+    <button class="btn-plan btn-free" onclick="signOut()" style="margin-top:1rem">Sign Out</button>
   </div>
 </div>
 
@@ -515,12 +542,15 @@ function openDetail(item){
   document.getElementById('detailCat').textContent = cat;
   document.getElementById('detailDur').textContent = item.duration || '';
 
+  // Always start on trailer — pressing the button swaps to full film
   const trailer = document.getElementById('detailTrailer');
   trailer.src = `https://www.youtube.com/embed/${trailerYtId}?autoplay=1&mute=0&controls=1&modestbranding=1&rel=0`;
 
   const locked = item.is_premium && !isPremium;
   const btn = document.getElementById('detailWatchBtn');
+  btn.disabled = false;
   btn.textContent = locked ? '🔒 Unlock with Premium — $3.99/mo' : '▶ Watch Full Film';
+  document.getElementById('watchNotice').style.display = 'none';
 
   // Update URL and meta
   window.history.pushState({ page: 'detail', slug, id: item.id }, item.title, `/film/${slug}`);
@@ -529,9 +559,61 @@ function openDetail(item){
   showPage('detail');
 }
 
-function handleDetailWatch(){
+async function handleDetailWatch(){
   if(!currentDetailItem) return;
-  showPage('pricing');
+
+  const locked = currentDetailItem.is_premium && !isPremium;
+  if(locked){ showPage('pricing'); return; }
+
+  if(!currentUser){ openModal(); return; }
+
+  const btn = document.getElementById('detailWatchBtn');
+  const notice = document.getElementById('watchNotice');
+  btn.textContent = 'Loading...';
+  btn.disabled = true;
+
+  const token = localStorage.getItem('tvarz_token');
+  try {
+    const res = await fetch(`${API}/program/watch`, {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ video_id: currentDetailItem.id })
+    });
+    const d = await res.json();
+
+    if(!d.success){
+      btn.disabled = false;
+      if(d.code === 'DAILY_LIMIT_REACHED'){
+        notice.textContent = d.message;
+        notice.style.display = 'block';
+        btn.textContent = '✦ Upgrade for Unlimited Access';
+        btn.onclick = () => showPage('pricing');
+      } else if(d.code === 'PREMIUM_REQUIRED'){
+        showPage('pricing');
+      } else {
+        notice.textContent = 'Something went wrong. Please try again.';
+        notice.style.display = 'block';
+        btn.textContent = '▶ Watch Full Film';
+      }
+      return;
+    }
+
+    // Play the actual full film — swap trailer iframe to full movie
+    const trailer = document.getElementById('detailTrailer');
+    trailer.src = d.data.embed_url;
+    btn.textContent = '▶ Now Playing';
+    btn.disabled = true;
+
+    if(!d.data.unlimited){
+      notice.textContent = "This was today's free watch. Come back tomorrow, or upgrade to Premium for unlimited access anytime.";
+      notice.style.display = 'block';
+    }
+  } catch(e){
+    btn.disabled = false;
+    btn.textContent = '▶ Watch Full Film';
+    notice.textContent = 'Connection error. Please try again.';
+    notice.style.display = 'block';
+  }
 }
 
 function showPage(id){
@@ -549,7 +631,75 @@ function showPage(id){
   document.getElementById('page-'+id).classList.add('active');
   const nl = document.getElementById('nav-'+id); if(nl) nl.classList.add('active');
   if(id==='archive') buildArchiveGrid();
+  if(id==='account') loadAccountPage();
   window.scrollTo(0,0);
+}
+
+async function loadAccountPage(){
+  if(!currentUser){ showPage('home'); openModal(); return; }
+
+  document.getElementById('acctAvatar').textContent = currentUser.name ? currentUser.name[0].toUpperCase() : '?';
+  document.getElementById('acctName').textContent = currentUser.name || 'Tvarz Member';
+  document.getElementById('acctEmail').textContent = currentUser.email || '';
+
+  const token = localStorage.getItem('tvarz_token');
+  const subBox = document.getElementById('acctSubBox');
+  const watchBox = document.getElementById('acctWatchBox');
+
+  // Subscription info
+  if(isPremium){
+    try {
+      const res = await fetch(`${API}/user/subscription`, { headers: { Authorization: `Bearer ${token}` } });
+      const d = await res.json();
+      const sub = d.success ? d.data.subscription : null;
+      const renews = sub?.renews_at ? new Date(sub.renews_at).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : null;
+      const trialEnds = sub?.trial_ends_at ? new Date(sub.trial_ends_at) : null;
+      const onTrial = trialEnds && trialEnds > new Date();
+
+      subBox.innerHTML = `
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <div class="premium-badge-nav">Premium ${onTrial ? '· Trial' : ''}</div>
+          <div style="font-size:12px;color:var(--text2)">$3.99/month</div>
+        </div>
+        ${renews ? `<div style="font-size:13px;color:var(--text2);margin-bottom:14px">${sub?.status==='cancelled' ? 'Access ends' : 'Renews'} on ${renews}</div>` : ''}
+        <button class="btn-plan btn-free" style="width:auto;padding:10px 20px" onclick="openBillingPortal()">Manage Billing</button>
+      `;
+    } catch(e){
+      subBox.innerHTML = `<div style="color:var(--text3);font-size:13px">Could not load subscription details.</div>`;
+    }
+  } else {
+    subBox.innerHTML = `
+      <div style="font-size:13px;color:var(--text2);margin-bottom:14px">You're on the Free plan — live stream only.</div>
+      <button class="btn-plan btn-prem" style="width:auto;padding:10px 20px" onclick="showPage('pricing')">Upgrade to Premium</button>
+    `;
+  }
+
+  // Daily watch status
+  if(isPremium){
+    watchBox.innerHTML = `Unlimited — Premium members can watch anything, anytime.`;
+  } else {
+    try {
+      const res = await fetch(`${API}/user/watch-status`, { headers: { Authorization: `Bearer ${token}` } });
+      const d = await res.json();
+      if(d.success && d.data.watched_today){
+        watchBox.innerHTML = `You watched <strong style="color:var(--text)">${d.data.video_title}</strong> today. Your next free watch unlocks tomorrow.`;
+      } else {
+        watchBox.innerHTML = `You have <strong style="color:var(--gold)">1 free watch</strong> available today. Pick anything from the Archive.`;
+      }
+    } catch(e){
+      watchBox.innerHTML = `Could not load watch status.`;
+    }
+  }
+}
+
+async function openBillingPortal(){
+  const token = localStorage.getItem('tvarz_token');
+  try {
+    const res = await fetch(`${API}/user/billing-portal`, { headers: { Authorization: `Bearer ${token}` } });
+    const d = await res.json();
+    if(d.success && d.data.portal_url) window.open(d.data.portal_url, '_blank');
+    else alert('Could not open billing portal.');
+  } catch(e){ alert('Connection error.'); }
 }
 
 // Handle browser back/forward
@@ -672,8 +822,8 @@ function renderAuth(){
   if(!currentUser){ area.innerHTML=`<button class="btn-login" onclick="openModal()">Sign in</button>`; return; }
   const init=currentUser.name?currentUser.name[0].toUpperCase():'?';
   area.innerHTML=isPremium
-    ?`<div class="user-status"><div class="premium-badge-nav">Premium</div><div class="avatar" onclick="signOut()" title="Sign out">${init}</div></div>`
-    :`<div class="user-status"><button class="btn-premium-nav" onclick="showPage('pricing')">Get Premium</button><div class="avatar" onclick="signOut()" title="Sign out">${init}</div></div>`;
+    ?`<div class="user-status"><div class="premium-badge-nav">Premium</div><div class="avatar" onclick="showPage('account')" title="Account">${init}</div></div>`
+    :`<div class="user-status"><button class="btn-premium-nav" onclick="showPage('pricing')">Get Premium</button><div class="avatar" onclick="showPage('account')" title="Account">${init}</div></div>`;
 }
 
 function signOut(){
