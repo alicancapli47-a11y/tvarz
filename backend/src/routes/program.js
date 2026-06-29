@@ -187,4 +187,78 @@ router.get('/archive', async (req, res) => {
   }
 });
 
+// POST /program/watch — request to watch an on-demand archive title
+// Free users: 1 watch per day (any title). Premium users: unlimited.
+router.post('/watch', authMiddleware, async (req, res) => {
+  try {
+    const { video_id } = req.body;
+    if (!video_id) return res.status(400).json({ success: false, message: 'video_id required' });
+
+    const { data: video, error: vErr } = await supabase
+      .from('videos')
+      .select('*')
+      .eq('id', video_id)
+      .single();
+
+    if (vErr || !video) return res.status(404).json({ success: false, message: 'Video not found' });
+
+    const isPremium = req.user.is_premium;
+
+    // Premium-locked content always requires premium — daily allowance does not unlock it
+    if (video.is_premium && !isPremium) {
+      return res.status(403).json({ success: false, code: 'PREMIUM_REQUIRED', message: 'This title requires Premium' });
+    }
+
+    // Premium users — unlimited, no tracking needed
+    if (isPremium) {
+      return res.json({
+        success: true,
+        data: {
+          embed_url: `https://www.youtube.com/embed/${video.youtube_id}?autoplay=1&mute=0&controls=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playsinline=1`,
+          unlimited: true
+        }
+      });
+    }
+
+    // Free user — check daily allowance
+    const today = new Date().toISOString().split('T')[0];
+    const { data: existing } = await supabase
+      .from('daily_watches')
+      .select('*')
+      .eq('user_id', req.user.id)
+      .eq('watched_date', today)
+      .maybeSingle();
+
+    if (existing && existing.video_id !== video_id) {
+      return res.status(403).json({
+        success: false,
+        code: 'DAILY_LIMIT_REACHED',
+        message: `You've already used today's free watch on "${existing.video_title}". Upgrade to Premium for unlimited access.`
+      });
+    }
+
+    if (!existing) {
+      await supabase.from('daily_watches').insert({
+        user_id: req.user.id,
+        video_id: video_id,
+        video_title: video.title,
+        watched_date: today
+      });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        embed_url: `https://www.youtube.com/embed/${video.youtube_id}?autoplay=1&mute=0&controls=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playsinline=1`,
+        unlimited: false,
+        daily_watch_used: true
+      }
+    });
+
+  } catch (err) {
+    console.error('Watch error:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 module.exports = router;
