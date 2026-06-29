@@ -133,23 +133,29 @@ router.get('/billing-portal', authMiddleware, async (req, res) => {
   }
 });
 
-// GET /user/watch-status — how many free watches used today
+// GET /user/watch-status — how many of today's 2 Premium watches used
 router.get('/watch-status', authMiddleware, async (req, res) => {
   try {
+    if (!req.user.is_premium) {
+      return res.json({ success: true, data: { is_premium: false, watches_used: 0, daily_limit: 0, titles: [] } });
+    }
+
     const today = new Date().toISOString().split('T')[0];
-    const { data: watch } = await supabase
+    const { data: watches } = await supabase
       .from('daily_watches')
       .select('*')
       .eq('user_id', req.user.id)
-      .eq('watched_date', today)
-      .maybeSingle();
+      .eq('watched_date', today);
+
+    const list = watches || [];
 
     res.json({
       success: true,
       data: {
-        watched_today: !!watch,
-        video_id: watch?.video_id || null,
-        video_title: watch?.video_title || null
+        is_premium: true,
+        watches_used: list.length,
+        daily_limit: 2,
+        titles: list.map(w => w.video_title)
       }
     });
   } catch (err) {
