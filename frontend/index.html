@@ -1,1180 +1,570 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZD3BV0XKCK"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-ZD3BV0XKCK');
-</script>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tvarz — Free AI Cinema Channel</title>
-<meta name="description" content="Tvarz is a free AI cinema channel streaming 24/7. Watch AI-generated films, thrillers, documentaries and more. Always free, always on.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --red:#D92B3A;--red2:#a81e2a;--gold:#C9A84C;
-  --bg:#080809;--surface:#141416;--surface2:#1a1a1d;--surface3:#222226;
-  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.12);
-  --text:#ede8e0;--text2:#9a9690;--text3:#5a5855;
-  --fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;--fm:'DM Mono',monospace;
-}
-body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
-::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--surface3)}
-
-/* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:200;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;background:rgba(8,8,9,0.95);backdrop-filter:blur(12px);border-bottom:0.5px solid var(--border)}
-.nav-logo img{height:42px;width:auto;display:block;cursor:pointer}
-.nav-links{display:flex;align-items:center}
-.nav-link{font-family:var(--fd);font-size:13px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text2);padding:0 1rem;height:54px;display:flex;align-items:center;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s;background:none;border-top:none;border-left:none;border-right:none}
-.nav-link:hover{color:var(--text)}
-.nav-link.active{color:var(--text);border-bottom-color:var(--red)}
-.nav-right{display:flex;align-items:center;gap:1rem}
-.live-pill{display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:10px;letter-spacing:0.14em;color:var(--red);padding:4px 10px;border:0.5px solid rgba(217,43,58,0.3)}
-.live-dot{width:5px;height:5px;border-radius:50%;background:var(--red);animation:blink 1.6s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
-.nav-clock{font-family:var(--fm);font-size:11px;color:var(--text3);letter-spacing:0.1em}
-.btn-login{font-family:var(--fd);font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:6px 16px;background:transparent;border:0.5px solid var(--border2);color:var(--text);cursor:pointer;transition:all 0.15s}
-.btn-login:hover{background:var(--surface2)}
-.btn-premium-nav{font-family:var(--fd);font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:6px 16px;background:var(--red);border:none;color:#fff;cursor:pointer;transition:all 0.15s}
-.btn-premium-nav:hover{background:var(--red2)}
-.avatar{width:30px;height:30px;border-radius:50%;background:var(--surface3);border:0.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:13px;font-weight:600;color:var(--text);cursor:pointer}
-.user-status{display:flex;align-items:center;gap:8px}
-.premium-badge-nav{font-family:var(--fm);font-size:9px;letter-spacing:0.12em;color:var(--gold);border:0.5px solid rgba(201,168,76,0.4);padding:3px 8px;text-transform:uppercase}
-
-/* PAGES */
-.page{display:none;padding-top:54px;min-height:100vh}
-.page.active{display:block}
-
-/* ── PLAYER ── */
-.player-wrap{position:relative;width:100%;background:#000;overflow:hidden;cursor:pointer}
-.player-wrap::before{content:'';display:block;padding-top:52%}
-.player-wrap iframe{position:absolute;top:-90px;left:-2px;width:calc(100% + 4px);height:calc(100% + 180px);border:none;pointer-events:none}
-.player-grad{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 35%,rgba(8,8,9,0.75) 72%,rgba(8,8,9,1) 100%);pointer-events:none}
-.player-tap{position:absolute;inset:0;z-index:5;cursor:pointer}
-.mute-hint{position:absolute;top:1rem;right:1rem;z-index:8;background:rgba(8,8,9,0.75);border:0.5px solid var(--border2);padding:5px 12px;font-family:var(--fm);font-size:10px;letter-spacing:0.1em;color:var(--text2);display:flex;align-items:center;gap:6px;transition:opacity 0.4s}
-.mute-hint.gone{opacity:0;pointer-events:none}
-.fs-btn{position:absolute;bottom:5rem;right:1rem;z-index:8;background:rgba(8,8,9,0.75);border:0.5px solid var(--border2);color:var(--text2);width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;transition:all 0.15s}
-.fs-btn:hover{background:rgba(255,255,255,0.1);color:var(--text)}
-.player-info{position:absolute;bottom:0;left:0;right:0;padding:1.2rem 2rem;z-index:6;pointer-events:none}
-.now-label{font-family:var(--fm);font-size:9px;letter-spacing:0.2em;color:var(--red);text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:8px}
-.now-label::before{content:'';width:14px;height:1px;background:var(--red)}
-.film-title{font-family:var(--fd);font-size:clamp(1.3rem,2.5vw,2.2rem);font-weight:700;letter-spacing:0.03em;line-height:1.1;color:var(--text);max-width:650px;text-transform:uppercase;margin-bottom:8px}
-.film-tags{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.tag{font-family:var(--fm);font-size:10px;letter-spacing:0.1em;padding:3px 10px;border:0.5px solid var(--border2);color:var(--text2);text-transform:uppercase}
-.tag.red{border-color:rgba(217,43,58,0.4);color:var(--red)}
-.tag.dim{color:var(--text3);border-color:var(--border)}
-
-/* UP NEXT */
-.section{padding:2rem 2.5rem}
-.sec-title{font-family:var(--fd);font-size:1.2rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text);margin-bottom:1rem}
-.up-next-box{display:flex;align-items:center;justify-content:space-between;gap:1rem;background:var(--surface);border:0.5px solid var(--border);padding:1rem 1.5rem;cursor:pointer;transition:all 0.2s;flex-wrap:wrap}
-.up-next-box:hover{border-color:rgba(201,168,76,0.4);background:rgba(201,168,76,0.04)}
-.up-next-title{font-family:var(--fd);font-size:15px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text)}
-.up-next-cta{font-family:var(--fm);font-size:10px;letter-spacing:0.12em;color:var(--gold);border:0.5px solid rgba(201,168,76,0.4);padding:5px 14px;white-space:nowrap;flex-shrink:0}
-
-/* ARCHIVE */
-.archive-wrap{padding:2.5rem 2rem}
-.filter-bar{display:flex;gap:8px;margin-bottom:2rem;flex-wrap:wrap}
-.filter-btn{font-family:var(--fd);font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:6px 16px;background:var(--surface);border:0.5px solid var(--border);color:var(--text3);cursor:pointer;transition:all 0.15s}
-.filter-btn.on{background:var(--surface3);border-color:var(--border2);color:var(--text)}
-.filter-btn:hover:not(.on){background:var(--surface2);color:var(--text)}
-.prem-banner{background:rgba(201,168,76,0.06);border:0.5px solid rgba(201,168,76,0.25);padding:1rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
-.archive-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:1px}
-.film-card{background:var(--surface);border:0.5px solid var(--border);cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
-.film-card:hover{border-color:var(--border2);transform:translateY(-2px)}
-.film-thumb{position:relative;padding-top:56.25%;background:var(--surface2);overflow:hidden}
-.thumb-img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block;transition:opacity 0.3s;z-index:1}
-.thumb-preview{position:absolute;top:-15%;left:-2px;width:calc(100% + 4px);height:130%;border:none;opacity:0;transition:opacity 0.4s;pointer-events:none;z-index:2}
-.film-card:hover .thumb-preview{opacity:1}
-.film-card:hover .thumb-img{opacity:0}
-.thumb-letters{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:3rem;font-weight:700;color:rgba(255,255,255,0.04);text-transform:uppercase}
-.thumb-grad{position:absolute;inset:0;background:linear-gradient(135deg,rgba(217,43,58,0.12) 0%,transparent 60%);z-index:1}
-.wm{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0.14;font-family:var(--fd);font-size:1.3rem;font-weight:700;letter-spacing:0.2em;color:#fff;text-transform:uppercase;transform:rotate(-20deg);user-select:none;pointer-events:none;z-index:1}
-.lock-ov{position:absolute;inset:0;background:rgba(8,8,9,0.6);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;opacity:0;transition:opacity 0.2s;z-index:3}
-.film-card:hover .lock-ov{opacity:1}
-.lock-icon{font-size:1.4rem;color:var(--gold)}
-.lock-txt{font-family:var(--fd);font-size:11px;font-weight:600;letter-spacing:0.12em;color:var(--gold);text-transform:uppercase}
-.card-badge{position:absolute;top:8px;left:8px;font-family:var(--fm);font-size:8px;letter-spacing:0.1em;padding:3px 8px;text-transform:uppercase;z-index:4}
-.badge-free{background:rgba(8,8,9,0.8);border:0.5px solid var(--border2);color:var(--text2)}
-.badge-prem{background:rgba(201,168,76,0.15);border:0.5px solid rgba(201,168,76,0.4);color:var(--gold)}
-.film-info{padding:10px 12px}
-.film-cat{font-family:var(--fm);font-size:9px;letter-spacing:0.14em;color:var(--red);text-transform:uppercase;margin-bottom:4px}
-.film-name{font-family:var(--fd);font-size:13px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:var(--text);line-height:1.2;margin-bottom:4px}
-.film-desc{font-size:11px;color:var(--text3);line-height:1.5;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.film-dur{font-size:11px;color:var(--text3)}
-
-/* FILM DETAIL PAGE */
-.detail-wrap{max-width:900px;margin:0 auto;padding:2.5rem 2rem}
-.detail-back{font-family:var(--fm);font-size:11px;letter-spacing:0.1em;color:var(--text3);cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin-bottom:2rem;background:none;border:none;padding:0;transition:color 0.15s}
-.detail-back:hover{color:var(--text)}
-.detail-trailer{position:relative;width:100%;padding-top:56.25%;background:#000;margin-bottom:2rem;overflow:hidden}
-.detail-trailer iframe{position:absolute;inset:0;width:100%;height:100%;border:none}
-.detail-title{font-family:var(--fd);font-size:clamp(1.5rem,3vw,2.8rem);font-weight:700;letter-spacing:0.04em;text-transform:uppercase;line-height:1.1;margin-bottom:12px}
-.detail-meta{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;flex-wrap:wrap}
-.detail-desc{font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:2rem;max-width:680px}
-.detail-cta{display:flex;gap:12px;flex-wrap:wrap}
-.btn-watch-full{font-family:var(--fd);font-size:14px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:14px 32px;background:var(--red);color:#fff;border:none;cursor:pointer;transition:all 0.15s}
-.btn-watch-full:hover{background:var(--red2)}
-.btn-watch-free{font-family:var(--fd);font-size:14px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:14px 32px;background:transparent;color:var(--text);border:0.5px solid var(--border2);cursor:pointer;transition:all 0.15s}
-.btn-watch-free:hover{background:var(--surface2)}
-
-/* PRICING */
-.pricing-wrap{max-width:860px;margin:0 auto;padding:4rem 2rem}
-.pricing-eye{font-family:var(--fm);font-size:10px;letter-spacing:0.2em;color:var(--red);text-transform:uppercase;margin-bottom:12px;text-align:center}
-.pricing-h{font-family:var(--fd);font-size:clamp(2.5rem,6vw,5rem);font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--text);line-height:0.95;margin-bottom:16px;text-align:center}
-.pricing-sub{font-size:15px;color:var(--text2);max-width:480px;margin:0 auto 4rem;line-height:1.6;text-align:center}
-.plans{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin-bottom:3rem}
-.plan{background:var(--surface);border:0.5px solid var(--border);padding:2.5rem}
-.plan.hot{border-color:rgba(217,43,58,0.4);background:rgba(217,43,58,0.03);position:relative}
-.plan-hot-label{position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:var(--red);font-family:var(--fm);font-size:9px;letter-spacing:0.14em;color:#fff;padding:3px 16px;text-transform:uppercase}
-.plan-name{font-family:var(--fd);font-size:1rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text2);margin-bottom:1.5rem}
-.plan-price{font-family:var(--fd);font-size:3.5rem;font-weight:700;color:var(--text);line-height:1}
-.plan-period{font-family:var(--fd);font-size:1rem;color:var(--text3)}
-.plan-trial{font-family:var(--fm);font-size:10px;letter-spacing:0.1em;color:var(--gold);margin:6px 0 2rem}
-.plan-div{height:0.5px;background:var(--border);margin:1.5rem 0}
-.plan-feats{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:2rem}
-.plan-feats li{display:flex;gap:10px;font-size:13px;color:var(--text2);line-height:1.4}
-.fi{flex-shrink:0;margin-top:1px}
-.btn-plan{width:100%;font-family:var(--fd);font-size:14px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:14px;cursor:pointer;border:none;transition:all 0.15s}
-.btn-free{background:var(--surface3);color:var(--text);border:0.5px solid var(--border2)}
-.btn-free:hover{background:var(--surface2)}
-.btn-prem{background:var(--red);color:#fff}
-.btn-prem:hover{background:var(--red2)}
-.faq{margin-top:3rem}
-.faq-title{font-family:var(--fd);font-size:1.3rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text);margin-bottom:1.5rem;text-align:center}
-.faq-item{border-bottom:0.5px solid var(--border);padding:1.2rem 0}
-.faq-q{font-family:var(--fd);font-size:14px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text);cursor:pointer;display:flex;justify-content:space-between}
-.faq-a{font-size:13px;color:var(--text2);line-height:1.6;margin-top:10px;display:none}
-.faq-a.open{display:block}
-
-/* AUTH MODAL */
-.modal-bg{position:fixed;inset:0;background:rgba(8,8,9,0.88);backdrop-filter:blur(4px);z-index:500;display:none;align-items:center;justify-content:center}
-.modal-bg.open{display:flex}
-.modal{background:var(--surface);border:0.5px solid var(--border2);padding:2.5rem;width:100%;max-width:400px;position:relative}
-.modal-x{position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--text3);font-size:1.2rem;cursor:pointer}
-.modal-x:hover{color:var(--text)}
-.modal-title{font-family:var(--fd);font-size:1.8rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text);margin-bottom:6px}
-.modal-sub{font-size:13px;color:var(--text2);margin-bottom:2rem;line-height:1.5}
-.btn-google{width:100%;display:flex;align-items:center;justify-content:center;gap:12px;padding:13px;background:var(--surface3);border:0.5px solid var(--border2);color:var(--text);font-family:var(--fd);font-size:14px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:all 0.15s}
-.btn-google:hover{background:var(--surface2)}
-.google-icon{width:18px;height:18px}
-.modal-note{font-size:11px;color:var(--text3);text-align:center;margin-top:1.5rem;line-height:1.5}
-.modal-note a{color:var(--red);text-decoration:none}
-
-/* TOGGLE SWITCH */
-.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:1rem}
-.toggle-label{font-size:13px;color:var(--text2)}
-.toggle-sub{font-size:11px;color:var(--text3);margin-top:2px}
-.toggle-switch{position:relative;width:46px;height:26px;flex-shrink:0;cursor:pointer}
-.toggle-switch input{opacity:0;width:0;height:0}
-.toggle-track{position:absolute;inset:0;background:var(--surface3);border:0.5px solid var(--border2);border-radius:13px;transition:all 0.2s}
-.toggle-knob{position:absolute;top:3px;left:3px;width:18px;height:18px;background:var(--text3);border-radius:50%;transition:all 0.2s}
-.toggle-switch input:checked + .toggle-track{background:rgba(46,204,113,0.25);border-color:rgba(46,204,113,0.5)}
-.toggle-switch input:checked + .toggle-track .toggle-knob{transform:translateX(20px);background:#2ecc71}
-.toggle-switch.loading{opacity:0.5;pointer-events:none}
-
-/* CINEMA PLAYER — fullscreen, no YouTube UI ever clickable */
-.cinema-modal{position:fixed;inset:0;background:#000;z-index:1000;display:none}
-.cinema-modal.open{display:block}
-.cinema-iframe-wrap{position:absolute;inset:0;overflow:hidden}
-.cinema-iframe-wrap iframe{position:absolute;top:50%;left:50%;width:100%;height:100%;min-width:100%;min-height:100%;transform:translate(-50%,-50%);border:none;pointer-events:none}
-.cinema-clickzone{position:absolute;inset:0;z-index:2;cursor:pointer}
-.cinema-top{position:absolute;top:0;left:0;right:0;padding:1.2rem 1.5rem;background:linear-gradient(180deg,rgba(0,0,0,0.85) 0%,transparent 100%);z-index:5;display:flex;align-items:center;justify-content:space-between;opacity:1;transition:opacity 0.3s;pointer-events:none}
-.cinema-top.show{pointer-events:auto}
-.cinema-title-row{font-family:var(--fd);font-size:15px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text)}
-.cinema-close{background:rgba(255,255,255,0.1);border:0.5px solid var(--border2);color:var(--text);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all 0.15s}
-.cinema-close:hover{background:rgba(255,255,255,0.2)}
-.cinema-bottom{position:absolute;bottom:0;left:0;right:0;padding:0 1.5rem 1.3rem;background:linear-gradient(0deg,rgba(0,0,0,0.9) 0%,transparent 100%);z-index:5;opacity:1;transition:opacity 0.3s}
-.cinema-progress{position:relative;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;cursor:pointer;margin-bottom:14px}
-.cinema-progress-fill{position:absolute;top:0;left:0;height:100%;background:var(--red);border-radius:2px;width:0%}
-.cinema-progress-handle{position:absolute;top:50%;width:11px;height:11px;background:var(--red);border-radius:50%;transform:translate(-50%,-50%);left:0%}
-.cinema-controls-row{display:flex;align-items:center;gap:16px}
-.cinema-btn{background:none;border:none;color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;width:32px;height:32px;transition:opacity 0.15s}
-.cinema-btn:hover{opacity:0.7}
-.cinema-time{font-family:var(--fm);font-size:11px;color:var(--text2);letter-spacing:0.05em;white-space:nowrap}
-.cinema-spacer{flex:1}
-.cinema-vol-wrap{display:flex;align-items:center;gap:8px}
-.cinema-vol-slider{width:70px;height:3px;background:rgba(255,255,255,0.25);border-radius:2px;position:relative;cursor:pointer}
-.cinema-vol-fill{position:absolute;top:0;left:0;height:100%;background:var(--text);border-radius:2px;width:100%}
-.cinema-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:4;background:#000;font-family:var(--fm);font-size:12px;color:var(--text3);letter-spacing:0.1em}
-.cinema-modal.hide-ui .cinema-top, .cinema-modal.hide-ui .cinema-bottom{opacity:0;pointer-events:none}
-
-/* FOOTER */
-footer{border-top:0.5px solid var(--border);padding:2rem 2.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-top:4rem}
-.footer-logo img{height:22px}
-.footer-copy{font-size:11px;color:var(--text3);font-family:var(--fm)}
-.footer-links{display:flex;gap:1.5rem}
-.footer-links a{font-size:11px;color:var(--text3);text-decoration:none;font-family:var(--fm)}
-.footer-links a:hover{color:var(--text2)}
-
-@media(max-width:700px){
-  nav{padding:0 1rem}
-  .player-info{padding:1rem}
-  .section,.archive-wrap,.pricing-wrap{padding:1.5rem 1rem}
-  .plans{grid-template-columns:1fr}
-  .archive-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
-  footer{padding:1.5rem 1rem}
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Müstakit Studio — Arsa ve Yapı Projesi Videosu Siparişi</title>
+  <meta name="description" content="Arsanız veya yapı projeniz için profesyonel tanıtım videosu. 1-2 gün içinde teslim." />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://app.lemonsqueezy.com/js/lemon.js" defer></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #F26419;
+      --primary-dark: #D4510A;
+      --bg: #FFFFFF;
+      --surface: #F7F4F1;
+      --border: #E0D9D0;
+      --text: #1A1A1A;
+      --muted: #777;
+    }
+    body { font-family: 'Inter', sans-serif; color: var(--text); background: var(--bg); }
+    h1,h2,h3,h4 { font-family: 'Plus Jakarta Sans', sans-serif; }
+    nav { border-bottom: 1px solid var(--border); }
+    .nav-inner { max-width: 900px; margin: 0 auto; padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; }
+    .logo { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 20px; color: var(--primary); text-decoration: none; }
+    .logo span { color: var(--text); font-weight: 400; font-size: 14px; }
+    .nav-badge { background: var(--primary); color: white; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; }
+    .hero { background: linear-gradient(135deg, #1a1a1a 0%, #2d1f0e 100%); color: white; padding: 70px 24px; text-align: center; }
+    .hero-badge { display: inline-block; background: rgba(242,100,25,0.2); border: 1px solid rgba(242,100,25,0.5); color: #F26419; font-size: 12px; font-weight: 600; padding: 6px 16px; border-radius: 20px; margin-bottom: 24px; }
+    .hero h1 { font-size: clamp(26px, 4.5vw, 42px); font-weight: 800; line-height: 1.15; letter-spacing: -1px; margin-bottom: 16px; }
+    .hero h1 span { color: var(--primary); }
+    .hero p { font-size: 16px; color: rgba(255,255,255,0.75); max-width: 560px; margin: 0 auto 32px; line-height: 1.7; }
+    section { padding: 64px 24px; }
+    .container { max-width: 900px; margin: 0 auto; }
+    .section-tag { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--primary); margin-bottom: 10px; text-align: center; }
+    .section-title { font-size: clamp(22px, 4vw, 32px); font-weight: 800; letter-spacing: -0.5px; margin-bottom: 36px; text-align: center; }
+    .packages { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 760px; margin: 0 auto; }
+    .pkg-card { border: 2px solid var(--border); border-radius: 20px; overflow: hidden; background: white; display: flex; flex-direction: column; }
+    .pkg-card.featured { border-color: var(--primary); position: relative; }
+    .pkg-badge { position: absolute; top: -1px; right: 16px; background: var(--primary); color: white; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 0 0 8px 8px; }
+    .pkg-top { padding: 24px; border-bottom: 1px solid var(--border); }
+    .pkg-name { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+    .pkg-desc { font-size: 12px; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
+    .pkg-price-row { display: flex; align-items: baseline; gap: 8px; }
+    .pkg-price { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 30px; font-weight: 800; color: var(--primary); }
+    .pkg-price-old { font-size: 15px; color: var(--muted); text-decoration: line-through; }
+    .pkg-body { padding: 20px 24px; flex: 1; display: flex; flex-direction: column; }
+    .pkg-features { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; flex: 1; }
+    .pkg-features li { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: #333; }
+    .pkg-features li.no::before { content: '✕'; color: #c44; font-weight: 700; flex-shrink: 0; }
+    .pkg-features li.yes::before { content: '✓'; color: #2E9E5B; font-weight: 700; flex-shrink: 0; }
+    .pkg-select-btn { width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--text); font-weight: 700; padding: 12px; border-radius: 10px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+    .pkg-select-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; }
+    .step { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
+    .step-num { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 34px; font-weight: 800; color: var(--border); line-height: 1; margin-bottom: 12px; }
+    .step-title { font-weight: 700; font-size: 14px; margin-bottom: 6px; }
+    .step-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .form-section { background: var(--surface); }
+    .form-card { background: white; border: 1px solid var(--border); border-radius: 24px; padding: 40px; }
+    .form-title { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
+    .form-sub { font-size: 13px; color: var(--muted); margin-bottom: 32px; }
+    .form-group { margin-bottom: 18px; }
+    .form-group-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    label { display: block; font-size: 12px; font-weight: 600; color: #555; margin-bottom: 6px; }
+    label span { color: #e53e3e; }
+    input, select, textarea { width: 100%; border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; font-size: 14px; font-family: 'Inter', sans-serif; color: var(--text); background: white; transition: border-color 0.2s, box-shadow 0.2s; outline: none; }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(242,100,25,0.12); }
+    textarea { resize: vertical; min-height: 90px; }
+    .form-section-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 15px; color: var(--primary); padding-bottom: 8px; border-bottom: 2px solid var(--primary); margin: 28px 0 18px; }
+    .upload-area { border: 2px dashed var(--border); border-radius: 12px; padding: 28px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--surface); }
+    .upload-area:hover { border-color: var(--primary); background: rgba(242,100,25,0.04); }
+    .upload-icon { font-size: 32px; margin-bottom: 8px; }
+    .upload-text { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+    .upload-sub { font-size: 11px; color: var(--muted); }
+    .upload-input { display: none; }
+    .file-list { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .file-tag { background: rgba(242,100,25,0.1); border: 1px solid rgba(242,100,25,0.3); color: var(--primary); font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px; }
+    .selected-summary { background: #fff8f5; border: 1px solid rgba(242,100,25,0.3); border-radius: 12px; padding: 16px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; }
+    .selected-summary-text { font-size: 13px; }
+    .selected-summary-text b { color: var(--primary); }
+    .selected-summary-price { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 22px; font-weight: 800; color: var(--primary); }
+    .form-note { background: #fff8f5; border: 1px solid rgba(242,100,25,0.2); border-radius: 10px; padding: 14px 16px; font-size: 12px; color: #7a3a10; margin-bottom: 20px; line-height: 1.6; }
+    .payment-options { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+    .payment-option { display: flex; align-items: center; gap: 12px; border: 2px solid var(--border); border-radius: 12px; padding: 16px; cursor: pointer; transition: all 0.2s; }
+    .payment-option.selected { border-color: var(--primary); background: rgba(242,100,25,0.04); }
+    .payment-option input[type="radio"] { width: 18px; height: 18px; accent-color: var(--primary); }
+    .payment-option-label { flex: 1; }
+    .payment-option-title { font-weight: 700; font-size: 14px; }
+    .payment-option-desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .form-submit { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .btn-submit { width: 100%; background: var(--primary); color: white; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; font-weight: 700; padding: 16px; border-radius: 12px; border: none; cursor: pointer; transition: background 0.2s; }
+    .btn-submit:hover { background: var(--primary-dark); }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+    .form-guarantee { font-size: 11px; color: var(--muted); }
+    .success-box { display: none; text-align: center; padding: 40px 24px; }
+    .success-box.show { display: block; }
+    .success-icon { font-size: 56px; margin-bottom: 16px; }
+    .success-title { font-size: 24px; font-weight: 800; margin-bottom: 10px; }
+    .success-desc { font-size: 14px; color: var(--muted); max-width: 420px; margin: 0 auto 20px; line-height: 1.7; }
+    .faq-list { display: flex; flex-direction: column; gap: 10px; max-width: 680px; margin: 0 auto; }
+    details { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    summary { padding: 16px 18px; font-weight: 600; font-size: 13px; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+    summary::after { content: '+'; font-size: 18px; color: var(--primary); font-weight: 300; }
+    details[open] summary::after { content: '−'; }
+    details p { padding: 0 18px 16px; font-size: 12px; color: var(--muted); line-height: 1.7; }
+    footer { background: #1a1a1a; color: rgba(255,255,255,0.5); text-align: center; padding: 24px; font-size: 12px; }
+    footer a { color: var(--primary); text-decoration: none; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 24px; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: white; border-radius: 20px; padding: 36px; max-width: 480px; width: 100%; text-align: center; }
+    .modal h3 { font-size: 20px; font-weight: 800; margin-bottom: 12px; }
+    .modal p { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
+    .modal-btns { display: flex; gap: 10px; }
+    .btn-cancel { flex: 1; background: none; border: 1px solid var(--border); color: var(--text); font-size: 13px; font-weight: 600; padding: 11px; border-radius: 10px; cursor: pointer; }
+    .btn-pay { flex: 2; background: var(--primary); color: white; border: none; font-size: 13px; font-weight: 700; padding: 11px; border-radius: 10px; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; }
+    .btn-pay:hover { background: var(--primary-dark); }
+    .contract-box { display: flex; align-items: flex-start; gap: 10px; background: #fff8f5; border: 1px solid rgba(242,100,25,0.2); border-radius: 10px; padding: 16px; margin-bottom: 20px; }
+    .contract-box input { width: auto; margin-top: 3px; accent-color: var(--primary); }
+    .contract-box label { font-size: 12px; font-weight: 400; color: #333; cursor: pointer; margin: 0; }
+    .contract-box a { color: var(--primary); font-weight: 600; text-decoration: underline; }
+    @media (max-width: 600px) {
+      .packages { grid-template-columns: 1fr; }
+      .form-group-row { grid-template-columns: 1fr; }
+      .form-card { padding: 24px 18px; }
+    }
+  </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
-  <div class="nav-logo" onclick="showPage('home')"><img src="tvarzlogo.png" alt="TVARZ"></div>
-  <div class="nav-links">
-    <button class="nav-link active" id="nav-home" onclick="showPage('home')">Watch</button>
-    <button class="nav-link" id="nav-archive" onclick="showPage('archive')">Archive</button>
-    <button class="nav-link" id="nav-pricing" onclick="showPage('pricing')">Pricing</button>
-  </div>
-  <div class="nav-right">
-    <div class="live-pill"><div class="live-dot"></div>LIVE</div>
-    <div class="nav-clock" id="navClock">00:00:00</div>
-    <div id="authArea"><button class="btn-login" onclick="openModal()">Sign in</button></div>
+  <div class="nav-inner">
+    <a href="https://mustakit.com" class="logo">Müstakit <span>Studio</span></a>
+    <div class="nav-badge">Profesyonel Video</div>
   </div>
 </nav>
 
-<!-- HOME -->
-<div class="page active" id="page-home">
-  <div class="player-wrap" id="playerWrap">
-    <div id="iframeContainer"></div>
-    <div class="player-grad"></div>
-    <div class="player-tap" id="playerTap" onclick="unmute()"></div>
-    <div class="mute-hint" id="muteHint">🔇 Tap to unmute</div>
-    <button class="fs-btn" onclick="goFullscreen()">⛶</button>
-    <div class="player-info">
-      <div class="now-label">Now Playing <span style="font-family:var(--fm);font-size:8px;letter-spacing:0.12em;color:var(--gold);border:0.5px solid rgba(201,168,76,0.5);background:rgba(201,168,76,0.08);padding:3px 10px;margin-left:10px;text-transform:uppercase">✦ Exclusive · Not on YouTube</span></div>
-      <div class="film-title" id="filmTitle">Loading stream...</div>
-      <div class="film-tags" id="filmTags"></div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="sec-title">Up Next</div>
-    <div class="up-next-box" onclick="showPage('pricing')">
-      <div class="up-next-title" id="upNext">—</div>
-      <div class="up-next-cta">UNLOCK WITH PREMIUM →</div>
-    </div>
-  </div>
-
-  <footer>
-    <div class="footer-logo"><img src="tvarzlogo.png" alt="TVARZ"></div>
-    <div class="footer-copy">© 2025 Tvarz · Free AI Cinema Channel</div>
-    <div class="footer-links"><a href="#">Privacy</a><a href="#">Terms</a><a onclick="showPage('pricing')" href="#">Pricing</a></div>
-  </footer>
+<div class="hero">
+  <div class="hero-badge">🏞️ Arsa &amp; Yapı Projesi Videosu</div>
+  <h1>Arsanız veya projeniz için <span>profesyonel</span><br>tanıtım videosu</h1>
+  <p>Bilgilerinizi doldurun, paketinizi seçin, ödemenizi yapın. 1-2 iş günü içinde videonuz hazır.</p>
 </div>
 
-<!-- FILM DETAIL -->
-<div class="page" id="page-detail">
-  <div class="detail-wrap">
-    <button class="detail-back" onclick="showPage('archive')">← Back to Archive</button>
-    <div class="detail-trailer">
-      <iframe id="detailTrailer" allowfullscreen allow="autoplay;encrypted-media"></iframe>
-    </div>
-    <div class="detail-meta">
-      <span class="tag red" id="detailCat">AI Film</span>
-      <span class="tag" id="detailDur">—</span>
-    </div>
-    <div class="detail-title" id="detailTitle">—</div>
-    <div class="detail-desc" id="detailDesc">—</div>
-    <div class="detail-cta">
-      <button class="btn-watch-full" id="detailWatchBtn" onclick="handleDetailWatch()">▶ Watch Full Film</button>
-    </div>
-    <div id="watchNotice" style="display:none;margin-top:1rem;font-family:var(--fm);font-size:12px;color:var(--gold);background:rgba(201,168,76,0.08);border:0.5px solid rgba(201,168,76,0.3);padding:10px 16px"></div>
-  </div>
-</div>
-
-<!-- ARCHIVE -->
-<div class="page" id="page-archive">
-  <div class="archive-wrap">
-    <div style="margin-bottom:1.5rem">
-      <div style="font-family:var(--fd);font-size:2.2rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">Archive</div>
-      <div style="font-family:var(--fm);font-size:10px;color:var(--text3);letter-spacing:0.12em;margin-top:4px" id="archiveSub">FILMS · DOCUMENTARIES · SERIES</div>
-    </div>
-    <div class="filter-bar">
-      <button class="filter-btn on" onclick="filterArchive('all',this)">All</button>
-      <button class="filter-btn" onclick="filterArchive('film',this)">AI Films</button>
-      <button class="filter-btn" onclick="filterArchive('doc',this)">Documentary</button>
-      <button class="filter-btn" onclick="filterArchive('turkish',this)">Turkish Films & Series</button>
-    </div>
-    <div class="prem-banner" id="premBanner" style="display:none">
-      <div>
-        <div style="font-family:var(--fd);font-size:14px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);margin-bottom:3px">Unlock the Full Archive</div>
-        <div style="font-size:12px;color:var(--text2)">Get Premium for $3.99/mo — 2 films a day</div>
-      </div>
-      <button class="btn-prem" style="font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:9px 20px;border:none;cursor:pointer;" onclick="showPage('pricing')">Get Premium</button>
-    </div>
-    <div class="archive-grid" id="archiveGrid"><div style="padding:2rem;color:var(--text3);font-family:var(--fm);font-size:12px">Loading...</div></div>
-  </div>
-</div>
-
-<!-- PRICING -->
-<div class="page" id="page-pricing">
-  <div class="pricing-wrap">
-    <div class="pricing-eye">Simple pricing</div>
-    <div class="pricing-h">Watch live.<br>Or pick 2 a day.</div>
-    <div class="pricing-sub">Free members watch the live channel. Premium members also get 2 on-demand films a day from the Archive.</div>
-    <div class="plans">
-      <div class="plan">
-        <div class="plan-name">Free</div>
-        <div><span class="plan-price">$0</span><span class="plan-period">/forever</span></div>
-        <div class="plan-trial" style="color:var(--text3)">No credit card needed</div>
-        <div class="plan-div"></div>
-        <ul class="plan-feats">
-          <li><span class="fi" style="color:var(--red)">✓</span>Live stream — always on</li>
-          <li><span class="fi" style="color:var(--red)">✓</span>Full schedule access</li>
-          <li><span class="fi" style="color:var(--red)">✓</span>New content weekly</li>
-          <li><span class="fi" style="color:var(--text3)">✗</span><span style="color:var(--text3)">On-demand archive</span></li>
-          <li><span class="fi" style="color:var(--text3)">✗</span><span style="color:var(--text3)">Ad-free experience</span></li>
-        </ul>
-        <button class="btn-plan btn-free" onclick="openModal()">Start Watching Free</button>
-      </div>
-      <div class="plan hot">
-        <div class="plan-hot-label">Most Popular</div>
-        <div class="plan-name" style="color:var(--gold)">Premium</div>
-        <div><span class="plan-price">$3.99</span><span class="plan-period">/month</span></div>
-        <div class="plan-trial">✦ 2 on-demand films every day</div>
-        <div class="plan-div"></div>
-        <ul class="plan-feats">
-          <li><span class="fi" style="color:var(--gold)">✓</span>Everything in Free</li>
-          <li><span class="fi" style="color:var(--gold)">✓</span>Full archive access</li>
-          <li><span class="fi" style="color:var(--gold)">✓</span>2 on-demand films a day</li>
-          <li><span class="fi" style="color:var(--gold)">✓</span>Ad-free experience</li>
-          <li><span class="fi" style="color:var(--gold)">✓</span>New films 48h early access</li>
-        </ul>
-        <button class="btn-plan btn-prem" onclick="startTrial()">Get Premium</button>
-      </div>
-    </div>
-    <div class="faq">
-      <div class="faq-title">Questions</div>
-      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">What is Tvarz? <span>+</span></div><div class="faq-a">Tvarz is a free AI cinema channel streaming 24/7 — just like TV, but built with artificial intelligence. Free members watch the live stream only. Premium members can also pick 2 films a day from the Archive.</div></div>
-      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Do I need an account? <span>+</span></div><div class="faq-a">No account needed for the free live stream. Sign in with Google to access Premium.</div></div>
-      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Why only 2 films a day? <span>+</span></div><div class="faq-a">Tvarz is built around live, shared viewing — not an unlimited on-demand library. Premium gives you 2 picks a day from the Archive on top of the live channel, so there's always something new to look forward to.</div></div>
-      <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)">Are the films really made with AI? <span>+</span></div><div class="faq-a">Yes. Every title on Tvarz is produced with AI video tools — Seedance, Veo, Kling, and others.</div></div>
-    </div>
-  </div>
-</div>
-
-<!-- ACCOUNT -->
-<div class="page" id="page-account">
-  <div class="pricing-wrap" style="max-width:560px">
-    <div class="pricing-eye" style="text-align:left">My Account</div>
-    <div style="display:flex;align-items:center;gap:14px;margin-bottom:2rem">
-      <div class="avatar" style="width:48px;height:48px;font-size:18px" id="acctAvatar">?</div>
-      <div>
-        <div style="font-family:var(--fd);font-size:18px;font-weight:600;color:var(--text)" id="acctName">—</div>
-        <div style="font-family:var(--fm);font-size:12px;color:var(--text3)" id="acctEmail">—</div>
-      </div>
-    </div>
-
-    <div style="background:var(--surface);border:0.5px solid var(--border);padding:1.5rem;margin-bottom:1rem">
-      <div style="font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:1rem">Subscription</div>
-      <div id="acctSubBox">Loading...</div>
-    </div>
-
-    <div style="background:var(--surface);border:0.5px solid var(--border);padding:1.5rem;margin-bottom:1rem">
-      <div style="font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:1rem">Today's Free Watch</div>
-      <div id="acctWatchBox" style="font-size:13px;color:var(--text2)">Loading...</div>
-    </div>
-
-    <button class="btn-plan btn-free" onclick="signOut()" style="margin-top:1rem">Sign Out</button>
-  </div>
-</div>
-
-<!-- CINEMA PLAYER — fullscreen, custom controls, no YouTube UI exposed -->
-<div class="cinema-modal" id="cinemaModal">
-  <div class="cinema-iframe-wrap" id="cinemaIframeWrap"></div>
-  <div class="cinema-loading" id="cinemaLoading">Loading film...</div>
-  <div class="cinema-clickzone" id="cinemaClickzone" onclick="cinemaTogglePlay()"></div>
-  <div class="cinema-top show" id="cinemaTop">
-    <div class="cinema-title-row" id="cinemaTitle">—</div>
-    <button class="cinema-close" onclick="closeCinemaPlayer()">✕</button>
-  </div>
-  <div class="cinema-bottom" id="cinemaBottom">
-    <div class="cinema-progress" id="cinemaProgress" onclick="cinemaSeek(event)">
-      <div class="cinema-progress-fill" id="cinemaProgressFill"></div>
-      <div class="cinema-progress-handle" id="cinemaProgressHandle"></div>
-    </div>
-    <div class="cinema-controls-row">
-      <button class="cinema-btn" id="cinemaPlayBtn" onclick="cinemaTogglePlay()">⏸</button>
-      <div class="cinema-vol-wrap">
-        <button class="cinema-btn" id="cinemaMuteBtn" onclick="cinemaToggleMute()" style="font-size:15px">🔊</button>
-        <div class="cinema-vol-slider" id="cinemaVolSlider" onclick="cinemaSetVolume(event)">
-          <div class="cinema-vol-fill" id="cinemaVolFill"></div>
+<section>
+  <div class="container">
+    <div class="section-tag">Paketler</div>
+    <div class="section-title">İhtiyacınıza Uygun Paket Seçin</div>
+    <div class="packages">
+      <div class="pkg-card" id="pkg-minimal">
+        <div class="pkg-top">
+          <div class="pkg-name">Minimalist Paket</div>
+          <div class="pkg-desc">30 saniyelik sade arsa &amp; yapı projesi videosu</div>
+          <div class="pkg-price-row">
+            <span class="pkg-price">1.500 TL</span>
+          </div>
+        </div>
+        <div class="pkg-body">
+          <ul class="pkg-features">
+            <li class="yes">30 saniyelik video</li>
+            <li class="yes">Temel video kurgu</li>
+            <li class="no">Seslendirme yok</li>
+            <li class="no">Gerçekçi animasyon yok</li>
+            <li class="no">Drone görüntüsü yok</li>
+          </ul>
+          <button type="button" class="pkg-select-btn active" onclick="selectPackage('minimal')">Bu Paketi Seç</button>
         </div>
       </div>
-      <div class="cinema-time" id="cinemaTime">0:00 / 0:00</div>
-      <div class="cinema-spacer"></div>
-      <button class="cinema-btn" onclick="cinemaToggleFullscreen()" style="font-size:15px">⛶</button>
+
+      <div class="pkg-card featured" id="pkg-standart">
+        <div class="pkg-badge">En Popüler</div>
+        <div class="pkg-top">
+          <div class="pkg-name">Standart Paket</div>
+          <div class="pkg-desc">Seslendirmeli, gerçekçi animasyon ve drone görüntülü tam prodüksiyon</div>
+          <div class="pkg-price-row">
+            <span class="pkg-price">2.000 TL</span>
+            <span class="pkg-price-old">2.500 TL</span>
+          </div>
+        </div>
+        <div class="pkg-body">
+          <ul class="pkg-features">
+            <li class="yes">30 saniyelik video</li>
+            <li class="yes">Profesyonel seslendirme</li>
+            <li class="yes">Projenizin gerçekçi animasyonu</li>
+            <li class="yes">Gerçekçi drone footage</li>
+            <li class="yes">Müzik &amp; ses tasarımı</li>
+          </ul>
+          <button type="button" class="pkg-select-btn" onclick="selectPackage('standart')">Bu Paketi Seç</button>
+        </div>
+      </div>
     </div>
+  </div>
+</section>
+
+<section style="background: var(--surface);">
+  <div class="container">
+    <div class="section-tag">Nasıl Çalışır</div>
+    <div class="section-title">3 adımda videonuz hazır</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-title">Paket Seçin</div>
+        <div class="step-desc">Minimalist veya Standart paketten size uygun olanı seçin.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-title">Formu Doldurup Ödeyin</div>
+        <div class="step-desc">Bilgilerinizi girin, ödeme yönteminizi seçin ve tamamlayın.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-title">Videonuzu Alın</div>
+        <div class="step-desc">1-2 iş günü içinde videonuz e-posta adresinize teslim edilir.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="form-section" id="siparis-formu">
+  <div class="container">
+    <div class="form-card" id="formCard">
+      <h2 class="form-title">Sipariş Formu</h2>
+      <p class="form-sub">Aşağıdaki formu doldurun. Ödeme tamamlandıktan sonra 1-2 iş günü içinde videonuz hazırlanır.</p>
+
+      <div class="selected-summary">
+        <div class="selected-summary-text">Seçili paket: <b id="selectedPkgName">Minimalist Paket</b></div>
+        <div class="selected-summary-price" id="selectedPkgPrice">1.500 TL</div>
+      </div>
+
+      <form id="orderForm">
+        <div class="form-section-title">👤 İletişim Bilgileri</div>
+        <div class="form-group form-group-row">
+          <div>
+            <label>Ad Soyad <span>*</span></label>
+            <input type="text" name="name" required placeholder="Ahmet Yılmaz" />
+          </div>
+          <div>
+            <label>Firma / Unvan</label>
+            <input type="text" name="company" placeholder="ABC Emlak" />
+          </div>
+        </div>
+        <div class="form-group form-group-row">
+          <div>
+            <label>E-posta <span>*</span></label>
+            <input type="email" name="email" required placeholder="ahmet@email.com" />
+          </div>
+          <div>
+            <label>Telefon <span>*</span></label>
+            <input type="tel" name="phone" required placeholder="0555 000 00 00" />
+          </div>
+        </div>
+
+        <div class="form-section-title">📍 Proje Bilgileri</div>
+        <div class="form-group form-group-row">
+          <div>
+            <label>İl <span>*</span></label>
+            <select name="city" required>
+              <option value="">Seçin</option>
+              <option>Adana</option><option>Ankara</option><option>Antalya</option>
+              <option>Aydın</option><option>Balıkesir</option><option>Bursa</option>
+              <option>Denizli</option><option>Diyarbakır</option><option>Eskişehir</option>
+              <option>İstanbul</option><option>İzmir</option><option>Kocaeli</option>
+              <option>Konya</option><option>Malatya</option><option>Mersin</option>
+              <option>Muğla</option><option>Samsun</option><option>Trabzon</option>
+              <option>Van</option><option>Diğer</option>
+            </select>
+          </div>
+          <div>
+            <label>İlçe <span>*</span></label>
+            <input type="text" name="district" required placeholder="İlçe adı" />
+          </div>
+        </div>
+        <div class="form-group form-group-row">
+          <div>
+            <label>Proje / Arsa Adı</label>
+            <input type="text" name="projectName" placeholder="örn: Yeşil Vadi Konutları veya Arsa adı" />
+          </div>
+          <div>
+            <label>Alan (m²)</label>
+            <input type="text" name="area" placeholder="örn: 500" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Google Maps Linki</label>
+          <input type="url" name="maps_link" placeholder="https://maps.google.com/..." />
+        </div>
+
+        <div class="form-section-title">✨ Detaylar</div>
+        <div class="form-group">
+          <label>Projeyi / Arsayı Anlatın <span>*</span></label>
+          <textarea name="description" required placeholder="Öne çıkan özellikleri, konumu, yatırım avantajlarını anlatın. Ne kadar detaylı yazarsanız video o kadar güçlü olur." rows="5"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Videoda Vurgulanmasını İstediğiniz Noktalar</label>
+          <textarea name="highlights" placeholder="örn: Yol genişletme projesi planlanıyor, merkeze yakınlık, esnek ödeme planı..." rows="3"></textarea>
+        </div>
+
+        <div class="form-section-title">📐 Kroki / Plan (varsa)</div>
+        <div class="form-group">
+          <div class="upload-area" onclick="document.getElementById('krokiInput').click()">
+            <div class="upload-icon">📐</div>
+            <div class="upload-text">Kroki, mimari plan veya teknik çizim yüklemek için tıklayın</div>
+            <div class="upload-sub">PDF, JPG, PNG, DWG formatları</div>
+          </div>
+          <input type="file" id="krokiInput" class="upload-input" multiple accept=".pdf,.jpg,.jpeg,.png,.dwg" onchange="handleKrokiFiles(this)" />
+          <div class="file-list" id="krokiFileList"></div>
+        </div>
+
+        <div class="form-section-title">📸 Fotoğraf ve Medya</div>
+        <div class="form-group">
+          <div class="upload-area" onclick="document.getElementById('photoInput').click()">
+            <div class="upload-icon">🖼️</div>
+            <div class="upload-text">Fotoğraf yüklemek için tıklayın</div>
+            <div class="upload-sub">JPG, PNG formatları · Birden fazla seçilebilir</div>
+          </div>
+          <input type="file" id="photoInput" class="upload-input" multiple accept="image/*" onchange="handleFiles(this)" />
+          <div class="file-list" id="fileList"></div>
+        </div>
+        <div class="form-group">
+          <label>Drone Video Linki (varsa)</label>
+          <input type="url" name="drone_link" placeholder="YouTube, Google Drive veya benzeri link" />
+        </div>
+        <div class="form-group">
+          <label>Ek Notlar</label>
+          <textarea name="notes" placeholder="Eklemek istediğiniz başka bir şey var mı?" rows="2"></textarea>
+        </div>
+
+        <div class="contract-box">
+          <input type="checkbox" id="contractCheck" required />
+          <label for="contractCheck">
+            <a href="#" onclick="openContractModal(); return false;">Hizmet Sözleşmesi ve KVKK Aydınlatma Metni</a>'ni okudum, kabul ediyorum. <span style="color:#e53e3e;">*</span>
+          </label>
+        </div>
+
+        <div class="form-section-title">💳 Ödeme Yöntemi Seçin</div>
+        <div class="payment-options">
+          <label class="payment-option selected" id="opt-lemon">
+            <input type="radio" name="paymentMethod" value="lemonsqueezy" checked onchange="selectPaymentMethod('lemonsqueezy')" />
+            <div class="payment-option-label">
+              <div class="payment-option-title">Kredi/Banka Kartı ile Öde</div>
+              <div class="payment-option-desc">Güvenli ödeme altyapısı üzerinden anında ödeme</div>
+            </div>
+          </label>
+          <label class="payment-option" id="opt-shopier">
+            <input type="radio" name="paymentMethod" value="shopier" onchange="selectPaymentMethod('shopier')" />
+            <div class="payment-option-label">
+              <div class="payment-option-title">Shopier ile Öde</div>
+              <div class="payment-option-desc">Shopier güvenli ödeme sayfasına yönlendirilirsiniz</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="form-note">
+          💳 Tek seferlik tam ödeme alınır, ön ödeme yoktur. Ödeme tamamlandıktan sonra videonuz 1-2 iş günü içinde e-posta adresinize teslim edilir.
+        </div>
+
+        <div class="form-submit">
+          <button type="submit" class="btn-submit" id="submitBtn">
+            Ödemeye Geç →
+          </button>
+          <div class="form-guarantee">🔒 Güvenli ödeme · Bilgileriniz korunur</div>
+        </div>
+      </form>
+
+      <div class="success-box" id="successBox">
+        <div class="success-icon">🎬</div>
+        <div class="success-title">Siparişiniz alındı!</div>
+        <div class="success-desc">Form bilgileriniz ekibimize iletildi. Ödemeniz tamamlandıktan sonra 1-2 iş günü içinde videonuz e-posta adresinize gönderilecektir.</div>
+        <a href="https://mustakit.com" style="display:inline-block;background:var(--primary);color:white;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:700;font-size:13px;">Müstakit'e Dön</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-tag">Sık Sorulan Sorular</div>
+    <div class="section-title">Aklınızdaki Sorular</div>
+    <div class="faq-list">
+      <details>
+        <summary>İki paket arasındaki fark ne?</summary>
+        <p>Minimalist paket sade, seslendirmesiz bir video sunar. Standart paket ise profesyonel seslendirme, projenizin gerçekçi animasyonu ve drone görüntüleriyle tam prodüksiyon sunar.</p>
+      </details>
+      <details>
+        <summary>Video ne kadar sürede teslim edilir?</summary>
+        <p>Ödemeniz ve form bilgileriniz alındıktan sonra 1-2 iş günü içinde videonuz hazırlanır ve e-posta adresinize gönderilir.</p>
+      </details>
+      <details>
+        <summary>Ön ödeme var mı?</summary>
+        <p>Hayır, tek seferlik tam ödeme alınır. Ön ödeme veya kalan ödeme yoktur.</p>
+      </details>
+      <details>
+        <summary>Hangi ödeme yöntemlerini kullanabilirim?</summary>
+        <p>Kredi/banka kartı ile güvenli ödeme altyapımız üzerinden veya Shopier üzerinden ödeme yapabilirsiniz.</p>
+      </details>
+      <details>
+        <summary>Revizyon hakkım var mı?</summary>
+        <p>Her iki pakette de 1 revizyon hakkınız bulunmaktadır.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>© 2025 <a href="https://mustakit.com">Müstakit</a> · Müstakil evinizi yaptırmanın en şeffaf yolu</p>
+  <p style="margin-top:6px;">studio.mustakit.com — Arsa &amp; Yapı Projesi Video Servisi</p>
+</footer>
+
+<div class="modal-overlay" id="contractModal">
+  <div class="modal" style="max-width:600px; text-align:left; max-height:80vh; overflow-y:auto;">
+    <h3 style="margin-bottom:16px;">Müstakit Studio Hizmet Sözleşmesi</h3>
+    <div style="font-size:13px; color:#555; line-height:1.8; max-height:50vh; overflow-y:auto; padding-right:8px;">
+      <p style="margin-bottom:12px;"><strong>1. TARAFLAR</strong><br>Bu sözleşme, "Müstakit Studio" (Hizmet Sağlayıcı) ile formu dolduran ve ödeme yapan kişi/kurum (Müşteri) arasında akdedilmiştir.</p>
+      <p style="margin-bottom:12px;"><strong>2. HİZMETİN KAPSAMI</strong><br>Hizmet Sağlayıcı, Müşteri tarafından sağlanan bilgi, fotoğraf, kroki ve/veya plan dokümanlarını kullanarak profesyonel tanıtım videosu hazırlar.</p>
+      <p style="margin-bottom:12px;"><strong>3. TESLİMAT SÜRESİ</strong><br>Ödeme onayının alınmasından itibaren video, 1-2 iş günü içinde teslim edilir. Mücbir sebepler süreyi uzatabilir.</p>
+      <p style="margin-bottom:12px;"><strong>4. ÖDEME KOŞULLARI</strong><br>Hizmet bedeli, sipariş anında tek seferde tahsil edilir. Ön ödeme veya kısmi ödeme uygulanmaz.</p>
+      <p style="margin-bottom:12px;"><strong>5. İPTAL VE İADE</strong><br>Ödeme yapıldıktan sonra üretim süreci başlar. Üretimi tamamlanmış işler için iade yapılmaz.</p>
+      <p style="margin-bottom:12px;"><strong>6. REVİZYON HAKKI</strong><br>Her sipariş kapsamında 1 revizyon hakkı tanınır. Talepler teslim tarihinden itibaren 7 gün içinde iletilmelidir.</p>
+      <p style="margin-bottom:12px;"><strong>7. TELİF VE KULLANIM HAKLARI</strong><br>Teslim edilen video, Müşteri'nin ticari ve kişisel kullanımı için tam kullanım hakkı ile teslim edilir.</p>
+      <p style="margin-bottom:12px;"><strong>8. KİŞİSEL VERİLERİN KORUNMASI (KVKK)</strong><br>Paylaşılan bilgiler, 6698 sayılı KVKK kapsamında yalnızca hizmetin ifası amacıyla işlenir ve üçüncü kişilerle paylaşılmaz.</p>
+      <p style="margin-bottom:12px;"><strong>9. SORUMLULUK SINIRI</strong><br>Hizmet Sağlayıcı, Müşteri tarafından sağlanan bilgi ve görsellerin doğruluğundan sorumlu değildir.</p>
+      <p style="margin-bottom:12px;"><strong>10. UYUŞMAZLIKLARIN ÇÖZÜMÜ</strong><br>Bu sözleşmeden doğacak uyuşmazlıklarda Türkiye Cumhuriyeti yasaları yetkilidir.</p>
+    </div>
+    <button class="btn-cancel" onclick="closeContractModal()" style="width:100%; margin-top:16px;">Kapat</button>
   </div>
 </div>
 
-<!-- AUTH MODAL -->
-<div class="modal-bg" id="authModal">
+<div class="modal-overlay" id="paymentModal">
   <div class="modal">
-    <button class="modal-x" onclick="closeModal()">✕</button>
-    <div class="modal-title">Sign In</div>
-    <div class="modal-sub">Join Tvarz to unlock Premium and save your watchlist.</div>
-    <button class="btn-google" onclick="googleSignIn()">
-      <svg class="google-icon" viewBox="0 0 24 24" fill="none">
-        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
-        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-      </svg>
-      Continue with Google
-    </button>
-    <div id="gBtnWrap" style="margin-top:10px;display:flex;justify-content:center"></div>
-    <div class="modal-note">By signing in you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</div>
+    <div style="font-size:36px;margin-bottom:14px;" id="paymentModalIcon">💳</div>
+    <h3 id="paymentModalTitle">Ödemeyi Tamamlayın</h3>
+    <p id="paymentModalDesc">Formunuz alındı. Aşağıdaki butona tıklayarak ödemenizi tamamlayın.</p>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">İptal</button>
+      <a id="paymentLink" href="#" class="btn-pay" target="_blank" onclick="handlePayment()">Ödemeye Git →</a>
+    </div>
   </div>
 </div>
 
 <script>
-const API = 'https://tvarz-production.up.railway.app';
-const GOOGLE_CLIENT_ID = '548804749992-1vlr2bbl71u6u4kpgrh95bbk3rti0bta.apps.googleusercontent.com';
+  let uploadedFiles = []
+  let krokiFiles = []
+  let selectedPackage = 'minimal'
+  let selectedPaymentMethod = 'lemonsqueezy'
 
-let currentUser = null;
-let isPremium = false;
-let currentFilter = 'all';
-let allVideos = [];
-let advanceTimer = null;
-let currentTitle = null;
-let muted = true;
+  const packages = {
+    minimal: { name: 'Minimalist Paket', price: 1500, label: '1.500 TL' },
+    standart: { name: 'Standart Paket', price: 2000, label: '2.000 TL' },
+  }
 
-async function loadStream(){
-  try {
-    const res = await fetch(`${API}/program/live`);
-    const d = await res.json();
-    if(!d.success) throw new Error('no data');
+  function selectPackage(pkg) {
+    selectedPackage = pkg
+    document.getElementById('pkg-minimal').querySelector('.pkg-select-btn').classList.toggle('active', pkg === 'minimal')
+    document.getElementById('pkg-standart').querySelector('.pkg-select-btn').classList.toggle('active', pkg === 'standart')
+    document.getElementById('selectedPkgName').textContent = packages[pkg].name
+    document.getElementById('selectedPkgPrice').textContent = packages[pkg].label
+  }
 
-    const { stream_token, title, category, remaining_seconds, next_video } = d.data;
+  function selectPaymentMethod(method) {
+    selectedPaymentMethod = method
+    document.getElementById('opt-lemon').classList.toggle('selected', method === 'lemonsqueezy')
+    document.getElementById('opt-shopier').classList.toggle('selected', method === 'shopier')
+  }
 
-    // If same video still playing and plenty of time left — don't rebuild iframe
-    if(title === currentTitle && remaining_seconds > 10){
-      // Just reschedule
-      if(advanceTimer) clearTimeout(advanceTimer);
-      advanceTimer = setTimeout(loadStream, (remaining_seconds + 1) * 1000);
-      return;
+  function handleFiles(input) {
+    const files = Array.from(input.files)
+    uploadedFiles = uploadedFiles.concat(files)
+    const list = document.getElementById('fileList')
+    list.innerHTML = uploadedFiles.map(function(f) { return '<div class="file-tag">📎 ' + f.name + '</div>' }).join('')
+  }
+
+  function handleKrokiFiles(input) {
+    const files = Array.from(input.files)
+    krokiFiles = krokiFiles.concat(files)
+    const list = document.getElementById('krokiFileList')
+    list.innerHTML = krokiFiles.map(function(f) { return '<div class="file-tag">📐 ' + f.name + '</div>' }).join('')
+  }
+
+  function openContractModal() { document.getElementById('contractModal').classList.add('show') }
+  function closeContractModal() { document.getElementById('contractModal').classList.remove('show') }
+  function openModal() { document.getElementById('paymentModal').classList.add('show') }
+  function closeModal() { document.getElementById('paymentModal').classList.remove('show') }
+
+  document.getElementById('orderForm').addEventListener('submit', async function(e) {
+    e.preventDefault()
+
+    if (!document.getElementById('contractCheck').checked) {
+      alert('Lütfen Hizmet Sözleşmesi ve KVKK Aydınlatma Metni\'ni onaylayın.')
+      return
     }
 
-    currentTitle = title;
+    const btn = document.getElementById('submitBtn')
+    btn.disabled = true
+    btn.textContent = 'Gönderiliyor...'
 
-    document.getElementById('filmTitle').textContent = title;
-    const catLabel = {film:'AI Film',doc:'Documentary',turkish:'Turkish Films & Series',series:'Series',short:'Short'}[category]||'Film';
-    document.getElementById('filmTags').innerHTML =
-      `<span class="tag red">${catLabel}</span>`+
-      (next_video ? `<span class="tag dim">Next: ${next_video.title}</span>` : '');
-    document.getElementById('upNext').textContent = next_video ? next_video.title : '—';
+    const formData = new FormData(this)
+    const pkg = packages[selectedPackage]
 
-    await buildIframeFromToken(stream_token, remaining_seconds);
+    const data = {
+      name: formData.get('name'),
+      company: formData.get('company'),
+      email: formData.get('email'),
+      phone: formData.get('phone'),
+      city: formData.get('city'),
+      district: formData.get('district'),
+      projectName: formData.get('projectName'),
+      area: formData.get('area'),
+      maps_link: formData.get('maps_link'),
+      description: formData.get('description'),
+      highlights: formData.get('highlights'),
+      drone_link: formData.get('drone_link'),
+      notes: formData.get('notes'),
+      files: uploadedFiles.map(function(f) { return f.name }).join(', '),
+      krokiFiles: krokiFiles.map(function(f) { return f.name }).join(', '),
+      packageName: pkg.name,
+      packagePrice: pkg.label,
+      packageType: selectedPackage,
+      paymentMethod: selectedPaymentMethod,
+      serviceType: 'tr_studio_' + selectedPackage,
+      source: 'studio.mustakit.com',
+    }
 
-    // Primary timer — fires exactly when video should end
-    if(advanceTimer) clearTimeout(advanceTimer);
-    advanceTimer = setTimeout(loadStream, (remaining_seconds + 1) * 1000);
-
-    // Aggressive poll — every 3s near end, every 10s otherwise
-    if(window._pollTimer) clearInterval(window._pollTimer);
-    const pollInterval = remaining_seconds < 30 ? 3000 : 10000;
-    window._pollTimer = setInterval(async()=>{
-      try {
-        const r = await fetch(`${API}/program/live`);
-        const pd = await r.json();
-        if(!pd.success) return;
-        // Video changed — switch immediately
-        if(pd.data.title !== currentTitle){
-          clearInterval(window._pollTimer);
-          clearTimeout(advanceTimer);
-          loadStream();
-          return;
-        }
-        // Near end — switch to fast polling
-        if(pd.data.remaining_seconds < 15){
-          clearInterval(window._pollTimer);
-          window._pollTimer = setInterval(async()=>{
-            try {
-              const r2 = await fetch(`${API}/program/live`);
-              const pd2 = await r2.json();
-              if(pd2.success && pd2.data.title !== currentTitle){
-                clearInterval(window._pollTimer);
-                clearTimeout(advanceTimer);
-                loadStream();
-              }
-            } catch(e){}
-          }, 2000);
-        }
-      } catch(e){}
-    }, pollInterval);
-
-  } catch(e){
-    console.error('Stream error:', e);
-    document.getElementById('filmTitle').textContent = 'Connecting...';
-    setTimeout(loadStream, 5000);
-  }
-}
-
-async function buildIframeFromToken(token, remainingSeconds){
-  try {
-    const res = await fetch(`${API}/program/stream?token=${token}`);
-    const d = await res.json();
-    if(!d.success) throw new Error('bad token');
-
-    if(advanceTimer) clearTimeout(advanceTimer);
-    if(window._pollTimer) clearInterval(window._pollTimer);
-
-    const container = document.getElementById('iframeContainer');
-    container.innerHTML = '';
-    const iframe = document.createElement('iframe');
-    iframe.id = 'ytIframe';
-    iframe.style.cssText = 'position:absolute;top:-90px;left:-2px;width:calc(100% + 4px);height:calc(100% + 180px);border:none;pointer-events:none';
-    iframe.allow = 'autoplay; encrypted-media';
-    iframe.allowFullscreen = true;
-    iframe.src = d.data.embed_url;
-    container.appendChild(iframe);
-
-    muted = true;
-    const hint = document.getElementById('muteHint');
-    if(hint){ hint.classList.remove('gone'); hint.textContent = '🔇 Tap to unmute'; }
-
-    advanceTimer = setTimeout(loadStream, remainingSeconds * 1000);
-  } catch(e){
-    console.error('Token error:', e);
-    setTimeout(loadStream, 5000);
-  }
-}
-
-function unmute(){
-  const iframe = document.getElementById('ytIframe');
-  if(!iframe) return;
-  if(muted){
-    iframe.src = iframe.src.replace('mute=1','mute=0');
-    muted = false;
-    const hint = document.getElementById('muteHint');
-    if(hint) hint.classList.add('gone');
-  } else {
-    iframe.src = iframe.src.replace('mute=0','mute=1');
-    muted = true;
-    const hint = document.getElementById('muteHint');
-    if(hint){ hint.classList.remove('gone'); hint.textContent = '🔇 Tap to unmute'; }
-  }
-}
-
-function goFullscreen(){
-  const wrap = document.getElementById('playerWrap');
-  if(document.fullscreenElement) document.exitFullscreen();
-  else wrap.requestFullscreen().catch(()=>{});
-}
-
-let currentDetailItem = null;
-const DEFAULT_TRAILER = 'TY81-GglrwA';
-
-function slugify(title){
-  return title.toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .trim();
-}
-
-function updateMeta(title, description, imageUrl){
-  document.title = title ? `${title} — Tvarz` : 'Tvarz — Free AI Cinema Channel';
-  let desc = document.querySelector('meta[name="description"]');
-  if(!desc){ desc = document.createElement('meta'); desc.name='description'; document.head.appendChild(desc); }
-  desc.content = description ? description.slice(0,160) : 'Watch AI-generated films, thrillers and documentaries on Tvarz.';
-  // OG tags
-  ['og:title','og:description','og:image'].forEach(p => {
-    let el = document.querySelector(`meta[property="${p}"]`);
-    if(!el){ el = document.createElement('meta'); el.setAttribute('property',p); document.head.appendChild(el); }
-    if(p==='og:title') el.content = title || 'Tvarz';
-    if(p==='og:description') el.content = description ? description.slice(0,160) : '';
-    if(p==='og:image') el.content = imageUrl || '';
-  });
-}
-
-function openDetail(item){
-  currentDetailItem = item;
-  const trailerYtId = item.trailer_id || DEFAULT_TRAILER;
-  const cat = {film:'AI Film',doc:'Documentary',turkish:'Turkish Films & Series'}[item.category]||item.category;
-  const slug = slugify(item.title);
-  const thumbUrl = item.youtube_id ? `https://img.youtube.com/vi/${item.youtube_id}/maxresdefault.jpg` : '';
-
-  document.getElementById('detailTitle').textContent = item.title;
-  document.getElementById('detailDesc').textContent = item.description || '';
-  document.getElementById('detailCat').textContent = cat;
-  document.getElementById('detailDur').textContent = item.duration || '';
-
-  // Always start on trailer — pressing the button swaps to full film
-  const trailer = document.getElementById('detailTrailer');
-  trailer.src = `https://www.youtube.com/embed/${trailerYtId}?autoplay=1&mute=0&controls=1&modestbranding=1&rel=0`;
-
-  const locked = !isPremium;
-  const btn = document.getElementById('detailWatchBtn');
-  btn.disabled = false;
-  btn.textContent = locked ? '🔒 Unlock with Premium — $3.99/mo' : '▶ Watch Full Film';
-  document.getElementById('watchNotice').style.display = 'none';
-
-  // Update URL and meta
-  window.history.pushState({ page: 'detail', slug, id: item.id }, item.title, `/film/${slug}`);
-  updateMeta(item.title, item.description, thumbUrl);
-
-  showPage('detail');
-}
-
-// ── CINEMA PLAYER ── fullscreen, custom controls, YouTube UI never exposed
-let cinemaPlayer = null;
-let cinemaYTReady = false;
-let cinemaProgressTimer = null;
-let cinemaHideUITimer = null;
-
-(function loadCinemaYTAPI(){
-  if(window.YT && window.YT.Player){ cinemaYTReady = true; return; }
-  const prevReady = window.onYouTubeIframeAPIReady;
-  window.onYouTubeIframeAPIReady = function(){
-    cinemaYTReady = true;
-    if(typeof prevReady === 'function') prevReady();
-  };
-  if(!document.querySelector('script[src*="youtube.com/iframe_api"]')){
-    const s = document.createElement('script');
-    s.src = 'https://www.youtube.com/iframe_api';
-    document.head.appendChild(s);
-  }
-})();
-
-function openCinemaPlayer(embedUrl, title){
-  // Extract video ID from whatever embed URL the backend returned
-  const match = embedUrl.match(/embed\/([a-zA-Z0-9_-]+)/);
-  const videoId = match ? match[1] : null;
-  if(!videoId){ window.open(embedUrl, '_blank'); return; }
-
-  document.getElementById('cinemaTitle').textContent = title || '';
-  document.getElementById('cinemaModal').classList.add('open');
-  document.getElementById('cinemaLoading').style.display = 'flex';
-  document.getElementById('cinemaLoading').textContent = 'Loading film...';
-  document.body.style.overflow = 'hidden';
-
-  const wrap = document.getElementById('cinemaIframeWrap');
-  wrap.innerHTML = '';
-  const iframe = document.createElement('iframe');
-  iframe.id = 'cinemaIframe';
-  iframe.allow = 'autoplay; encrypted-media';
-  iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playsinline=1&disablekb=1&fs=0&enablejsapi=1&origin=${encodeURIComponent(window.location.origin)}`;
-  wrap.appendChild(iframe);
-
-  const bindPlayer = setInterval(()=>{
-    if(!cinemaYTReady) return;
-    clearInterval(bindPlayer);
     try {
-      cinemaPlayer = new YT.Player('cinemaIframe', {
-        events: {
-          onReady(e){
-            document.getElementById('cinemaLoading').style.display = 'none';
-            e.target.playVideo();
-            document.getElementById('cinemaVolFill').style.width = '100%';
-            if(cinemaProgressTimer) clearInterval(cinemaProgressTimer);
-            cinemaProgressTimer = setInterval(updateCinemaProgress, 500);
-            cinemaArmAutoHide();
-          },
-          onStateChange(e){
-            const btn = document.getElementById('cinemaPlayBtn');
-            if(e.data === YT.PlayerState.PLAYING) btn.textContent = '⏸';
-            if(e.data === YT.PlayerState.PAUSED) btn.textContent = '▶';
-            if(e.data === YT.PlayerState.ENDED){
-              btn.textContent = '↻';
-              document.getElementById('cinemaModal').classList.remove('hide-ui');
-            }
-          }
-        }
-      });
-    } catch(err){ console.warn('Cinema player bind failed', err); }
-  }, 250);
-}
+      const response = await fetch('https://mustakitbackend-production.up.railway.app/studio/order-tr', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
 
-function updateCinemaProgress(){
-  if(!cinemaPlayer || typeof cinemaPlayer.getCurrentTime !== 'function') return;
-  try {
-    const cur = cinemaPlayer.getCurrentTime();
-    const dur = cinemaPlayer.getDuration();
-    if(!dur) return;
-    const pct = (cur/dur)*100;
-    document.getElementById('cinemaProgressFill').style.width = pct+'%';
-    document.getElementById('cinemaProgressHandle').style.left = pct+'%';
-    const fmt = s => `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
-    document.getElementById('cinemaTime').textContent = `${fmt(cur)} / ${fmt(dur)}`;
-  } catch(e){}
-}
+      const result = await response.json()
+      btn.disabled = false
+      btn.textContent = 'Ödemeye Geç →'
 
-function cinemaTogglePlay(){
-  if(!cinemaPlayer) return;
-  const state = cinemaPlayer.getPlayerState();
-  if(state === 1) cinemaPlayer.pauseVideo();
-  else cinemaPlayer.playVideo();
-  cinemaArmAutoHide();
-}
-
-function cinemaToggleMute(){
-  if(!cinemaPlayer) return;
-  const muted = cinemaPlayer.isMuted();
-  const btn = document.getElementById('cinemaMuteBtn');
-  if(muted){
-    cinemaPlayer.unMute();
-    cinemaPlayer.setVolume(100);
-    btn.textContent = '🔊';
-    document.getElementById('cinemaVolFill').style.width = '100%';
-  } else {
-    cinemaPlayer.mute();
-    btn.textContent = '🔇';
-    document.getElementById('cinemaVolFill').style.width = '0%';
-  }
-}
-
-function cinemaSetVolume(e){
-  if(!cinemaPlayer) return;
-  const rect = e.currentTarget.getBoundingClientRect();
-  const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-  cinemaPlayer.setVolume(pct*100);
-  cinemaPlayer.unMute();
-  document.getElementById('cinemaVolFill').style.width = (pct*100)+'%';
-  document.getElementById('cinemaMuteBtn').textContent = pct === 0 ? '🔇' : '🔊';
-}
-
-function cinemaSeek(e){
-  if(!cinemaPlayer) return;
-  const rect = e.currentTarget.getBoundingClientRect();
-  const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-  const dur = cinemaPlayer.getDuration();
-  if(dur) cinemaPlayer.seekTo(dur*pct, true);
-}
-
-function cinemaToggleFullscreen(){
-  const modal = document.getElementById('cinemaModal');
-  if(document.fullscreenElement) document.exitFullscreen();
-  else modal.requestFullscreen().catch(()=>{});
-}
-
-function cinemaArmAutoHide(){
-  const modal = document.getElementById('cinemaModal');
-  modal.classList.remove('hide-ui');
-  if(cinemaHideUITimer) clearTimeout(cinemaHideUITimer);
-  cinemaHideUITimer = setTimeout(()=>{
-    if(cinemaPlayer && cinemaPlayer.getPlayerState() === 1) modal.classList.add('hide-ui');
-  }, 3000);
-}
-
-document.getElementById('cinemaModal').addEventListener('mousemove', cinemaArmAutoHide);
-
-function closeCinemaPlayer(){
-  if(cinemaProgressTimer) clearInterval(cinemaProgressTimer);
-  if(cinemaHideUITimer) clearTimeout(cinemaHideUITimer);
-  try { if(cinemaPlayer && cinemaPlayer.destroy) cinemaPlayer.destroy(); } catch(e){}
-  cinemaPlayer = null;
-  document.getElementById('cinemaIframeWrap').innerHTML = '';
-  document.getElementById('cinemaModal').classList.remove('open','hide-ui');
-  document.body.style.overflow = '';
-  if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
-}
-
-async function handleDetailWatch(){
-  if(!currentDetailItem) return;
-
-  if(!currentUser){ openModal(); return; }
-  if(!isPremium){ showPage('pricing'); return; }
-
-  const btn = document.getElementById('detailWatchBtn');
-  const notice = document.getElementById('watchNotice');
-  btn.textContent = 'Loading...';
-  btn.disabled = true;
-
-  const token = localStorage.getItem('tvarz_token');
-  try {
-    const res = await fetch(`${API}/program/watch`, {
-      method: 'POST',
-      headers: { 'Content-Type':'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ video_id: currentDetailItem.id })
-    });
-    const d = await res.json();
-
-    if(!d.success){
-      btn.disabled = false;
-      if(d.code === 'DAILY_LIMIT_REACHED'){
-        notice.textContent = d.message;
-        notice.style.display = 'block';
-        btn.textContent = '✦ Upgrade to Premium';
-        btn.onclick = () => showPage('pricing');
-      } else if(d.code === 'PREMIUM_REQUIRED'){
-        showPage('pricing');
+      if (selectedPaymentMethod === 'shopier') {
+        document.getElementById('paymentModalIcon').textContent = '🛍️'
+        document.getElementById('paymentModalTitle').textContent = 'Shopier ile Ödeme'
+        document.getElementById('paymentModalDesc').textContent = 'Formunuz alındı. Shopier güvenli ödeme sayfasına yönlendirileceksiniz.'
+        document.getElementById('paymentLink').href = 'https://www.shopier.com/Mustakit/47021980'
+        document.getElementById('paymentLink').textContent = 'Shopier\'a Git →'
+        openModal()
       } else {
-        notice.textContent = 'Something went wrong. Please try again.';
-        notice.style.display = 'block';
-        btn.textContent = '▶ Watch Full Film';
-      }
-      return;
-    }
-
-    // Play the actual full film in our fullscreen cinema player — no YouTube UI exposed
-    btn.textContent = '▶ Watch Full Film';
-    btn.disabled = false;
-    openCinemaPlayer(d.data.embed_url, currentDetailItem.title);
-
-    const used = d.data.watches_used;
-    const limit = d.data.daily_limit;
-    const remaining = limit - used;
-    if(remaining > 0){
-      notice.textContent = `You have ${remaining} more watch${remaining>1?'es':''} available today.`;
-      notice.style.display = 'block';
-    } else {
-      notice.textContent = isPremium
-        ? "That's today's 2 watches used. More unlock tomorrow."
-        : "That was today's free watch. Upgrade to Premium for 2 watches a day.";
-      notice.style.display = 'block';
-    }
-  } catch(e){
-    btn.disabled = false;
-    btn.textContent = '▶ Watch Full Film';
-    notice.textContent = 'Connection error. Please try again.';
-    notice.style.display = 'block';
-  }
-}
-
-function showPage(id){
-  if(id !== 'detail'){
-    const trailer = document.getElementById('detailTrailer');
-    if(trailer) trailer.src = '';
-    // Restore URL
-    if(window.location.pathname.startsWith('/film/')){
-      window.history.pushState({page: id}, 'Tvarz', '/');
-    }
-    updateMeta(null, null, null);
-  }
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
-  const nl = document.getElementById('nav-'+id); if(nl) nl.classList.add('active');
-  if(id==='archive') buildArchiveGrid();
-  if(id==='account') loadAccountPage();
-  window.scrollTo(0,0);
-}
-
-async function loadAccountPage(){
-  if(!currentUser){ showPage('home'); openModal(); return; }
-
-  document.getElementById('acctAvatar').textContent = currentUser.name ? currentUser.name[0].toUpperCase() : '?';
-  document.getElementById('acctName').textContent = currentUser.name || 'Tvarz Member';
-  document.getElementById('acctEmail').textContent = currentUser.email || '';
-
-  const token = localStorage.getItem('tvarz_token');
-  const subBox = document.getElementById('acctSubBox');
-  const watchBox = document.getElementById('acctWatchBox');
-
-  // Subscription info
-  if(isPremium){
-    try {
-      const res = await fetch(`${API}/user/subscription`, { headers: { Authorization: `Bearer ${token}` } });
-      const d = await res.json();
-      const sub = d.success ? d.data.subscription : null;
-      const renews = sub?.renews_at ? new Date(sub.renews_at).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : null;
-      const endsAt = sub?.ends_at ? new Date(sub.ends_at).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : null;
-      const trialEnds = sub?.trial_ends_at ? new Date(sub.trial_ends_at) : null;
-      const onTrial = trialEnds && trialEnds > new Date();
-      const isCancelled = sub?.status === 'cancelled';
-
-      subBox.innerHTML = `
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-          <div class="premium-badge-nav">Premium ${onTrial ? '· Trial' : ''}</div>
-          <div style="font-size:12px;color:var(--text2)">$3.99/month</div>
-        </div>
-        ${isCancelled
-          ? `<div style="font-size:13px;color:var(--gold);margin-bottom:14px">Access ends on ${endsAt || renews || '—'}</div>`
-          : renews ? `<div style="font-size:13px;color:var(--text2);margin-bottom:14px">Renews on ${renews}</div>` : ''}
-
-        <div class="toggle-row" style="margin-bottom:14px">
-          <div>
-            <div class="toggle-label">Auto-renew</div>
-            <div class="toggle-sub" id="renewSub">${isCancelled ? 'Off — your access ends on the date above' : 'On — billed automatically each month'}</div>
-          </div>
-          <label class="toggle-switch" id="renewSwitch">
-            <input type="checkbox" id="renewCheckbox" ${isCancelled ? '' : 'checked'} onchange="toggleAutoRenew(this)">
-            <span class="toggle-track"><span class="toggle-knob"></span></span>
-          </label>
-        </div>
-
-        <button class="btn-plan btn-free" style="width:auto;padding:9px 18px;font-size:12px" onclick="openBillingPortal()">Update Payment Method</button>
-      `;
-    } catch(e){
-      subBox.innerHTML = `<div style="color:var(--text3);font-size:13px">Could not load subscription details.</div>`;
-    }
-  } else {
-    subBox.innerHTML = `
-      <div style="font-size:13px;color:var(--text2);margin-bottom:14px">You're on the Free plan — live stream only.</div>
-      <button class="btn-plan btn-prem" style="width:auto;padding:10px 20px" onclick="showPage('pricing')">Upgrade to Premium</button>
-    `;
-  }
-
-  // Daily watch status — Archive is Premium-only; Free just watches the live stream
-  if(!isPremium){
-    watchBox.innerHTML = `Free members watch the live stream — always on, no sign-up needed. <a href="#" onclick="showPage('pricing');return false" style="color:var(--gold)">Upgrade to Premium</a> to unlock 2 on-demand watches a day from the Archive.`;
-  } else {
-    try {
-      const res = await fetch(`${API}/user/watch-status`, { headers: { Authorization: `Bearer ${token}` } });
-      const d = await res.json();
-      if(d.success){
-        const { watches_used, daily_limit, titles } = d.data;
-        const remaining = daily_limit - watches_used;
-        if(watches_used === 0){
-          watchBox.innerHTML = `You have <strong style="color:var(--gold)">${daily_limit} watches</strong> available today. Pick anything from the Archive.`;
-        } else if(remaining > 0){
-          watchBox.innerHTML = `Watched <strong style="color:var(--text)">${titles.join(', ')}</strong> today. <strong style="color:var(--gold)">${remaining}</strong> watch left.`;
+        if (result.checkoutUrl) {
+          document.getElementById('paymentModalIcon').textContent = '💳'
+          document.getElementById('paymentModalTitle').textContent = 'Kart ile Ödeme'
+          document.getElementById('paymentModalDesc').textContent = 'Formunuz alındı. Güvenli ödeme sayfasına yönlendirileceksiniz.'
+          document.getElementById('paymentLink').href = result.checkoutUrl
+          document.getElementById('paymentLink').textContent = 'Ödemeye Git →'
+          openModal()
         } else {
-          watchBox.innerHTML = `Watched <strong style="color:var(--text)">${titles.join(' and ')}</strong> today. More unlocks tomorrow.`;
+          throw new Error(result.error || 'Hata oluştu')
         }
-      } else {
-        watchBox.innerHTML = `Could not load watch status.`;
       }
-    } catch(e){
-      watchBox.innerHTML = `Could not load watch status.`;
+    } catch (err) {
+      console.error('Hata:', err)
+      btn.disabled = false
+      btn.textContent = 'Ödemeye Geç →'
+      alert('Bir hata oluştu. Lütfen tekrar deneyin veya tvarzmedya@gmail.com adresine yazın.')
     }
-  }
-}
+  })
 
-async function toggleAutoRenew(checkbox){
-  const wrap = document.getElementById('renewSwitch');
-  const sub = document.getElementById('renewSub');
-  const turningOn = checkbox.checked;
-
-  wrap.classList.add('loading');
-  const token = localStorage.getItem('tvarz_token');
-
-  try {
-    const res = await fetch(`${API}/user/subscription/${turningOn ? 'resume' : 'cancel'}`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    const d = await res.json();
-
-    if(!d.success){
-      checkbox.checked = !turningOn; // revert on failure
-      alert(d.message || 'Could not update subscription.');
-      wrap.classList.remove('loading');
-      return;
-    }
-
-    if(turningOn){
-      sub.textContent = 'On — billed automatically each month';
-    } else {
-      const endsAt = d.data?.ends_at ? new Date(d.data.ends_at).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : 'the end of your billing period';
-      sub.textContent = `Off — your access ends on ${endsAt}`;
-    }
-  } catch(e){
-    checkbox.checked = !turningOn;
-    alert('Connection error. Please try again.');
-  }
-  wrap.classList.remove('loading');
-}
-
-async function openBillingPortal(){
-  const token = localStorage.getItem('tvarz_token');
-  try {
-    const res = await fetch(`${API}/user/billing-portal`, { headers: { Authorization: `Bearer ${token}` } });
-    const d = await res.json();
-    if(d.success && d.data.portal_url) window.open(d.data.portal_url, '_blank');
-    else alert('Could not open billing portal.');
-  } catch(e){ alert('Connection error.'); }
-}
-
-// Handle browser back/forward
-window.addEventListener('popstate', function(e){
-  if(e.state?.page === 'detail' && e.state?.id){
-    const item = allVideos.find(v => v.id === e.state.id);
-    if(item) openDetail(item);
-  } else {
-    showPage(e.state?.page || 'home');
-  }
-});
-
-// Handle direct URL access /film/slug
-(function(){
-  const path = window.location.pathname;
-  if(path.startsWith('/film/')){
-    const slug = path.replace('/film/','');
-    // Wait for archive to load then open detail
-    window._pendingSlug = slug;
-  }
-})();
-
-setInterval(()=>{
-  const n=new Date(),p=x=>String(x).padStart(2,'0');
-  document.getElementById('navClock').textContent=`${p(n.getHours())}:${p(n.getMinutes())}:${p(n.getSeconds())}`;
-},1000);
-
-async function loadArchive(){
-  try {
-    const token = localStorage.getItem('tvarz_token');
-    const res = await fetch(`${API}/program/archive`, { headers: token?{Authorization:`Bearer ${token}`}:{} });
-    const d = await res.json();
-    if(!d.success) return;
-    allVideos = d.data.videos;
-    document.getElementById('archiveSub').textContent = `${allVideos.length} TITLES · FILMS · DOCUMENTARIES · SERIES`;
-    buildArchiveGrid();
-
-    // Handle direct URL access /film/slug
-    if(window._pendingSlug){
-      const slug = window._pendingSlug;
-      window._pendingSlug = null;
-      const item = allVideos.find(v => slugify(v.title) === slug);
-      if(item) openDetail(item);
-    }
-  } catch(e){}
-}
-
-function buildArchiveGrid(){
-  const grid = document.getElementById('archiveGrid');
-  const banner = document.getElementById('premBanner');
-  banner.style.display = isPremium ? 'none' : 'flex';
-  const videos = currentFilter==='all' ? allVideos : allVideos.filter(v=>v.category===currentFilter);
-  if(!videos.length){ grid.innerHTML='<div style="padding:2rem;color:var(--text3);font-family:var(--fm);font-size:12px">Loading...</div>'; return; }
-  grid.innerHTML='';
-  videos.forEach(item=>{
-    const locked=!isPremium;
-    const init=item.title.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
-    const cat={film:'AI Film',doc:'Documentary',turkish:'Turkish Films & Series'}[item.category]||item.category;
-    const card=document.createElement('div');
-    card.className='film-card';
-    const thumbUrl = item.youtube_id ? `https://img.youtube.com/vi/${item.youtube_id}/mqdefault.jpg` : '';
-    const trailerYtId = item.trailer_id || item.youtube_id;
-    const previewSrc = trailerYtId ? `https://www.youtube.com/embed/${trailerYtId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playsinline=1` : '';
-    card.innerHTML=`<div class="film-thumb">${thumbUrl?`<img class="thumb-img" src="${thumbUrl}" alt="${item.title}" loading="lazy">`:`<div class="thumb-letters">${init}</div>`}${previewSrc?`<iframe class="thumb-preview" data-src="${previewSrc}" allowfullscreen allow="autoplay;encrypted-media"></iframe>`:''}<div class="thumb-grad"></div><div class="wm">TVARZ</div>${locked?`<div class="card-badge badge-prem">Premium</div><div class="lock-ov"><div class="lock-icon">🔒</div><div class="lock-txt">Unlock with Premium</div></div>`:''}</div><div class="film-info"><div class="film-cat">${cat}</div><div class="film-name">${item.title}</div>${item.description?`<div class="film-desc">${item.description}</div>`:''}<div class="film-dur">${item.duration||''}</div></div>`;
-    card.addEventListener('mouseenter', ()=>{
-      const iframe = card.querySelector('.thumb-preview');
-      if(iframe && !iframe.src && iframe.dataset.src) iframe.src = iframe.dataset.src;
-    });
-    card.addEventListener('mouseleave', ()=>{
-      const iframe = card.querySelector('.thumb-preview');
-      if(iframe && iframe.src) { iframe.src = ''; }
-    });
-    card.onclick=()=>{ openDetail(item); };
-    grid.appendChild(card);
-  });
-}
-
-function filterArchive(cat,btn){
-  currentFilter=cat;
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  buildArchiveGrid();
-}
-
-function openModal(){ document.getElementById('authModal').classList.add('open'); }
-function closeModal(){ document.getElementById('authModal').classList.remove('open'); }
-document.getElementById('authModal').addEventListener('click',function(e){ if(e.target===this) closeModal(); });
-
-(function(){
-  const s=document.createElement('script');
-  s.src='https://accounts.google.com/gsi/client';
-  s.async=s.defer=true;
-  s.onload=()=>google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:handleGoogle,auto_select:false});
-  document.head.appendChild(s);
-})();
-
-function googleSignIn(){
-  if(typeof google==='undefined'){ alert('Try again in a moment.'); return; }
-  google.accounts.id.prompt(n=>{
-    if(n.isNotDisplayed()||n.isSkippedMoment()){
-      google.accounts.id.renderButton(document.getElementById('gBtnWrap'),{theme:'filled_black',size:'large',width:320});
-    }
-  });
-}
-
-async function handleGoogle(response){
-  try {
-    const res=await fetch(`${API}/auth/google`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:response.credential})});
-    const d=await res.json();
-    if(!d.success) throw new Error(d.message);
-    localStorage.setItem('tvarz_token',d.data.token);
-    localStorage.setItem('tvarz_user',JSON.stringify(d.data.user));
-    currentUser=d.data.user; isPremium=d.data.user.is_premium;
-    closeModal(); renderAuth(); buildArchiveGrid();
-  } catch(e){ alert('Sign in failed. Please try again.'); }
-}
-
-function renderAuth(){
-  const area=document.getElementById('authArea');
-  if(!currentUser){ area.innerHTML=`<button class="btn-login" onclick="openModal()">Sign in</button>`; return; }
-  const init=currentUser.name?currentUser.name[0].toUpperCase():'?';
-  area.innerHTML=isPremium
-    ?`<div class="user-status"><div class="premium-badge-nav">Premium</div><div class="avatar" onclick="showPage('account')" title="Account">${init}</div></div>`
-    :`<div class="user-status"><button class="btn-premium-nav" onclick="showPage('pricing')">Get Premium</button><div class="avatar" onclick="showPage('account')" title="Account">${init}</div></div>`;
-}
-
-function signOut(){
-  if(!confirm('Sign out?')) return;
-  localStorage.removeItem('tvarz_token'); localStorage.removeItem('tvarz_user');
-  currentUser=null; isPremium=false; renderAuth(); buildArchiveGrid();
-}
-
-function restoreSession(){
-  const token=localStorage.getItem('tvarz_token');
-  const user=localStorage.getItem('tvarz_user');
-  if(token&&user){
-    currentUser=JSON.parse(user); isPremium=currentUser.is_premium; renderAuth();
-    fetch(`${API}/auth/me`,{headers:{Authorization:`Bearer ${token}`}}).then(r=>r.json()).then(d=>{
-      if(d.success){ localStorage.setItem('tvarz_token',d.data.token); localStorage.setItem('tvarz_user',JSON.stringify(d.data.user)); currentUser=d.data.user; isPremium=d.data.user.is_premium; renderAuth(); buildArchiveGrid(); }
-    }).catch(()=>{});
-  }
-}
-
-async function startTrial(){
-  if(!currentUser){ openModal(); return; }
-  const token=localStorage.getItem('tvarz_token');
-  try {
-    const res=await fetch(`${API}/user/checkout`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`}});
-    const d=await res.json();
-    if(d.success&&d.data.checkout_url) window.open(d.data.checkout_url,'_blank');
-    else alert('Could not create checkout. Please try again.');
-  } catch(e){ alert('Payment error. Please try again.'); }
-}
-
-function toggleFaq(el){
-  const a=el.nextElementSibling,s=el.querySelector('span');
-  a.classList.toggle('open'); s.textContent=a.classList.contains('open')?'−':'+';
-}
-
-restoreSession();
-loadStream();
-loadArchive();
-(function(){
-  const params = new URLSearchParams(window.location.search);
-  if(params.get('premium') === 'success'){
-    // Clean URL
-    window.history.replaceState({}, '', '/');
-    // Refresh token to get latest premium status
-    const token = localStorage.getItem('tvarz_token');
-    if(token){
-      fetch(`${API}/auth/me`, { headers: { Authorization: `Bearer ${token}` } })
-        .then(r => r.json())
-        .then(d => {
-          if(d.success){
-            localStorage.setItem('tvarz_token', d.data.token);
-            localStorage.setItem('tvarz_user', JSON.stringify(d.data.user));
-            currentUser = d.data.user;
-            isPremium = d.data.user.is_premium;
-            renderAuth();
-            buildArchiveGrid();
-            // Show success message
-            const msg = document.createElement('div');
-            msg.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#2ecc71;color:#fff;font-family:var(--fm);font-size:12px;letter-spacing:0.1em;padding:12px 24px;z-index:999;text-transform:uppercase';
-            msg.textContent = '✓ Premium activated — welcome!';
-            document.body.appendChild(msg);
-            setTimeout(() => msg.remove(), 4000);
-          }
-        }).catch(()=>{});
-    }
-  }
-})();
+  document.getElementById('paymentLink').addEventListener('click', function() {
+    setTimeout(function() {
+      closeModal()
+      document.getElementById('orderForm').style.display = 'none'
+      document.querySelector('.selected-summary').style.display = 'none'
+      document.getElementById('successBox').classList.add('show')
+    }, 1500)
+  })
 </script>
 </body>
 </html>
